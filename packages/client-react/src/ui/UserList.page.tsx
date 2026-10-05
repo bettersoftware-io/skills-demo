@@ -74,7 +74,7 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
   function findRow(name: string): HTMLElement {
     const row = findRows().find(
       (candidate) =>
-        within(candidate).queryByRole("rowheader", { name }) !== null ||
+        within(candidate).queryByRole("rowheader", { name: new RegExp(name) }) !== null ||
         within(candidate).queryByRole("form", { name: `Edit ${name}` }) !== null,
     );
 
