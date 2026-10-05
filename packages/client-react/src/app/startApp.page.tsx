@@ -1,10 +1,14 @@
 import { act } from "react";
 
+import { TESTIDS } from "../ui/testids.ts";
 import { startApp } from "./startApp.tsx";
 
 export interface StartedApp {
   heading: () => string | null;
+  /** How many rows the price list has. */
   rowCount: () => number;
+  /** How many categories and how many users the directory shows. */
+  directoryCounts: () => { categories: number; users: number };
   /** True when nothing is drawn in #root. */
   isBlank: () => boolean;
   stop: () => Promise<void>;
@@ -22,7 +26,8 @@ export async function startAppOnPage(): Promise<StartedApp> {
 
   return {
     heading: (): string | null => document.querySelector("h1")?.textContent ?? null,
-    rowCount: (): number => document.querySelectorAll("tbody tr").length,
+    rowCount: (): number => countMarked(TESTIDS.priceRow),
+    directoryCounts: () => ({ categories: countMarked(TESTIDS.categoryRow), users: countMarked(TESTIDS.userRow) }),
     isBlank: (): boolean => document.getElementById("root")?.childElementCount === 0,
     stop: async (): Promise<void> => {
       await act(async () => {
@@ -35,4 +40,8 @@ export async function startAppOnPage(): Promise<StartedApp> {
 /** Leaves the page as a test found it. */
 export function clearPage(): void {
   document.body.replaceChildren();
+}
+
+function countMarked(testId: string): number {
+  return document.querySelectorAll(`[data-testid="${testId}"]`).length;
 }

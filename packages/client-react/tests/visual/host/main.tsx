@@ -45,7 +45,8 @@ const clock = FakeTimers.install({
   now: NOW,
   toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval", "Date"],
 });
-const harness = createAppHarness();
+// The directory answers at once and from memory, so it is on screen before the frame says it is ready.
+const harness = createAppHarness({ directory: scenario.directory });
 
 function seedPrices(): void {
   deliverAll(harness, scenario?.stalePrices ?? []);
@@ -58,7 +59,14 @@ function seedPrices(): void {
 }
 
 createRoot(container).render(
-  <ViewModelProvider viewModel={createViewModel(selectFromTheStart(harness.app, scenario.selected))}>
+  <ViewModelProvider
+    viewModel={createViewModel(
+      sendUserFromTheStart(
+        askToDeleteFromTheStart(selectFromTheStart(harness.app, scenario.selected), scenario.categoryAskedToDelete),
+        scenario.userSent,
+      ),
+    )}
+  >
     <ScenarioFrame seed={seedPrices}>
       <App />
     </ScenarioFrame>
@@ -89,6 +97,55 @@ function selectFromTheStart(app: Application, symbol: string | undefined): Appli
         const machine = app.machines.createSelection();
 
         machine.intents.select(symbol);
+
+        return machine;
+      },
+    },
+  };
+}
+
+/**
+ * The application, with the row of one category already asked to delete it.
+ * The request goes through the row machine's own intent and the real rules, so
+ * the picture shows the refusal a click would have produced.
+ */
+function askToDeleteFromTheStart(app: Application, categoryId: string | undefined): Application {
+  if (categoryId === undefined) {
+    return app;
+  }
+
+  return {
+    ...app,
+    machines: {
+      ...app.machines,
+      createCategoryRow: (id) => {
+        const machine = app.machines.createCategoryRow(id);
+
+        if (id === categoryId) {
+          machine.intents.remove();
+        }
+
+        return machine;
+      },
+    },
+  };
+}
+
+/** The application, with the form that adds a user already filled in and sent. */
+function sendUserFromTheStart(app: Application, draft: Scenario["userSent"]): Application {
+  if (draft === undefined) {
+    return app;
+  }
+
+  return {
+    ...app,
+    machines: {
+      ...app.machines,
+      createUserForm: () => {
+        const machine = app.machines.createUserForm();
+
+        machine.intents.change(draft);
+        machine.intents.save();
 
         return machine;
       },

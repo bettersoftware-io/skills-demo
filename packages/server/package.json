@@ -9,8 +9,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@hono/node-server": "^2.1.3",
     "@skills-demo/domain": "workspace:*",
     "@skills-demo/shared": "workspace:*",
+    "hono": "^4.13.13",
     "rxjs": "^7.8.2",
     "ws": "^8.21.0"
   },

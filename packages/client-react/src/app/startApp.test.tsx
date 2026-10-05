@@ -1,3 +1,4 @@
+import { SEED_DIRECTORY } from "@skills-demo/domain";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -26,6 +27,17 @@ describe("starting the app", () => {
 
     expect(page.heading()).toBe("Prices");
     expect(page.rowCount()).toBe(1);
+
+    await page.stop();
+  });
+
+  it("draws the users and categories, kept in the browser when there is no API URL", async () => {
+    const page = await startAppOnPage();
+
+    expect(page.directoryCounts()).toEqual({
+      categories: SEED_DIRECTORY.categories.length,
+      users: SEED_DIRECTORY.users.length,
+    });
 
     await page.stop();
   });

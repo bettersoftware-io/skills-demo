@@ -1,4 +1,4 @@
-import type { Price } from "@skills-demo/domain";
+import type { DirectorySnapshot, Price, UserDraft } from "@skills-demo/domain";
 
 /**
  * One picture: a name and the state the screen is in when it is taken. The
@@ -18,6 +18,12 @@ export interface Scenario {
   prices: readonly Price[];
   /** The symbol of the row that is selected. */
   selected?: string;
+  /** The categories and users the directory holds. None, unless the scenario says otherwise. */
+  directory?: DirectorySnapshot;
+  /** The id of a category whose delete has just been asked for. With users in it, its row shows the refusal. */
+  categoryAskedToDelete?: string;
+  /** What has been typed into the form that adds a user, and sent. A draft the rules refuse stays, with the reason. */
+  userSent?: UserDraft;
 }
 
 /** Two symbols that have each moved once: EURUSD up, GBPUSD down. */
@@ -29,6 +35,20 @@ const MOVES: readonly Price[] = [
 ];
 
 const USDJPY: Price = { symbol: "USDJPY", mid: 151.2 };
+
+/** Three categories, one of them empty, and three users. */
+const PEOPLE: DirectorySnapshot = {
+  categories: [
+    { id: "design", name: "Design" },
+    { id: "eng", name: "Engineering" },
+    { id: "support", name: "Support" },
+  ],
+  users: [
+    { id: "ada", name: "Ada Lovelace", email: "ada@example.com", categoryId: "eng" },
+    { id: "dieter", name: "Dieter Rams", email: "dieter@example.com", categoryId: "design" },
+    { id: "grace", name: "Grace Hopper", email: "grace@example.com", categoryId: "eng" },
+  ],
+};
 
 /**
  * Every scenario, keyed by name. The name is the golden's file name
@@ -50,5 +70,19 @@ export const scenarios = {
   "row-stale": {
     stalePrices: [USDJPY],
     prices: MOVES,
+  },
+  "directory-listed": {
+    prices: [],
+    directory: PEOPLE,
+  },
+  "category-delete-refused": {
+    prices: [],
+    directory: PEOPLE,
+    categoryAskedToDelete: "eng",
+  },
+  "user-email-refused": {
+    prices: [],
+    directory: PEOPLE,
+    userSent: { name: "Linus Torvalds", email: "linus.example.com", categoryId: "support" },
   },
 } satisfies Record<string, Scenario>;

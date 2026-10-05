@@ -1,7 +1,7 @@
 import { connect } from "node:net";
 
-import type { Price } from "@skills-demo/domain";
-import { encodePrice, WS_PATH } from "@skills-demo/shared";
+import { createDirectorySimulator, type Price } from "@skills-demo/domain";
+import { API_PATH, encodePrice, parseCategoryList, WS_PATH } from "@skills-demo/shared";
 import { Subject } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
 
@@ -24,6 +24,7 @@ describe("the price server", () => {
     let feeds = 0;
     const server = await startServer({
       port: 0,
+      directory: createDirectorySimulator(),
       prices: {
         prices: () => {
           feeds += 1;
@@ -74,9 +75,58 @@ describe("the price server", () => {
   });
 });
 
+describe("the server's two faces", () => {
+  it("serves the directory API on the port the price feed is on, to a page from any origin", async () => {
+    const prices$ = new Subject<Price>();
+    const server = await startTestServer(prices$);
+    const client = await connectClient(server.port);
+    const message = client.nextMessage();
+
+    const response = await fetch(`http://localhost:${server.port}${API_PATH.categories}`, {
+      headers: { Origin: "http://localhost:5173" },
+    });
+    prices$.next({ symbol: "EURUSD", mid: 1.1 });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    expect(parseCategoryList(await response.json())?.length).toBeGreaterThan(1);
+    expect(await message).toEqual(encodePrice({ symbol: "EURUSD", mid: 1.1 }));
+  });
+
+  it("stops answering once it is closed, though a client has used it", async () => {
+    const server = await startServer({
+      port: 0,
+      prices: { prices: () => new Subject<Price>() },
+      directory: createDirectorySimulator(),
+    });
+    const address = `http://localhost:${server.port}${API_PATH.users}`;
+
+    await fetch(address);
+    await server.close();
+
+    await expect(fetch(address)).rejects.toThrow();
+  });
+
+  it("fails to start on a port that is taken", async () => {
+    const taken = await startTestServer(new Subject<Price>());
+
+    await expect(
+      startServer({
+        port: taken.port,
+        prices: { prices: () => new Subject<Price>() },
+        directory: createDirectorySimulator(),
+      }),
+    ).rejects.toThrow("EADDRINUSE");
+  });
+});
+
 /** A server on a free port, fed by hand and closed when the test ends. */
 async function startTestServer(prices$: Subject<Price>): Promise<RunningServer> {
-  const server = await startServer({ port: 0, prices: { prices: () => prices$ } });
+  const server = await startServer({
+    port: 0,
+    prices: { prices: () => prices$ },
+    directory: createDirectorySimulator(),
+  });
 
   onTestFinished(() => server.close());
 
