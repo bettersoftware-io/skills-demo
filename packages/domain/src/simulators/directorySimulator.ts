@@ -46,17 +46,20 @@ export const SEED_DIRECTORY: DirectorySnapshot = {
 export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTORY): DirectoryPort {
   let categories: Category[] = seed.categories.map((category) => ({ ...category }));
   let users: User[] = seed.users.map((user) => ({ ...user }));
+  // The ids it was seeded with, kept after their entries are deleted. The
+  // counter below never goes back, so with these an id is never given out
+  // twice, and a reference to a deleted entry cannot come to mean a new one.
+  const seeded = new Set([...categories, ...users].map((kept) => kept.id));
   let issued = 0;
 
-  /** An id nothing in the directory has yet. */
+  /** An id nothing in the directory has ever had. */
   function issueId(kind: "category" | "user"): string {
-    const taken = new Set([...categories, ...users].map((kept) => kept.id));
     let id: string;
 
     do {
       issued += 1;
       id = `${kind}-${issued}`;
-    } while (taken.has(id));
+    } while (seeded.has(id));
 
     return id;
   }

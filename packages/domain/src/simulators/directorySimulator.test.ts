@@ -39,6 +39,18 @@ describe("the directory simulator", () => {
     expect(outcome).toEqual({ accepted: true, value: { id: "category-2", name: "Support" } });
   });
 
+  it("never gives a new entry the id of one that was deleted, so an old reference cannot reach it", () => {
+    const directory = createDirectorySimulator({ categories: [{ id: "category-1", name: "Design" }], users: [] });
+    let outcome: Outcome<Category> | undefined;
+
+    directory.removeCategory("category-1").subscribe();
+    directory.addCategory({ name: "Support" }).subscribe((answered) => {
+      outcome = answered;
+    });
+
+    expect(outcome).toEqual({ accepted: true, value: { id: "category-2", name: "Support" } });
+  });
+
   it("keeps its own copy, so a change does not reach the seed it was given", () => {
     const seed = { categories: [{ id: "design", name: "Design" }], users: [] };
     const directory = createDirectorySimulator(seed);
