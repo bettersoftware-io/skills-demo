@@ -34,9 +34,10 @@ export function createFakeDirectoryServer(directory: DirectoryPort, baseUrl: str
   let down = false;
 
   async function route(method: string, path: string, body: unknown): Promise<HttpAnswer> {
-    const [, collection, id] = /^\/api\/(categories|users)(?:\/([^/]+))?$/.exec(path) ?? [];
+    const match = /^\/api\/(categories|users)(?:\/([^/]+)(?:\/(.+))?)?$/.exec(path) ?? [];
+    const [, collection, id, suffix] = match;
     const entry = id === undefined ? undefined : decodeURIComponent(id);
-    const key = `${method} ${collection}${entry === undefined ? "" : "/:id"}`;
+    const key = `${method} ${collection}${entry === undefined ? "" : "/:id"}${suffix === undefined ? "" : `/${suffix}`}`;
 
     switch (key) {
       case "GET categories":
@@ -59,6 +60,8 @@ export function createFakeDirectoryServer(directory: DirectoryPort, baseUrl: str
         return answerOutcome(await firstValueFrom(directory.changeUser(entry!, readUserDraft(body))), 200, encodeUser);
       case "DELETE users/:id":
         return answerOutcome(await firstValueFrom(directory.removeUser(entry!)), 204, encodeNothing);
+      case "PATCH users/:id/active":
+        return answerOutcome(await firstValueFrom(directory.toggleUserActive(entry!)), 200, encodeUser);
       default:
         return answer(404, "404 Not Found");
     }

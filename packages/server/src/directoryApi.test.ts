@@ -157,6 +157,23 @@ describe("the directory API: users", () => {
     expect(response.body).toBeNull();
     expect(parseUserList((await client.get(API_PATH.users)).body)).toEqual([]);
   });
+
+  it("toggles a user active and answers 200 with them", async () => {
+    const client = createClient();
+    const response = await client.patch(locateEntry(API_PATH.users, "ada") + "/active");
+    const toggled = parseUser(response.body);
+
+    expect(response.status).toBe(200);
+    expect(toggled?.active).toBe(false);
+    expect(parseUserList((await client.get(API_PATH.users)).body)).toContainEqual(toggled);
+  });
+
+  it("answers 404 when the user to toggle is not there", async () => {
+    const client = createClient();
+    const response = await client.patch(locateEntry(API_PATH.users, "grace") + "/active");
+
+    expect(response.status).toBe(404);
+  });
 });
 
 describe("the directory API: requests it cannot serve", () => {
@@ -226,6 +243,7 @@ interface Client {
   post: (path: string, body: object | string) => Promise<Answer>;
   put: (path: string, body: object | string) => Promise<Answer>;
   delete: (path: string) => Promise<Answer>;
+  patch: (path: string, body?: object | string) => Promise<Answer>;
 }
 
 /** A client of the API on a directory of its own, with no socket in between. */
@@ -248,5 +266,6 @@ function createClient(directory: DirectoryPort = createDirectorySimulator(SEED))
     post: (path, body) => send("POST", path, body),
     put: (path, body) => send("PUT", path, body),
     delete: (path) => send("DELETE", path),
+    patch: (path, body) => send("PATCH", path, body),
   };
 }

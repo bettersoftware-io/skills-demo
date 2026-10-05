@@ -119,6 +119,19 @@ describe("the application", () => {
 
     row.dispose();
   });
+
+  it("toggles a user's active status through their row", () => {
+    const app = createDirectoryApp();
+    const row = app.machines.createUserRow("ada");
+
+    expect(row.intents.toggleActive).toBeDefined();
+    row.intents.toggleActive?.();
+
+    expect(row.state$.getValue().open).toBe(false);
+    expect(row.state$.getValue().refusal).toBeNull();
+
+    row.dispose();
+  });
 });
 
 const SEED: DirectorySnapshot = {

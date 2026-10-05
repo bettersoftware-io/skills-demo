@@ -269,5 +269,40 @@ export function describeDirectoryPortContract(
         teardown();
       }
     });
+
+    it("toggles a user active and inactive", async () => {
+      const { port, teardown } = createHarness(SEED);
+
+      try {
+        let deactivated = await firstValueFrom(port.toggleUserActive("ada"));
+        expect(deactivated).toEqual({
+          accepted: true,
+          value: { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: false },
+        });
+
+        let reactivated = await firstValueFrom(port.toggleUserActive("ada"));
+        expect(reactivated).toEqual({
+          accepted: true,
+          value: { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
+        });
+
+        expect(await firstValueFrom(port.users())).toEqual(SEED.users);
+      } finally {
+        teardown();
+      }
+    });
+
+    it("refuses to toggle a user that does not exist", async () => {
+      const { port, teardown } = createHarness(SEED);
+
+      try {
+        expect(await firstValueFrom(port.toggleUserActive("linus"))).toMatchObject({
+          accepted: false,
+          refusal: { reason: "not-found", field: null },
+        });
+      } finally {
+        teardown();
+      }
+    });
   });
 }

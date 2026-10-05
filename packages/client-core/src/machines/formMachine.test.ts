@@ -221,6 +221,24 @@ describe("the form of one entry in a list", () => {
 
     machine.dispose();
   });
+
+  it("toggles the active status when the row has a toggleAction", () => {
+    let toggles = 0;
+    const { machine } = createRowForm({
+      toggleAction: () => {
+        toggles += 1;
+        return of(accept(null));
+      },
+    });
+
+    expect(machine.intents.toggleActive).toBeDefined();
+    machine.intents.toggleActive?.();
+
+    expect(toggles).toBe(1);
+    expect(machine.state$.getValue()).toMatchObject({ open: false, refusal: null, busy: false });
+
+    machine.dispose();
+  });
 });
 
 interface Person {
@@ -255,7 +273,7 @@ function createAddForm(answer: Answer = () => of(accept(null))) {
 }
 
 /** The form of an entry called "Design"; `entry` is that entry, for a test to change behind the form's back. */
-function createRowForm({ save = () => of(accept(null)), remove = () => of(accept(null)) }: { save?: Answer; remove?: Answer } = {}) {
+function createRowForm({ save = () => of(accept(null)), remove = () => of(accept(null)), toggleAction }: { save?: Answer; remove?: Answer; toggleAction?: Answer } = {}) {
   const entry = { name: "Design" };
   const saved: { name: string }[] = [];
   let removals = 0;
@@ -271,6 +289,7 @@ function createRowForm({ save = () => of(accept(null)), remove = () => of(accept
 
       return remove();
     },
+    toggleAction: toggleAction !== undefined ? () => toggleAction() : undefined,
   });
 
   return { machine, entry, saved, removals: () => removals };
