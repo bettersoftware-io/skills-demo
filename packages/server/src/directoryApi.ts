@@ -30,7 +30,7 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
 
   // The client is served from another origin (Vite's, in development), and
   // the API has no credentials to protect, so any origin may read it.
-  api.use(`${API_ROOT}/*`, cors({ origin: "*", allowMethods: ["GET", "POST", "PUT", "DELETE"] }));
+  api.use(`${API_ROOT}/*`, cors({ origin: "*", allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH"] }));
 
   api.get(API_PATH.categories, async (context) =>
     context.json((await firstValueFrom(directory.categories())).map(encodeCategory)),
@@ -82,6 +82,15 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
 
   api.delete(`${API_PATH.users}/:id`, async (context) =>
     answerRemoval(context, await firstValueFrom(directory.removeUser(context.req.param("id")))),
+  );
+
+  api.patch(`${API_PATH.users}/:id/active`, async (context) =>
+    answerWithEntry(
+      context,
+      await firstValueFrom(directory.toggleUserActive(context.req.param("id"))),
+      200,
+      encodeUser,
+    ),
   );
 
   api.notFound((context) => answerRefusal(context, NO_SUCH_ADDRESS));

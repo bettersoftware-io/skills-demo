@@ -138,8 +138,8 @@ describe("the directory API: users", () => {
     const response = await client.put(locateEntry(API_PATH.users, "ada"), encodeUserDraft(moved));
 
     expect(response.status).toBe(200);
-    expect(parseUser(response.body)).toEqual({ id: "ada", ...moved });
-    expect(parseUserList((await client.get(API_PATH.users)).body)).toEqual([{ id: "ada", ...moved }]);
+    expect(parseUser(response.body)).toEqual({ id: "ada", ...moved, active: true });
+    expect(parseUserList((await client.get(API_PATH.users)).body)).toEqual([{ id: "ada", ...moved, active: true }]);
   });
 
   it("answers 404 when the user to change or delete is not there", async () => {
@@ -200,7 +200,7 @@ describe("the directory API: requests it cannot serve", () => {
     });
 
     expect(response.headers.get("access-control-allow-origin")).toBe("*");
-    expect(response.headers.get("access-control-allow-methods")).toBe("GET,POST,PUT,DELETE");
+    expect(response.headers.get("access-control-allow-methods")).toBe("GET,POST,PUT,DELETE,PATCH");
   });
 });
 
@@ -210,7 +210,7 @@ const SEED: DirectorySnapshot = {
     { id: "eng", name: "Engineering" },
     { id: "ops", name: "Operations" },
   ],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true }],
 };
 
 const GRACE = { name: "Grace", email: "grace@example.com", categoryId: "ops" };

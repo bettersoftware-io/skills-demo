@@ -17,8 +17,8 @@ const SEED: DirectorySnapshot = {
     { id: "ops", name: "Operations" },
   ],
   users: [
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
   ],
 };
 
@@ -170,7 +170,7 @@ export function describeDirectoryPortContract(
 
         expect(outcome).toEqual({
           accepted: true,
-          value: { id: expect.any(String), name: "Linus", email: "linus@example.com", categoryId: "ops" },
+          value: { id: expect.any(String), name: "Linus", email: "linus@example.com", categoryId: "ops", active: true },
         });
         expect(users).toHaveLength(3);
         expect(users).toContainEqual(outcome.accepted && outcome.value);
@@ -233,9 +233,9 @@ export function describeDirectoryPortContract(
       try {
         expect(await firstValueFrom(port.changeUser("ada", moved))).toEqual({
           accepted: true,
-          value: { id: "ada", ...moved },
+          value: { id: "ada", ...moved, active: true },
         });
-        expect(await firstValueFrom(port.users())).toEqual([{ id: "ada", ...moved }, SEED.users[1]]);
+        expect(await firstValueFrom(port.users())).toEqual([{ id: "ada", ...moved, active: true }, SEED.users[1]]);
       } finally {
         teardown();
       }

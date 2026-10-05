@@ -29,6 +29,8 @@ export interface RowFormIntents<TDraft> extends FormIntents<TDraft> {
   cancel: () => void;
   /** Asks for the entry to be deleted. A refusal stays on the row. */
   remove: () => void;
+  /** Performs a toggle action (e.g., toggle active status). Optional, may not exist for all row types. */
+  toggleActive?: () => void;
 }
 
 export interface AddFormConfig<TDraft> {
@@ -41,6 +43,7 @@ export interface RowFormConfig<TDraft> {
   current: () => TDraft;
   save: (draft: TDraft) => Observable<Outcome<unknown>>;
   remove: () => Observable<Outcome<unknown>>;
+  toggleAction?: () => Observable<Outcome<unknown>>;
 }
 
 export type FormAction<TDraft> =
@@ -90,24 +93,33 @@ export function createRowFormMachine<TDraft>({
   current,
   save,
   remove,
+  toggleAction,
 }: RowFormConfig<TDraft>): Machine<FormState<TDraft>, RowFormIntents<TDraft>> {
   const form = createForm<TDraft>({ open: false, draft: current(), refusal: null, busy: false });
 
+  const intents: RowFormIntents<TDraft> = {
+    change: form.change,
+    save: (): void => {
+      form.send(() => save(form.state$.getValue().draft));
+    },
+    edit: (): void => {
+      form.dispatch({ type: "opened", draft: current() });
+    },
+    cancel: form.settle,
+    remove: (): void => {
+      form.send(remove);
+    },
+  };
+
+  if (toggleAction !== undefined) {
+    intents.toggleActive = (): void => {
+      form.send(toggleAction);
+    };
+  }
+
   return {
     state$: form.state$,
-    intents: {
-      change: form.change,
-      save: (): void => {
-        form.send(() => save(form.state$.getValue().draft));
-      },
-      edit: (): void => {
-        form.dispatch({ type: "opened", draft: current() });
-      },
-      cancel: form.settle,
-      remove: (): void => {
-        form.send(remove);
-      },
-    },
+    intents,
     dispose: form.dispose,
   };
 }

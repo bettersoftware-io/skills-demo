@@ -44,9 +44,9 @@ const PEOPLE: DirectorySnapshot = {
     { id: "support", name: "Support" },
   ],
   users: [
-    { id: "ada", name: "Ada Lovelace", email: "ada@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter Rams", email: "dieter@example.com", categoryId: "design" },
-    { id: "grace", name: "Grace Hopper", email: "grace@example.com", categoryId: "eng" },
+    { id: "ada", name: "Ada Lovelace", email: "ada@example.com", categoryId: "eng", active: true },
+    { id: "dieter", name: "Dieter Rams", email: "dieter@example.com", categoryId: "design", active: true },
+    { id: "grace", name: "Grace Hopper", email: "grace@example.com", categoryId: "eng", active: true },
   ],
 };
 

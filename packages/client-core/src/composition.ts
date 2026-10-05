@@ -71,6 +71,7 @@ export function createApp(ports: AppPorts): App {
           current: () => directory.userDraft(id),
           save: (draft) => directory.changeUser(id, draft),
           remove: () => directory.removeUser(id),
+          toggleAction: () => directory.toggleUserActive(id),
         }),
     },
   };

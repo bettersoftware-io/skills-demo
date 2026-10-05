@@ -146,8 +146,8 @@ const DIRECTORY: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
+    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", active: true },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
   ],
 };

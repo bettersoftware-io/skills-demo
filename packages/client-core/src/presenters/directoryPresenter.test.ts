@@ -14,7 +14,7 @@ describe("the directory presenter: what it shows", () => {
   it("is loading until someone reads it", () => {
     const presenter = createDirectoryPresenter(createDirectorySimulator(SEED));
 
-    expect(presenter.view$.getValue()).toEqual({ status: "loading", categories: [], users: [], shownCategory: null });
+    expect(presenter.view$.getValue()).toEqual({ status: "loading", categories: [], users: [], shownCategory: null, showInactive: true });
   });
 
   it("lists the categories in name order, each with how many users it has", () => {
@@ -32,9 +32,9 @@ describe("the directory presenter: what it shows", () => {
     const { latest } = createPresented();
 
     expect(latest().users).toEqual([
-      { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", categoryName: "Engineering" },
-      { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", categoryName: "Design" },
-      { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", categoryName: "Engineering" },
+      { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", categoryName: "Engineering", active: true },
+      { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", categoryName: "Design", active: true },
+      { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", categoryName: "Engineering", active: true },
     ]);
   });
 
@@ -175,7 +175,7 @@ describe("the directory presenter: a directory that cannot be reached", () => {
   it("says the lists are unavailable, and shows none", () => {
     const { latest } = createPresented(createFlakyDirectory().port);
 
-    expect(latest()).toEqual({ status: "unavailable", categories: [], users: [], shownCategory: null });
+    expect(latest()).toEqual({ status: "unavailable", categories: [], users: [], shownCategory: null, showInactive: true });
   });
 
   it("loads them when asked again, once the directory can be reached", () => {
@@ -208,6 +208,79 @@ describe("the directory presenter: what an edit starts from", () => {
   });
 });
 
+describe("the directory presenter: user deactivation", () => {
+  it("toggles a user's active status and reloads the lists", () => {
+    const { presenter, latest } = createPresented();
+
+    expect(latest().users.map((user) => ({ name: user.name, active: user.active }))).toEqual([
+      { name: "Ada", active: true },
+      { name: "Dieter", active: true },
+      { name: "Grace", active: true },
+    ]);
+
+    presenter.toggleUserActive("grace").subscribe();
+
+    expect(latest().users.map((user) => ({ name: user.name, active: user.active }))).toEqual([
+      { name: "Ada", active: true },
+      { name: "Dieter", active: true },
+      { name: "Grace", active: false },
+    ]);
+  });
+
+  it("keeps inactive users hidden when showInactive is false", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.setShowInactive(false);
+    expect(latest().users.map((user) => user.name)).toEqual(["Ada", "Dieter", "Grace"]);
+
+    presenter.toggleUserActive("grace").subscribe();
+    expect(latest().users.map((user) => user.name)).toEqual(["Ada", "Dieter"]);
+
+    presenter.setShowInactive(true);
+    expect(latest().users.map((user) => user.name)).toEqual(["Ada", "Dieter", "Grace"]);
+  });
+
+  it("shows showInactive as true by default", () => {
+    const { latest } = createPresented();
+
+    expect(latest().showInactive).toBe(true);
+  });
+
+  it("toggles the showInactive state", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.setShowInactive(false);
+    expect(latest().showInactive).toBe(false);
+
+    presenter.setShowInactive(true);
+    expect(latest().showInactive).toBe(true);
+  });
+
+  it("preserves category filter when toggling showInactive", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.showCategory("eng");
+    presenter.toggleUserActive("ada").subscribe();
+    presenter.setShowInactive(false);
+
+    expect(latest().shownCategory).toBe("eng");
+    expect(latest().users.map((user) => user.name)).toEqual(["Grace"]);
+  });
+
+  it("refuses a toggle for a user that no longer exists", () => {
+    const { presenter } = createPresented();
+
+    expect(answerOf(presenter.toggleUserActive("linus"))).toEqual({
+      accepted: false,
+      refusal: {
+        reason: "not-found",
+        field: null,
+        message: "This user no longer exists.",
+      },
+    });
+  });
+});
+
 /** Three categories, one of them empty, and three users. Neither list is in name order. */
 const SEED: DirectorySnapshot = {
   categories: [
@@ -216,9 +289,9 @@ const SEED: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
+    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", active: true },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
   ],
 };
 
@@ -256,6 +329,7 @@ function createPresented(directory: DirectoryPort = createDirectorySimulator(SEE
     addUser: countChange(directory.addUser),
     changeUser: countChange(directory.changeUser),
     removeUser: countChange(directory.removeUser),
+    toggleUserActive: countChange(directory.toggleUserActive),
   });
   let view = presenter.view$.getValue();
 

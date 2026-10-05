@@ -126,7 +126,7 @@ const SEED: DirectorySnapshot = {
     { id: "eng", name: "Engineering" },
     { id: "design", name: "Design" },
   ],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true }],
 };
 
 /** The application on a small directory, with a reader on the directory screen until the test ends. */
