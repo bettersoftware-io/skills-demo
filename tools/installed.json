@@ -1,0 +1,34 @@
+{
+  "kit": {
+    "files": {
+      "tools/arch/README.md": "ac5c1ffeb969bec884eabf36f305f24f5fbf3a49a9001ff90128ea2447e3cbc6",
+      "tools/arch/docs/handler-naming.md": "eb42398985e010ea302ee0bded7de227d334b0339d4d76694a70b7f95983a40f",
+      "tools/arch/docs/review.md": "c0cacc16c37e5060180af1ae48b9a3304279bcd7acd16488fbbff5e00c03d567",
+      "tools/arch/eslint-rules/class-filename-match.mts": "7255b0f1c69417b073465ccbb1546d6de3fe3881069e0df8dca50f07d4b9dbc5",
+      "tools/arch/eslint-rules/component-newspaper.mts": "e828328d38d160006d00fae660084fd2839897d8293487fca1458bdc5998ffd3",
+      "tools/arch/eslint-rules/json-fixtures-in-factories.mts": "6c4ef5b0dcb9c138c933eee98dfb0471a8f1a559c7ba7a70a34ab8c5ad065e30",
+      "tools/arch/eslint-rules/name-fixture-factories.mts": "ea0602adc4debcc4eace886dfd3411ee25ecf0defe7737632dfaf61354d2daa5",
+      "tools/arch/eslint-rules/name-functions-by-effect.mts": "058b3a9d359fb1b6f251e5d06d2bdb40ab5d037a171710c219631d7d425fcca0",
+      "tools/arch/eslint-rules/name-jsx-handlers.mts": "f2c7e5bd2139081579c46d16d4f9c2017c95cdc4394ba4d1df499eafc0269c39",
+      "tools/arch/eslint-rules/newspaper-order.mts": "ef43bc6e8ff64f734f486a2117108bc1f2bd0c9e81eee29358e4688b9b6cb03a",
+      "tools/arch/eslint-rules/no-framework-calls-in-specs.mts": "9947f1dead91ba79e04ea31202d5c8231af83078bfd51675a4bea29b5c9eb328",
+      "tools/arch/eslint-rules/no-minified-json-literal.mts": "fc140d3e07108d7432f66dbc80919c05e1c5a2819a2437d2d7e44f4120e89022",
+      "tools/arch/eslint-rules/no-real-sleeps-in-tests.mts": "8b64014b43d31e3d70f219c1aa12549fcf49df062d0551bd2dbf8da5b07863fe",
+      "tools/arch/eslint-rules/no-render-functions.mts": "8a8fdd17c383f9b3bafb078b6103241dfdf30eea9f9146e4e4d214492cf604e9",
+      "tools/arch/eslint-rules/page-objects-own-their-component.mts": "c149be0134a5839b50718ae4ee3cb4cb751094db376b9c1caf7e89f8c66836a3",
+      "tools/arch/eslint.config.mts": "41bca297bf2f710e6a71f700e2548bdc4d17cddf8bce29ab821e4512767ba236",
+      "tools/arch/gates/lib/config.mts": "cd6945b1ef237293cf7d75e7b800cad4a6d48a23cc170d5eac1cc138e6e4ad62",
+      "tools/arch/gates/lib/contracts.mts": "619c751cd12b601d480128d12e8db64912a4add85124cd2741b0cb785977857e",
+      "tools/arch/gates/lib/depcruise.mts": "908d2a8f26c93c0e3d08ab2042855b32595a675033c9e13e58cb260c722b1dc2",
+      "tools/arch/gates/lib/files.mts": "f42faa8357e25fba4985b96186f4db48d9deae671843a171b3661348590fe999",
+      "tools/arch/gates/lib/language.mts": "f718fdddbc04a1058b78820a98e10fde2fcf1ae6ba338608319e06bfd8bcec32",
+      "tools/arch/gates/lib/structure.mts": "20b86f953eb4e38f0709e7119eb31e821abbe58407dde9519617fcfcedd57538",
+      "tools/arch/gates/lib/ui-bans.mts": "b8aea78943e779a05913db1f0db0840ddfe45979fe8e39c4b7568d859e960357",
+      "tools/arch/gates/run.mts": "f67d0a030e6551d91ee0ed14fbd01c0cad8d2a54d58a47b5bf814378283cc3b1",
+      "tools/arch/hooks/after-edit.mts": "1de0ed2f2bc8d104a09d250bcf8efc3e883d936c0a58ad407e868a0eb4d416ea",
+      "tools/arch/hooks/before-stop.mts": "a21f1217423a0dda4603b57082627a6c5c054f0ec5865ecd8c76c6c90e171ef9",
+      "tools/arch/hooks/claude.settings.json": "926ef8e097f2f4e08ae7ee041775b12220061914014ff14b238de88e73f40b94",
+      "tools/arch/hooks/codex.hooks.json": "5c943c4b46d721992a5be862060d97d42e3c8b81990a8ff40e9d4734edd6bebe"
+    }
+  }
+}
