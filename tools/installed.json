@@ -30,5 +30,23 @@
       "tools/arch/hooks/claude.settings.json": "926ef8e097f2f4e08ae7ee041775b12220061914014ff14b238de88e73f40b94",
       "tools/arch/hooks/codex.hooks.json": "5c943c4b46d721992a5be862060d97d42e3c8b81990a8ff40e9d4734edd6bebe"
     }
+  },
+  "coverage": {
+    "files": {
+      ".github/workflows/coverage.yml": "a705c37c4ad4efc12b91d731fed36b80e6563acdeadd2158d0f6b2eba8a85c17",
+      "tools/.gitignore": "4424513510f3bbbe04155cd812f9a7bb6731a8c06ccb25cd3b20de9512c556eb",
+      "tools/coverage/gaps.mts": "b45754b9397cbd3167b16de9f101f67ab6ed5c60f94d81171111a73f118d3903",
+      "tools/coverage/lib/config.mts": "106bf9ccecb16de01d8f08c7c238c9712c534788826a27460e8c4a7666320d29",
+      "tools/coverage/lib/ignores.mts": "0ee998bfa1dfce2c0b94255bdf7d929163c6225e53621603408c7e45dc8b51c3",
+      "tools/coverage/lib/judge.mts": "b9e0ad8d48ab35e5766199e3061d85ddfb7ef2b95ea115129fda7f66373d3ff3",
+      "tools/coverage/lib/main.mts": "b9510ffce92e72c31b519bffcd5b2d464d723a11e9d2755b065afb91bca5d54c",
+      "tools/coverage/lib/measure.mts": "81b3e2c41f384790dcd09cc0b8845cf4517f3be08b73017f675bc70679a21450",
+      "tools/coverage/lib/report.mts": "de83c9b68d153fdbd25af2b224b42b31f9c6145b3c91ea8db6965caef0a77291",
+      "tools/coverage/lib/site.mts": "855e11fa5388cbe6f9022a79892bf2d14ad01c6fbf0dc1b98609f82117b203cf",
+      "tools/coverage/lib/workspace.mts": "62fd854d59951423f41d6437deffdc61187d180dc62213ac23155fd12e6561fe",
+      "tools/coverage/mutation-check.mts": "39f03006f5050db5c6938fb4c6df7277b0c88050026fb582844494970e3d2bd6",
+      "tools/coverage/publish-to-pages.mts": "005e5a8f60cbb66275b47a5bee7a636a6e848362ae492d86948f05a309ef9383",
+      "tools/coverage/run.mts": "3d9d7f792c2d5759527afacd9cb5a933832e27e5c6b73b3c4ebc085a19cd1eaa"
+    }
   }
 }
