@@ -115,6 +115,8 @@ export function createHttpDirectoryPort(
       change("PUT", locateEntry(API_PATH.users, id), encodeUserDraft(draft), parseUser),
     removeUser: (id: string): Observable<Outcome<null>> =>
       change("DELETE", locateEntry(API_PATH.users, id), undefined, parseNothing),
+    toggleUserActive: (id: string): Observable<Outcome<User>> =>
+      change("PATCH", `${locateEntry(API_PATH.users, id)}/active`, undefined, parseUser),
   };
 }
 

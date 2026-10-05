@@ -41,6 +41,14 @@ export interface UserListPage {
   refusalCount: () => number;
   /** Someone else deletes the user of this id; the screen is not told. */
   removeBehindTheScreen: (id: string) => void;
+  /** Whether the "Show inactive users" checkbox is checked. */
+  showsInactive: () => boolean;
+  /** Toggles the "Show inactive users" checkbox. */
+  toggleShowInactive: () => Promise<void>;
+  /** Toggles a user's active status. */
+  toggleActive: (name: string) => Promise<void>;
+  /** The active status of a user. */
+  isActive: (name: string) => boolean;
 }
 
 /**
@@ -153,6 +161,31 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
       act(() => {
         harness.directory.removeUser(id).subscribe();
       });
+    },
+    showsInactive: (): boolean => {
+      const checkbox = rendered.getByRole("checkbox", { name: "Show inactive users" });
+      return (checkbox as HTMLInputElement).checked;
+    },
+    toggleShowInactive: async (): Promise<void> => {
+      await user.click(rendered.getByRole("checkbox", { name: "Show inactive users" }));
+    },
+    toggleActive: async (name): Promise<void> => {
+      const button = within(findRow(name)).getByRole("button", {
+        name: (accessible) => accessible.includes(name) && (accessible.includes("Deactivate") || accessible.includes("Reactivate")),
+      });
+      await user.click(button);
+    },
+    isActive: (name): boolean => {
+      const rows = findRows();
+      const row = rows.find(
+        (candidate) =>
+          within(candidate).queryByRole("rowheader", { name: new RegExp(name) }) !== null,
+      );
+      if (!row) {
+        throw new Error(`no row for the user ${name}`);
+      }
+      const header = within(row).getByRole("rowheader");
+      return !(header.textContent?.includes("Inactive") ?? false);
     },
   };
 }

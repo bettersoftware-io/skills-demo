@@ -40,6 +40,7 @@ export interface UserRow {
   email: string;
   categoryId: string;
   categoryName: string;
+  active: boolean;
 }
 
 /** The directory screen: nothing is left for the UI to work out. */
@@ -52,6 +53,8 @@ export interface DirectoryView {
   users: UserRow[];
   /** The category the user list is narrowed to, or null for every user. */
   shownCategory: string | null;
+  /** Whether to show inactive users in the list. */
+  showInactive: boolean;
 }
 
 export interface DirectoryPresenter {
@@ -61,6 +64,8 @@ export interface DirectoryPresenter {
   showCategory: (id: string | null) => void;
   /** Loads the lists again, for when they could not be loaded. */
   reload: () => void;
+  /** Toggles whether to show inactive users. */
+  toggleShowInactive: () => void;
   /**
    * The changes. Each does nothing until subscribed, answers once, and brings
    * the lists up to date when it was accepted. A draft that is wrong on its
@@ -72,6 +77,7 @@ export interface DirectoryPresenter {
   addUser: (draft: UserDraft) => Observable<Outcome<User>>;
   changeUser: (id: string, draft: UserDraft) => Observable<Outcome<User>>;
   removeUser: (id: string) => Observable<Outcome<null>>;
+  toggleUserActive: (id: string) => Observable<Outcome<User>>;
   /** What an edit of this entry starts from: its values as they are now on screen. */
   categoryDraft: (id: string) => CategoryDraft;
   userDraft: (id: string) => UserDraft;
@@ -83,11 +89,12 @@ export const BLANK_USER: UserDraft = { name: "", email: "", categoryId: "" };
 
 type Loaded = { reached: true; categories: Category[]; users: User[] } | { reached: false };
 
-const LOADING: DirectoryView = { status: "loading", categories: [], users: [], shownCategory: null };
+const LOADING: DirectoryView = { status: "loading", categories: [], users: [], shownCategory: null, showInactive: true };
 
 export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresenter {
   const reload$ = new Subject<void>();
   const shown$ = new BehaviorSubject<string | null>(null);
+  const showInactive$ = new BehaviorSubject<boolean>(true);
 
   const loaded$ = reload$.pipe(
     startWith(undefined),
@@ -101,7 +108,7 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
   );
 
   const view$ = state(
-    combineLatest([loaded$, shown$]).pipe(map(([loaded, shown]) => present(loaded, shown))),
+    combineLatest([loaded$, shown$, showInactive$]).pipe(map(([loaded, shown, showInactive]) => present(loaded, shown, showInactive))),
     LOADING,
   );
 
@@ -128,12 +135,16 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
     reload: (): void => {
       reload$.next();
     },
+    toggleShowInactive: (): void => {
+      showInactive$.next(!showInactive$.getValue());
+    },
     addCategory: (draft) => perform(checkCategoryDraft(draft), () => port.addCategory(draft)),
     renameCategory: (id, draft) => perform(checkCategoryDraft(draft), () => port.renameCategory(id, draft)),
     removeCategory: (id) => perform(null, () => port.removeCategory(id)),
     addUser: (draft) => perform(checkUserDraft(draft), () => port.addUser(draft)),
     changeUser: (id, draft) => perform(checkUserDraft(draft), () => port.changeUser(id, draft)),
     removeUser: (id) => perform(null, () => port.removeUser(id)),
+    toggleUserActive: (id) => perform(null, () => port.toggleUserActive(id)),
     categoryDraft: (id): CategoryDraft => {
       const row = view$.getValue().categories.find((category) => category.id === id);
 
@@ -147,7 +158,7 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
   };
 }
 
-function present(loaded: Loaded, shown: string | null): DirectoryView {
+function present(loaded: Loaded, shown: string | null, showInactive: boolean): DirectoryView {
   if (!loaded.reached) {
     return { ...LOADING, status: "unavailable" };
   }
@@ -167,9 +178,11 @@ function present(loaded: Loaded, shown: string | null): DirectoryView {
       .sort(byName),
     users: users
       .filter((user) => shownCategory === null || user.categoryId === shownCategory)
+      .filter((user) => showInactive || user.active)
       .map((user) => ({ ...user, categoryName: nameOf.get(user.categoryId) ?? "" }))
       .sort(byName),
     shownCategory,
+    showInactive,
   };
 }
 

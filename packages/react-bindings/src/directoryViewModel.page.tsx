@@ -31,7 +31,7 @@ const SEED = {
     { id: "design", name: "Design" },
     { id: "eng", name: "Engineering" },
   ],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true }],
 };
 
 /**

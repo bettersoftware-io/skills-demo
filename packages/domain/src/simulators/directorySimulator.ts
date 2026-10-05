@@ -29,9 +29,9 @@ export const SEED_DIRECTORY: DirectorySnapshot = {
     { id: "category-3", name: "Support" },
   ],
   users: [
-    { id: "user-1", name: "Ada Lovelace", email: "ada@example.com", categoryId: "category-1" },
-    { id: "user-2", name: "Grace Hopper", email: "grace@example.com", categoryId: "category-1" },
-    { id: "user-3", name: "Dieter Rams", email: "dieter@example.com", categoryId: "category-2" },
+    { id: "user-1", name: "Ada Lovelace", email: "ada@example.com", categoryId: "category-1", active: true },
+    { id: "user-2", name: "Grace Hopper", email: "grace@example.com", categoryId: "category-1", active: true },
+    { id: "user-3", name: "Dieter Rams", email: "dieter@example.com", categoryId: "category-2", active: true },
   ],
 };
 
@@ -124,7 +124,7 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
       return refuse(refusal);
     }
 
-    const user = { id: issueId("user"), ...tidyUserDraft(draft) };
+    const user = { id: issueId("user"), ...tidyUserDraft(draft), active: true };
 
     users = [...users, user];
 
@@ -132,13 +132,15 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
   }
 
   function changeUser(id: string, draft: UserDraft): Outcome<User> {
-    if (!users.some((user) => user.id === id)) {
+    const user = users.find((u) => u.id === id);
+
+    if (user === undefined) {
       return refuse(USER_NOT_FOUND);
     }
 
     const refusal = judgeUserDraft(
       draft,
-      users.filter((user) => user.id !== id),
+      users.filter((u) => u.id !== id),
       categories,
     );
 
@@ -146,9 +148,9 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
       return refuse(refusal);
     }
 
-    const changed = { id, ...tidyUserDraft(draft) };
+    const changed = { id, ...tidyUserDraft(draft), active: user.active };
 
-    users = users.map((user) => (user.id === id ? changed : user));
+    users = users.map((u) => (u.id === id ? changed : u));
 
     return accept(changed);
   }
@@ -163,6 +165,20 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
     return accept(null);
   }
 
+  function toggleUserActive(id: string): Outcome<User> {
+    const user = users.find((user) => user.id === id);
+
+    if (user === undefined) {
+      return refuse(USER_NOT_FOUND);
+    }
+
+    const toggled = { ...user, active: !user.active };
+
+    users = users.map((u) => (u.id === id ? toggled : u));
+
+    return accept(toggled);
+  }
+
   return {
     categories: (): Observable<Category[]> => defer(() => of(categories.map((category) => ({ ...category })))),
     users: (): Observable<User[]> => defer(() => of(users.map((user) => ({ ...user })))),
@@ -172,5 +188,6 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
     addUser: (draft): Observable<Outcome<User>> => defer(() => of(addUser(draft))),
     changeUser: (id, draft): Observable<Outcome<User>> => defer(() => of(changeUser(id, draft))),
     removeUser: (id): Observable<Outcome<null>> => defer(() => of(removeUser(id))),
+    toggleUserActive: (id): Observable<Outcome<User>> => defer(() => of(toggleUserActive(id))),
   };
 }

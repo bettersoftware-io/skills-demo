@@ -34,6 +34,14 @@ export function createFakeDirectoryServer(directory: DirectoryPort, baseUrl: str
   let down = false;
 
   async function route(method: string, path: string, body: unknown): Promise<HttpAnswer> {
+    const activeMatch = /^\/api\/users\/([^/]+)\/active$/.exec(path);
+    if (activeMatch) {
+      const id = decodeURIComponent(activeMatch[1]);
+      if (method === "PATCH") {
+        return answerOutcome(await firstValueFrom(directory.toggleUserActive(id)), 200, encodeUser);
+      }
+    }
+
     const [, collection, id] = /^\/api\/(categories|users)(?:\/([^/]+))?$/.exec(path) ?? [];
     const entry = id === undefined ? undefined : decodeURIComponent(id);
     const key = `${method} ${collection}${entry === undefined ? "" : "/:id"}`;

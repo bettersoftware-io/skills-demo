@@ -72,7 +72,7 @@ describe("a user draft", () => {
   });
 
   it("cannot take the email address of another user, whatever the case", () => {
-    const others: User[] = [{ id: "ada", ...ADA }];
+    const others: User[] = [{ id: "ada", ...ADA, active: true }];
 
     expect(judgeUserDraft({ ...ADA, name: "Other", email: " ADA@EXAMPLE.COM " }, others, CATEGORIES)?.reason).toBe(
       "duplicate-email",
@@ -80,7 +80,7 @@ describe("a user draft", () => {
   });
 
   it("is told about its own flaws before it is compared with the others", () => {
-    const others: User[] = [{ id: "ada", ...ADA }];
+    const others: User[] = [{ id: "ada", ...ADA, active: true }];
 
     expect(judgeUserDraft({ ...ADA, name: "" }, others, CATEGORIES)?.reason).toBe("empty-name");
   });
@@ -92,11 +92,11 @@ describe("a user draft", () => {
 
 describe("deleting a category", () => {
   it("is allowed when no user is in it", () => {
-    expect(judgeCategoryRemoval(DESIGN, [{ id: "ada", ...ADA, categoryId: "support" }])).toBeNull();
+    expect(judgeCategoryRemoval(DESIGN, [{ id: "ada", ...ADA, categoryId: "support", active: true }])).toBeNull();
   });
 
   it("is refused while one user is in it, counted in the singular", () => {
-    expect(judgeCategoryRemoval(DESIGN, [{ id: "ada", ...ADA }])).toEqual({
+    expect(judgeCategoryRemoval(DESIGN, [{ id: "ada", ...ADA, active: true }])).toEqual({
       reason: "category-in-use",
       field: null,
       message: '"Design" still has 1 user. Move or delete them first.',
@@ -105,8 +105,8 @@ describe("deleting a category", () => {
 
   it("is refused while several users are in it, counted in the plural", () => {
     const members: User[] = [
-      { id: "ada", ...ADA },
-      { id: "grace", ...ADA, email: "grace@example.com" },
+      { id: "ada", ...ADA, active: true },
+      { id: "grace", ...ADA, email: "grace@example.com", active: true },
     ];
 
     expect(judgeCategoryRemoval(DESIGN, members)?.message).toBe(

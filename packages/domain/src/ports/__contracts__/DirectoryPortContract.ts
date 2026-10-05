@@ -17,8 +17,8 @@ const SEED: DirectorySnapshot = {
     { id: "ops", name: "Operations" },
   ],
   users: [
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
   ],
 };
 
@@ -170,7 +170,7 @@ export function describeDirectoryPortContract(
 
         expect(outcome).toEqual({
           accepted: true,
-          value: { id: expect.any(String), name: "Linus", email: "linus@example.com", categoryId: "ops" },
+          value: { id: expect.any(String), name: "Linus", email: "linus@example.com", categoryId: "ops", active: true },
         });
         expect(users).toHaveLength(3);
         expect(users).toContainEqual(outcome.accepted && outcome.value);
@@ -233,9 +233,9 @@ export function describeDirectoryPortContract(
       try {
         expect(await firstValueFrom(port.changeUser("ada", moved))).toEqual({
           accepted: true,
-          value: { id: "ada", ...moved },
+          value: { id: "ada", ...moved, active: true },
         });
-        expect(await firstValueFrom(port.users())).toEqual([{ id: "ada", ...moved }, SEED.users[1]]);
+        expect(await firstValueFrom(port.users())).toEqual([{ id: "ada", ...moved, active: true }, SEED.users[1]]);
       } finally {
         teardown();
       }
@@ -265,6 +265,36 @@ export function describeDirectoryPortContract(
           await firstValueFrom(port.changeUser("linus", { name: "Linus", email: "l@example.com", categoryId: "ops" })),
         ).toMatchObject(gone);
         expect(await firstValueFrom(port.removeUser("linus"))).toMatchObject(gone);
+      } finally {
+        teardown();
+      }
+    });
+
+    it("toggles a user's active status", async () => {
+      const { port, teardown } = createHarness(SEED);
+
+      try {
+        const toggled = await firstValueFrom(port.toggleUserActive("ada"));
+        expect(toggled).toEqual({ accepted: true, value: { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: false } });
+
+        const toggedBack = await firstValueFrom(port.toggleUserActive("ada"));
+        expect(toggedBack).toEqual({ accepted: true, value: { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true } });
+
+        const users = await firstValueFrom(port.users());
+        expect(users.find((u) => u.id === "ada")?.active).toBe(true);
+      } finally {
+        teardown();
+      }
+    });
+
+    it("refuses to toggle the active status of a user that does not exist", async () => {
+      const { port, teardown } = createHarness(SEED);
+
+      try {
+        expect(await firstValueFrom(port.toggleUserActive("linus"))).toMatchObject({
+          accepted: false,
+          refusal: { reason: "not-found", field: null },
+        });
       } finally {
         teardown();
       }
