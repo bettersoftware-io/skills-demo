@@ -18,6 +18,10 @@ export interface DirectoryScreen extends DirectoryView {
   /** Narrows the user list to one category, or widens it again with null. */
   showCategory: (id: string | null) => void;
   reload: () => void;
+  /** Toggles whether to show inactive users. */
+  toggleShowInactive: () => void;
+  /** Toggles a user's active status. */
+  toggleUserActive: (id: string) => any;
 }
 
 /**
@@ -49,6 +53,8 @@ export function createViewModel(app: App): ViewModel {
       ...useStateObservable(directory.view$),
       showCategory: directory.showCategory,
       reload: directory.reload,
+      toggleShowInactive: directory.toggleShowInactive,
+      toggleUserActive: directory.toggleUserActive,
     }),
     useCategoryForm: (): ViewOf<CategoryFormMachine> => useMachine(app.machines.createCategoryForm),
     useCategoryRow: (id: string): ViewOf<CategoryRowMachine> => useMachine(() => app.machines.createCategoryRow(id)),

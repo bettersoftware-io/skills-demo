@@ -137,6 +137,48 @@ describe("the user list", () => {
 
     expect(page.refusalOn("Dieter")).toBe("This user no longer exists.");
   });
+
+  it("shows the 'Show inactive users' checkbox, checked by default", () => {
+    const page = mountUserList(DIRECTORY);
+
+    expect(page.showsInactive()).toBe(true);
+  });
+
+  it("deactivates and reactivates a user", async () => {
+    const page = mountUserList(DIRECTORY);
+
+    expect(page.isActive("Ada")).toBe(true);
+
+    await page.toggleActive("Ada");
+    expect(page.isActive("Ada")).toBe(false);
+    expect(page.rows()).toContain("Ada — Inactive, ada@example.com, Engineering");
+
+    await page.toggleActive("Ada");
+    expect(page.isActive("Ada")).toBe(true);
+    expect(page.rows()).toContain("Ada, ada@example.com, Engineering");
+  });
+
+  it("hides inactive users when the checkbox is off", async () => {
+    const page = mountUserList(DIRECTORY);
+
+    await page.toggleActive("Ada");
+    expect(page.rows()).toHaveLength(3);
+
+    await page.toggleShowInactive();
+    expect(page.showsInactive()).toBe(false);
+    expect(page.rows()).toEqual(["Dieter, dieter@example.com, Design", "Grace, grace@example.com, Engineering"]);
+
+    await page.toggleShowInactive();
+    expect(page.showsInactive()).toBe(true);
+    expect(page.rows()).toHaveLength(3);
+  });
+
+  it("greyed out inactive users even when shown", async () => {
+    const page = mountUserList(DIRECTORY);
+
+    await page.toggleActive("Ada");
+    expect(page.rows()).toContain("Ada — Inactive, ada@example.com, Engineering");
+  });
 });
 
 const DIRECTORY: DirectorySnapshot = {
@@ -146,8 +188,8 @@ const DIRECTORY: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
+    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", active: true },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
   ],
 };

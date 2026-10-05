@@ -18,9 +18,21 @@ export function UserList(): ReactElement {
     directory.showCategory(event.target.value === "" ? null : event.target.value);
   }
 
+  function toggleShowInactive(): void {
+    directory.toggleShowInactive();
+  }
+
   return (
     <section data-testid={TESTIDS.userList}>
       <h2>Users</h2>
+      <label>
+        <input
+          type="checkbox"
+          checked={directory.showInactive}
+          onChange={toggleShowInactive}
+        />
+        Show inactive users
+      </label>
       <label>
         Show
         <select value={directory.shownCategory ?? ""} onChange={showCategory}>
@@ -43,7 +55,7 @@ export function UserList(): ReactElement {
         </thead>
         <tbody>
           {directory.users.map((user) => (
-            <UserItem key={user.id} user={user} categories={directory.categories} />
+            <UserItem key={user.id} user={user} categories={directory.categories} toggleActive={directory.toggleUserActive} />
           ))}
         </tbody>
       </table>
@@ -55,14 +67,19 @@ export function UserList(): ReactElement {
 interface UserItemProps {
   user: UserRow;
   categories: CategoryRow[];
+  toggleActive: (id: string) => any;
 }
 
-function UserItem({ user, categories }: UserItemProps): ReactElement {
+function UserItem({ user, categories, toggleActive }: UserItemProps): ReactElement {
   const form = useViewModel().useUserRow(user.id);
 
   function saveUser(event: FormEvent): void {
     event.preventDefault();
     form.save();
+  }
+
+  function toggleActiveUser(): void {
+    toggleActive(user.id).subscribe();
   }
 
   if (form.state.open) {
@@ -90,13 +107,19 @@ function UserItem({ user, categories }: UserItemProps): ReactElement {
   }
 
   return (
-    <tr data-testid={TESTIDS.userRow}>
-      <th scope="row">{user.name}</th>
+    <tr data-testid={TESTIDS.userRow} style={user.active ? {} : { opacity: 0.6 }}>
+      <th scope="row">
+        {user.name}
+        {!user.active && <span> — Inactive</span>}
+      </th>
       <td>{user.email}</td>
       <td>{user.categoryName}</td>
       <td>
         <button type="button" aria-label={`Edit ${user.name}`} onClick={form.edit}>
           Edit
+        </button>
+        <button type="button" aria-label={user.active ? `Deactivate ${user.name}` : `Reactivate ${user.name}`} disabled={form.state.busy} onClick={toggleActiveUser}>
+          {user.active ? "Deactivate" : "Reactivate"}
         </button>
         <button type="button" aria-label={`Delete ${user.name}`} disabled={form.state.busy} onClick={form.remove}>
           Delete

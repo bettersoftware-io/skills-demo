@@ -14,7 +14,7 @@ describe("the directory presenter: what it shows", () => {
   it("is loading until someone reads it", () => {
     const presenter = createDirectoryPresenter(createDirectorySimulator(SEED));
 
-    expect(presenter.view$.getValue()).toEqual({ status: "loading", categories: [], users: [], shownCategory: null });
+    expect(presenter.view$.getValue()).toEqual({ status: "loading", categories: [], users: [], shownCategory: null, showInactive: true });
   });
 
   it("lists the categories in name order, each with how many users it has", () => {
@@ -32,9 +32,9 @@ describe("the directory presenter: what it shows", () => {
     const { latest } = createPresented();
 
     expect(latest().users).toEqual([
-      { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", categoryName: "Engineering" },
-      { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", categoryName: "Design" },
-      { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", categoryName: "Engineering" },
+      { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", categoryName: "Engineering", active: true },
+      { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", categoryName: "Design", active: true },
+      { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", categoryName: "Engineering", active: true },
     ]);
   });
 
@@ -175,7 +175,7 @@ describe("the directory presenter: a directory that cannot be reached", () => {
   it("says the lists are unavailable, and shows none", () => {
     const { latest } = createPresented(createFlakyDirectory().port);
 
-    expect(latest()).toEqual({ status: "unavailable", categories: [], users: [], shownCategory: null });
+    expect(latest()).toEqual({ status: "unavailable", categories: [], users: [], shownCategory: null, showInactive: true });
   });
 
   it("loads them when asked again, once the directory can be reached", () => {
@@ -208,6 +208,81 @@ describe("the directory presenter: what an edit starts from", () => {
   });
 });
 
+describe("the directory presenter: inactive users", () => {
+  it("starts showing inactive users", () => {
+    const { latest } = createPresented();
+
+    expect(latest().showInactive).toBe(true);
+  });
+
+  it("toggles whether to show inactive users", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.toggleShowInactive();
+    expect(latest().showInactive).toBe(false);
+
+    presenter.toggleShowInactive();
+    expect(latest().showInactive).toBe(true);
+  });
+
+  it("hides inactive users when showInactive is false", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.toggleUserActive("ada").subscribe();
+    expect(latest().users).toHaveLength(3);
+
+    presenter.toggleShowInactive();
+    expect(latest().users).toHaveLength(2);
+    expect(latest().users.map((u) => u.name)).toEqual(["Dieter", "Grace"]);
+  });
+
+  it("shows inactive users again when toggled back on", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.toggleUserActive("ada").subscribe();
+    presenter.toggleShowInactive();
+    expect(latest().users).toHaveLength(2);
+
+    presenter.toggleShowInactive();
+    expect(latest().users).toHaveLength(3);
+    expect(latest().users.map((u) => u.name)).toEqual(["Ada", "Dieter", "Grace"]);
+  });
+
+  it("toggles a user's active status", () => {
+    const { presenter, latest } = createPresented();
+
+    const adaBefore = latest().users.find((u) => u.id === "ada");
+    expect(adaBefore?.active).toBe(true);
+
+    presenter.toggleUserActive("ada").subscribe();
+
+    const adaAfter = latest().users.find((u) => u.id === "ada");
+    expect(adaAfter?.active).toBe(false);
+  });
+
+  it("brings the lists up to date after toggling user active", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.toggleUserActive("ada").subscribe();
+    presenter.reload();
+
+    const users = latest().users;
+    expect(users.find((u) => u.id === "ada")?.active).toBe(false);
+  });
+
+  it("counts users correctly in categories regardless of active status", () => {
+    const { presenter, latest } = createPresented();
+
+    presenter.toggleUserActive("ada").subscribe();
+
+    expect(latest().categories).toEqual([
+      { id: "design", name: "Design", userCount: 1 },
+      { id: "eng", name: "Engineering", userCount: 2 },
+      { id: "ops", name: "Operations", userCount: 0 },
+    ]);
+  });
+});
+
 /** Three categories, one of them empty, and three users. Neither list is in name order. */
 const SEED: DirectorySnapshot = {
   categories: [
@@ -216,9 +291,9 @@ const SEED: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
+    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", active: true },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
   ],
 };
 
@@ -256,6 +331,7 @@ function createPresented(directory: DirectoryPort = createDirectorySimulator(SEE
     addUser: countChange(directory.addUser),
     changeUser: countChange(directory.changeUser),
     removeUser: countChange(directory.removeUser),
+    toggleUserActive: countChange(directory.toggleUserActive),
   });
   let view = presenter.view$.getValue();
 
@@ -280,6 +356,8 @@ function createFlakyDirectory(): FlakyDirectory {
     port: {
       ...directory,
       users: () => (reachable ? directory.users() : throwError(() => new Error("the directory cannot be reached"))),
+      toggleUserActive: (id: string) =>
+        reachable ? directory.toggleUserActive(id) : throwError(() => new Error("the directory cannot be reached")),
     },
     recover: (): void => {
       reachable = true;

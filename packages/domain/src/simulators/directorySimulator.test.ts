@@ -59,4 +59,57 @@ describe("the directory simulator", () => {
 
     expect(seed.categories).toEqual([{ id: "design", name: "Design" }]);
   });
+
+  it("toggles a user's active status", () => {
+    const directory = createDirectorySimulator({
+      categories: [],
+      users: [{ id: "user-1", name: "Ada", email: "ada@example.com", categoryId: "cat-1", active: true }],
+    });
+    let user = { id: "", name: "", email: "", categoryId: "", active: false };
+
+    directory.toggleUserActive("user-1").subscribe((outcome) => {
+      if (outcome.accepted) {
+        user = outcome.value;
+      }
+    });
+
+    expect(user.active).toBe(false);
+
+    directory.toggleUserActive("user-1").subscribe((outcome) => {
+      if (outcome.accepted) {
+        user = outcome.value;
+      }
+    });
+
+    expect(user.active).toBe(true);
+  });
+
+  it("refuses to toggle the active status of a user that does not exist", () => {
+    const directory = createDirectorySimulator({ categories: [], users: [] });
+    let outcome: Outcome<any> | undefined;
+
+    directory.toggleUserActive("user-999").subscribe((result) => {
+      outcome = result;
+    });
+
+    expect(outcome?.accepted).toBe(false);
+    if (outcome && !outcome.accepted) {
+      expect(outcome.refusal.reason).toBe("not-found");
+    }
+  });
+
+  it("updates the user list after toggling active status", () => {
+    const directory = createDirectorySimulator({
+      categories: [],
+      users: [{ id: "user-1", name: "Ada", email: "ada@example.com", categoryId: "cat-1", active: true }],
+    });
+    let users = [{ id: "", name: "", email: "", categoryId: "", active: false }];
+
+    directory.toggleUserActive("user-1").subscribe();
+    directory.users().subscribe((listed) => {
+      users = listed;
+    });
+
+    expect(users[0].active).toBe(false);
+  });
 });

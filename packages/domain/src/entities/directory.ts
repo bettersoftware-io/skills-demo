@@ -9,13 +9,14 @@ export interface User {
   name: string;
   email: string;
   categoryId: string;
+  active: boolean;
 }
 
 /** What a person fills in to add or rename a category. */
 export type CategoryDraft = Omit<Category, "id">;
 
 /** What a person fills in to add or edit a user. */
-export type UserDraft = Omit<User, "id">;
+export type UserDraft = Omit<User, "id" | "active">;
 
 /** Every category and every user, as they are at one moment. */
 export interface DirectorySnapshot {

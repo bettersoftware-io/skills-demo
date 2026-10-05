@@ -20,6 +20,7 @@ import {
 //   POST   /api/users             201 UserDto             body: UserDraftDto
 //   PUT    /api/users/:id         200 UserDto             body: UserDraftDto
 //   DELETE /api/users/:id         204
+//   PATCH  /api/users/:id/active  200 UserDto
 //
 // A refused change answers with the status in REFUSAL_STATUS and an ErrorBody.
 
@@ -60,6 +61,7 @@ export interface UserDto {
   name: string;
   email: string;
   categoryId: string;
+  active: boolean;
 }
 
 export interface CategoryDraftDto {
@@ -88,7 +90,7 @@ export function encodeCategory(category: Category): CategoryDto {
 }
 
 export function encodeUser(user: User): UserDto {
-  return { id: user.id, name: user.name, email: user.email, categoryId: user.categoryId };
+  return { id: user.id, name: user.name, email: user.email, categoryId: user.categoryId, active: user.active };
 }
 
 export function encodeCategoryDraft(draft: CategoryDraft): CategoryDraftDto {
@@ -116,13 +118,14 @@ export function parseUser(raw: unknown): User | undefined {
     return undefined;
   }
 
-  const { id, name, email, categoryId } = raw;
+  const { id, name, email, categoryId, active } = raw;
 
   return typeof id === "string" &&
     typeof name === "string" &&
     typeof email === "string" &&
-    typeof categoryId === "string"
-    ? { id, name, email, categoryId }
+    typeof categoryId === "string" &&
+    typeof active === "boolean"
+    ? { id, name, email, categoryId, active }
     : undefined;
 }
 
