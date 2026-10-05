@@ -1,8 +1,8 @@
 {
-  "commit": "96a52fc0bf9cb5aef191ff688f4fb99593ff1ac0",
+  "commit": "761ac0b24edf1d0e24400ed4bda83f0e6d0a3004",
   "uncommittedChanges": false,
   "ref": "main",
-  "builtAt": "2026-10-05T07:16:41.531Z",
+  "builtAt": "2026-10-05T09:58:34.629Z",
   "thresholds": {
     "lines": 95,
     "statements": 95,
@@ -23,8 +23,8 @@
     {
       "directory": "packages/client-core",
       "verdict": "PASS",
-      "reason": "5 files at or above the bar",
-      "measuredFiles": 5,
+      "reason": "8 files at or above the bar",
+      "measuredFiles": 8,
       "emptyFiles": 2,
       "underTheBar": [],
       "unexplainedIgnores": [],
@@ -33,8 +33,8 @@
     {
       "directory": "packages/client-react",
       "verdict": "PASS",
-      "reason": "5 files at or above the bar",
-      "measuredFiles": 5,
+      "reason": "10 files at or above the bar",
+      "measuredFiles": 10,
       "emptyFiles": 0,
       "underTheBar": [],
       "unexplainedIgnores": [],
@@ -43,9 +43,9 @@
     {
       "directory": "packages/domain",
       "verdict": "PASS",
-      "reason": "2 files at or above the bar",
-      "measuredFiles": 2,
-      "emptyFiles": 3,
+      "reason": "5 files at or above the bar",
+      "measuredFiles": 5,
+      "emptyFiles": 4,
       "underTheBar": [],
       "unexplainedIgnores": [],
       "failedTests": []
@@ -63,8 +63,8 @@
     {
       "directory": "packages/server",
       "verdict": "PASS",
-      "reason": "1 file at or above the bar",
-      "measuredFiles": 1,
+      "reason": "2 files at or above the bar",
+      "measuredFiles": 2,
       "emptyFiles": 0,
       "underTheBar": [],
       "unexplainedIgnores": [],
@@ -73,8 +73,8 @@
     {
       "directory": "packages/shared",
       "verdict": "PASS",
-      "reason": "1 file at or above the bar",
-      "measuredFiles": 1,
+      "reason": "2 files at or above the bar",
+      "measuredFiles": 2,
       "emptyFiles": 1,
       "underTheBar": [],
       "unexplainedIgnores": [],

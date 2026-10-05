@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/entities/price.ts</title>
+    <title>Code coverage report for src/ports/directoryPort.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,7 +19,7 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/entities</a> price.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/ports</a> directoryPort.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
@@ -75,7 +75,18 @@
 <a name='L10'></a><a href='#L10'>10</a>
 <a name='L11'></a><a href='#L11'>11</a>
 <a name='L12'></a><a href='#L12'>12</a>
-<a name='L13'></a><a href='#L13'>13</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -87,17 +98,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/** The latest mid price of one instrument. */
-export interface Price {
-  symbol: string;
-  mid: number;
-}
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { Observable } from "rxjs";
 &nbsp;
-export type Movement = "up" | "down" | "flat";
+import type { Category, CategoryDraft, Outcome, User, UserDraft } from "../entities/directory.ts";
 &nbsp;
-/** A price together with how it moved against the previous one for its symbol. */
-export interface PriceTick extends Price {
-  movement: Movement;
+/**
+ * Where categories and users are kept. The domain declares this; a simulator
+ * and a real transport each implement it, and the composition root picks one.
+ *
+ * Every method answers once and completes, and does nothing until subscribed.
+ * A list fails with an error when the keeper cannot be reached. A change never
+ * fails: it is accepted, or refused with the reason.
+ */
+export interface DirectoryPort {
+  categories(): Observable&lt;Category[]&gt;;
+  users(): Observable&lt;User[]&gt;;
+  addCategory(draft: CategoryDraft): Observable&lt;Outcome&lt;Category&gt;&gt;;
+  renameCategory(id: string, draft: CategoryDraft): Observable&lt;Outcome&lt;Category&gt;&gt;;
+  /** Refused while the category still has users. */
+  removeCategory(id: string): Observable&lt;Outcome&lt;null&gt;&gt;;
+  addUser(draft: UserDraft): Observable&lt;Outcome&lt;User&gt;&gt;;
+  changeUser(id: string, draft: UserDraft): Observable&lt;Outcome&lt;User&gt;&gt;;
+  removeUser(id: string): Observable&lt;Outcome&lt;null&gt;&gt;;
 }
 &nbsp;</pre></td></tr></table></pre>
 
