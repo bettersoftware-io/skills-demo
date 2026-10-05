@@ -1,7 +1,7 @@
 {
   "kit": {
     "files": {
-      "tools/arch/README.md": "541856b192ca846e71e9c23474f634153851b1234fc1d2c871e1f5f41dd4d28b",
+      "tools/arch/README.md": "f3a9ce7ccf0d90961dae0cd0f45e47c152b624570748b17ac1617390169c8b51",
       "tools/arch/docs/handler-naming.md": "eb42398985e010ea302ee0bded7de227d334b0339d4d76694a70b7f95983a40f",
       "tools/arch/docs/review.md": "c0cacc16c37e5060180af1ae48b9a3304279bcd7acd16488fbbff5e00c03d567",
       "tools/arch/eslint-rules/class-filename-match.mts": "7255b0f1c69417b073465ccbb1546d6de3fe3881069e0df8dca50f07d4b9dbc5",
@@ -28,7 +28,7 @@
       "tools/arch/gates/lib/ui-bans.mts": "b8aea78943e779a05913db1f0db0840ddfe45979fe8e39c4b7568d859e960357",
       "tools/arch/gates/run.mts": "1f081d46611aa1ec060d6ee2a7deaeba090ed23d23bbf7a29cdbf1031e0cff30",
       "tools/arch/hooks/after-edit.mts": "1de0ed2f2bc8d104a09d250bcf8efc3e883d936c0a58ad407e868a0eb4d416ea",
-      "tools/arch/hooks/before-stop.mts": "947aa009f0df444f126a56768f8336d3f271f8671c9ba19ff93d9c57acd020be",
+      "tools/arch/hooks/before-stop.mts": "385fed5debaa0e02039a6a821be175fbb188957d699e4fe5990fda7149a620c8",
       "tools/arch/hooks/claude.settings.json": "6e11703439c3bb4265b5c0bea7bf94a1962414db2f5617d5924d7047bd3ed7ea",
       "tools/arch/hooks/codex.hooks.json": "14b3bc4e19d7ce1ef510a9e530dff00c25cbc9ddee830484bbba87c22e646545"
     }
