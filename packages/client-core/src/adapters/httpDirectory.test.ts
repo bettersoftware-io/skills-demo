@@ -122,7 +122,7 @@ const SERVER_URL = "http://example.test";
 
 const SEED = {
   categories: [{ id: "eng", name: "Engineering" }],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true }],
 };
 
 const GRACE = { name: "Grace", email: "grace@example.com", categoryId: "eng" };

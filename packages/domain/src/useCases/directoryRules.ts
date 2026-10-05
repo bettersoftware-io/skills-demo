@@ -99,7 +99,7 @@ export function judgeUserDraft(
     : null;
 }
 
-/** Why this category cannot be deleted, or null if it can: a category that still has users stays. */
+/** Why this category cannot be deleted, or null if it can: a category that still has active or inactive users stays. */
 export function judgeCategoryRemoval(category: Category, users: readonly User[]): Refusal | null {
   const members = users.filter((user) => user.categoryId === category.id).length;
 

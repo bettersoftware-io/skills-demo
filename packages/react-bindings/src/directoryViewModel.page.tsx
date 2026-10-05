@@ -1,4 +1,5 @@
 import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
+import type { DirectorySnapshot } from "@skills-demo/domain";
 import { act, render } from "@testing-library/react";
 import type { ReactElement } from "react";
 
@@ -25,13 +26,13 @@ export interface DirectoryViewModelPage {
   reload: () => Promise<void>;
 }
 
-/** Two categories and one user; this package does not depend on the domain, so they are written out here. */
-const SEED = {
+/** Two categories and one user. */
+const SEED: DirectorySnapshot = {
   categories: [
     { id: "design", name: "Design" },
     { id: "eng", name: "Engineering" },
   ],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true }],
 };
 
 /**

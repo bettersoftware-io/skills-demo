@@ -103,7 +103,7 @@ describe("the directory protocol", () => {
 
 const DESIGN = { id: "design", name: "Design" };
 
-const ADA = { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "design" };
+const ADA = { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "design", active: true };
 
 /** What the other side receives: the value as JSON text, parsed again. */
 function overTheWire(value: unknown): unknown {

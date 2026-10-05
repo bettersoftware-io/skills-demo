@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@skills-demo/client-core": "workspace:*",
+    "@skills-demo/domain": "workspace:*",
     "@react-rxjs/core": "^0.10.7",
     "react": "^19.2.3"
   },

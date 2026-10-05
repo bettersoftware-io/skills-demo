@@ -137,6 +137,46 @@ describe("the user list", () => {
 
     expect(page.refusalOn("Dieter")).toBe("This user no longer exists.");
   });
+
+  it("deactivates and reactivates a user", async () => {
+    const page = mountUserList(DIRECTORY);
+
+    await page.toggleActive("Ada");
+    expect(page.rows()).toContain("AdaInactive, ada@example.com, Engineering");
+
+    await page.toggleActive("Ada");
+    expect(page.rows()).toContain("Ada, ada@example.com, Engineering");
+  });
+
+  it("shows and hides inactive users", async () => {
+    const page = mountUserList(DIRECTORY);
+
+    expect(page.rows()).toEqual([
+      "Ada, ada@example.com, Engineering",
+      "Dieter, dieter@example.com, Design",
+      "Grace, grace@example.com, Engineering",
+    ]);
+
+    await page.toggleActive("Ada");
+    expect(page.rows()).toEqual([
+      "AdaInactive, ada@example.com, Engineering",
+      "Dieter, dieter@example.com, Design",
+      "Grace, grace@example.com, Engineering",
+    ]);
+
+    await page.setShowInactive(false);
+    expect(page.rows()).toEqual([
+      "Dieter, dieter@example.com, Design",
+      "Grace, grace@example.com, Engineering",
+    ]);
+
+    await page.setShowInactive(true);
+    expect(page.rows()).toEqual([
+      "AdaInactive, ada@example.com, Engineering",
+      "Dieter, dieter@example.com, Design",
+      "Grace, grace@example.com, Engineering",
+    ]);
+  });
 });
 
 const DIRECTORY: DirectorySnapshot = {
@@ -146,8 +186,8 @@ const DIRECTORY: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
-    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", active: true },
+    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", active: true },
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true },
   ],
 };

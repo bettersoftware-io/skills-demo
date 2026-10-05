@@ -119,6 +119,19 @@ describe("the application", () => {
 
     row.dispose();
   });
+
+  it("toggles a user's active status through their row", () => {
+    const app = createDirectoryApp();
+    const row = app.machines.createUserRow("ada");
+
+    expect(row.intents.toggleActive).toBeDefined();
+    row.intents.toggleActive?.();
+
+    expect(row.state$.getValue().open).toBe(false);
+    expect(row.state$.getValue().refusal).toBeNull();
+
+    row.dispose();
+  });
 });
 
 const SEED: DirectorySnapshot = {
@@ -126,7 +139,7 @@ const SEED: DirectorySnapshot = {
     { id: "eng", name: "Engineering" },
     { id: "design", name: "Design" },
   ],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", active: true }],
 };
 
 /** The application on a small directory, with a reader on the directory screen until the test ends. */

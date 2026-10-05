@@ -20,4 +20,6 @@ export interface DirectoryPort {
   addUser(draft: UserDraft): Observable<Outcome<User>>;
   changeUser(id: string, draft: UserDraft): Observable<Outcome<User>>;
   removeUser(id: string): Observable<Outcome<null>>;
+  /** Toggle whether a user is active. */
+  toggleUserActive(id: string): Observable<Outcome<User>>;
 }

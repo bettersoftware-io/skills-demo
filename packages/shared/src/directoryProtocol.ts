@@ -60,6 +60,7 @@ export interface UserDto {
   name: string;
   email: string;
   categoryId: string;
+  active: boolean;
 }
 
 export interface CategoryDraftDto {
@@ -88,7 +89,7 @@ export function encodeCategory(category: Category): CategoryDto {
 }
 
 export function encodeUser(user: User): UserDto {
-  return { id: user.id, name: user.name, email: user.email, categoryId: user.categoryId };
+  return { id: user.id, name: user.name, email: user.email, categoryId: user.categoryId, active: user.active };
 }
 
 export function encodeCategoryDraft(draft: CategoryDraft): CategoryDraftDto {
@@ -116,13 +117,14 @@ export function parseUser(raw: unknown): User | undefined {
     return undefined;
   }
 
-  const { id, name, email, categoryId } = raw;
+  const { id, name, email, categoryId, active } = raw;
 
   return typeof id === "string" &&
     typeof name === "string" &&
     typeof email === "string" &&
-    typeof categoryId === "string"
-    ? { id, name, email, categoryId }
+    typeof categoryId === "string" &&
+    typeof active === "boolean"
+    ? { id, name, email, categoryId, active }
     : undefined;
 }
 

@@ -41,6 +41,10 @@ export interface UserListPage {
   refusalCount: () => number;
   /** Someone else deletes the user of this id; the screen is not told. */
   removeBehindTheScreen: (id: string) => void;
+  /** Toggles a user between active and inactive. */
+  toggleActive: (name: string) => Promise<void>;
+  /** Shows or hides inactive users. */
+  setShowInactive: (checked: boolean) => Promise<void>;
 }
 
 /**
@@ -153,6 +157,21 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
       act(() => {
         harness.directory.removeUser(id).subscribe();
       });
+    },
+    toggleActive: async (name): Promise<void> => {
+      const deactivateButton = rendered.queryByRole("button", { name: `Deactivate ${name}` });
+      const reactivateButton = rendered.queryByRole("button", { name: `Reactivate ${name}` });
+      const button = deactivateButton || reactivateButton;
+      if (!button) {
+        throw new Error(`no button to toggle active for user ${name}`);
+      }
+      await user.click(button);
+    },
+    setShowInactive: async (checked): Promise<void> => {
+      const checkbox = rendered.getByRole("checkbox", { name: "Show inactive users" }) as HTMLInputElement;
+      if (checkbox.checked !== checked) {
+        await user.click(checkbox);
+      }
     },
   };
 }

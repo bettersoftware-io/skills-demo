@@ -17,6 +17,8 @@ import { type MachineView, useMachine, type ViewOf } from "./useMachine.ts";
 export interface DirectoryScreen extends DirectoryView {
   /** Narrows the user list to one category, or widens it again with null. */
   showCategory: (id: string | null) => void;
+  /** Toggles whether to show inactive users. */
+  setShowInactive: (show: boolean) => void;
   reload: () => void;
 }
 
@@ -48,6 +50,7 @@ export function createViewModel(app: App): ViewModel {
     useDirectory: (): DirectoryScreen => ({
       ...useStateObservable(directory.view$),
       showCategory: directory.showCategory,
+      setShowInactive: directory.setShowInactive,
       reload: directory.reload,
     }),
     useCategoryForm: (): ViewOf<CategoryFormMachine> => useMachine(app.machines.createCategoryForm),

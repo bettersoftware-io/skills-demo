@@ -299,6 +299,9 @@ importers:
       '@skills-demo/client-core':
         specifier: workspace:*
         version: link:../client-core
+      '@skills-demo/domain':
+        specifier: workspace:*
+        version: link:../domain
       react:
         specifier: ^19.2.3
         version: 19.3.0
