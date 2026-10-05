@@ -15,7 +15,7 @@
     "test": "turbo run test",
     "lint": "eslint --flag unstable_native_nodejs_ts_config .",
     "gates": "node tools/arch/gates/run.mts",
-    "gate:fast": "pnpm gates && pnpm lint && pnpm typecheck && pnpm visual:check",
+    "gate:fast": "pnpm gates && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check",
     "gate:full": "pnpm gate:fast && pnpm test && pnpm build && pnpm coverage",
     "coverage": "node tools/coverage/run.mts",
     "coverage:gaps": "node tools/coverage/gaps.mts",
@@ -23,7 +23,9 @@
     "visual": "pnpm --dir packages/client-react exec playwright test --config tests/visual/playwright.config.ts",
     "visual:update": "pnpm --dir packages/client-react exec playwright test --config tests/visual/playwright.config.ts --update-snapshots=all",
     "visual:jitter": "node tools/visual/jitter.mts",
-    "visual:check": "node tools/visual/check-pin.mts && pnpm --dir packages/client-react run typecheck:visual"
+    "visual:check": "node tools/visual/check-pin.mts && pnpm --dir packages/client-react run typecheck:visual",
+    "perf:check": "node tools/perf/check-animations.mts",
+    "perf:motion-audit": "node tools/perf/motion-audit.mts"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
@@ -35,6 +37,7 @@
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "typescript-eslint": "^8.61.1",
     "vitest": "^5.0.3",
-    "@vitest/coverage-v8": "^5.0.3"
+    "@vitest/coverage-v8": "^5.0.3",
+    "playwright": "1.63.0"
   }
 }

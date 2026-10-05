@@ -72,5 +72,22 @@
       "tools/visual/lib/png.mts": "5eda898cd39377e0a1615cd1e999056c801d6e3fd420c3aaaf557f187ec0b61e",
       "tools/visual/summary.mts": "158c0b033a41ddc5091137c442b8b2c45a59759d16c832cab7dcc1aaab673aa0"
     }
+  },
+  "performance": {
+    "files": {
+      ".github/workflows/perf.yml": "c7e7d32e2eb2fe8cba5f4be94bcfc688673887e084545bef3ab9fa0e45b9b3bd",
+      "docs/performance.md": "6761e09ece28855a5a475a8d62e4b1c86928dfeea47fedb8011dc18de83b4499",
+      "tools/perf/check-animations.mts": "e2d8ba99dbc36e1476377cea1aaf32140aff5fe9bf05e861e6d21fe02a73048a",
+      "tools/perf/lib/allowed.mts": "19f265c3667cbf690643366c10b8748287a4e66eee41274fbcdd65943339bd1f",
+      "tools/perf/lib/css.mts": "70be62b8d4a9f85fb4ed1bc37f923325f8f8bff2440e17c3bf291bf9d49e1e15",
+      "tools/perf/lib/files.mts": "80e5ce2d14b6e27fe4ad08366bc7954c6b6820243e79a615e3293abbf784d2a2",
+      "tools/perf/lib/motion-judge.mts": "4c25548c818f133211202a41a953a29c1bee4ecd70e28b0ae0ed9f3ad5ddd10c",
+      "tools/perf/lib/motion-probe.mts": "805e4b59327204721cc1d0dbb3fe123f34bf9cb382b846e68c3ddafe7b2295b8",
+      "tools/perf/lib/properties.mts": "5503c3cc00243031191bd8583f4e8764ecf58746e5f5d75b40d801b5387d3b7a",
+      "tools/perf/lib/rules.mts": "f03a3c175dad08e6bf97d6157f87dd4d8451dac19a61add20762d63218c7b62e",
+      "tools/perf/lib/server.mts": "603435cd2d9e12db02bf46c90636c6e8e88b8a9156030762384851bbab302344",
+      "tools/perf/lib/waapi.mts": "feb563f0b2da5aa63f13db9037ba3a7f72781ec92d0a32153d8e1f49497e752d",
+      "tools/perf/motion-audit.mts": "cff0cd3b848fa5ce789298836d47cd5b799b3a7fe05434bd03bb8e6bfe9f4908"
+    }
   }
 }
