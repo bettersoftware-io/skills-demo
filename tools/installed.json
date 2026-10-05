@@ -48,5 +48,29 @@
       "tools/coverage/publish-to-pages.mts": "005e5a8f60cbb66275b47a5bee7a636a6e848362ae492d86948f05a309ef9383",
       "tools/coverage/run.mts": "3d9d7f792c2d5759527afacd9cb5a933832e27e5c6b73b3c4ebc085a19cd1eaa"
     }
+  },
+  "visual": {
+    "files": {
+      ".github/workflows/update-visual-goldens.yml": "faa7613f0aa3c745d28f63bc6a79078189bbd2173cb0d4050d846a7570173243",
+      ".github/workflows/visual.yml": "0ca09d7bf4d5d03760d03558fd3662550e83f83d5ea285644eac5a7241157e13",
+      "packages/client-react/tests/visual/.gitignore": "8f3de1e507d277f725b13858f0c46932e42bed12a7aeaf6adc57fb7089023581",
+      "packages/client-react/tests/visual/goldens.ts": "36f7b23eed29ec22968e239f7307c6336383aeeeba832bb15b02956d7944be25",
+      "packages/client-react/tests/visual/host/ScenarioFrame.tsx": "8e2ff957638c028169abcd87a057b6a9b899d4f30cd81c4aef5e999cd0fb4d5c",
+      "packages/client-react/tests/visual/host/address.ts": "ec71443e6bcee33648c734ed652f9ef7ff7f93141b64569f5bf10869d2307e96",
+      "packages/client-react/tests/visual/host/host.css": "d1bc10f4e3695d04bed182dd19a3827b0d41e57c16d29af4d13874a183946145",
+      "packages/client-react/tests/visual/host/index.html": "05d2386ef0a3b73da06339dceeb191726c8e03c1db87d0c4dab0680c35e1ba23",
+      "packages/client-react/tests/visual/host/main.tsx": "b6443808b74f110641c3458de0a33b6583e73c2b61e3debbc81993a431e9257e",
+      "packages/client-react/tests/visual/host/vite.config.ts": "27deef25fb8abf01ed904f813953822ff01580cd07bb76828b37ed1027e3a8de",
+      "packages/client-react/tests/visual/playwright.config.ts": "2abaf90d0d666e3e9b67513e43af5df6dfcff4b7dd970b293e3fa486f4506c09",
+      "packages/client-react/tests/visual/tsconfig.json": "a0a6a1cd826b12ed3c33226f18216641b5bbae249053cf0c4eaf31edfa5e2d82",
+      "packages/client-react/tests/visual/visual.pw.ts": "842327eef654c6ca48dfaa5b92767446ae65f4f9762d746a292a28df2fc5198d",
+      "tools/visual/check-pin.mts": "c5077dbc00d665328a589cca335f0e74938811f9c5eadaabb2ba523bdf32c136",
+      "tools/visual/jitter.mts": "26f21500df1e879d846ea706e1c88777de928cbc25eeb1c237d948b5dff3c9fa",
+      "tools/visual/lib/arguments.mts": "ef3da4c459975f347c05df4483f4766d0095adf94e1b0e665bd2667597817d77",
+      "tools/visual/lib/measure.mts": "873303992ebeb6a41c2f0b719019bbfc5c8d5e9e3831ccea30573cb1e9dc1a72",
+      "tools/visual/lib/pixelDiff.mts": "c89304955093781f6c9ccdc0647465d791487ad4b37893efc02300834591ea2b",
+      "tools/visual/lib/png.mts": "5eda898cd39377e0a1615cd1e999056c801d6e3fd420c3aaaf557f187ec0b61e",
+      "tools/visual/summary.mts": "158c0b033a41ddc5091137c442b8b2c45a59759d16c832cab7dcc1aaab673aa0"
+    }
   }
 }
