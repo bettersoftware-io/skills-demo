@@ -14,6 +14,13 @@ It contains one small feature, a live price list, built the way every feature
 is meant to be built. [AGENTS.md](AGENTS.md) says where each kind of code goes
 and lists the file that shows each pattern.
 
+Beside it is a small user-management screen: categories and the users in
+them, with add, edit and delete. With `pnpm dev` the data is kept in the
+browser; with `pnpm dev:fs` it is kept in the server's memory, behind a REST
+API built with Hono (`packages/shared/src/directoryProtocol.ts` lists the
+routes). The client finds the API through `VITE_API_URL`, and the price feed
+through `VITE_SERVER_URL`; either one left unset runs on its simulator.
+
 Packages export their TypeScript source. Nothing is compiled except the client,
 which Vite bundles; the server and the tooling are run by Node directly. This
 needs Node 24 or later.

@@ -33,3 +33,60 @@ td[data-movement="up"] {
 td[data-movement="down"] {
   color: #c0392b;
 }
+
+/* The directory: categories and users. Nothing here moves, so nothing here animates. */
+.directory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.directory tbody tr {
+  cursor: default;
+}
+
+.directory ul {
+  padding: 0;
+  list-style: none;
+}
+
+.directory li {
+  padding: 0.3rem 0;
+}
+
+.directory .entry,
+.directory form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.directory section > form {
+  margin-top: 0.75rem;
+}
+
+.directory td button + button {
+  margin-left: 0.5rem;
+}
+
+.directory label {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.directory .count {
+  opacity: 0.6;
+}
+
+.directory [aria-invalid="true"] {
+  outline: 2px solid #c0392b;
+}
+
+.refusal {
+  flex-basis: 100%;
+  margin: 0.2rem 0 0;
+  color: #c0392b;
+}

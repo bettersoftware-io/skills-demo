@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "pnpm --filter @skills-demo/client-react dev",
     "dev:server": "pnpm --filter @skills-demo/server dev",
-    "dev:fs": "VITE_SERVER_URL=ws://localhost:4000/ws turbo run dev",
+    "dev:fs": "VITE_SERVER_URL=ws://localhost:4000/ws VITE_API_URL=http://localhost:4000 turbo run dev",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck && tsc --noEmit -p tsconfig.tooling.json",
     "test": "turbo run test",

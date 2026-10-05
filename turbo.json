@@ -9,7 +9,8 @@
         "dist/**"
       ],
       "env": [
-        "VITE_SERVER_URL"
+        "VITE_SERVER_URL",
+        "VITE_API_URL"
       ]
     },
     "typecheck": {},
@@ -19,6 +20,7 @@
       "persistent": true,
       "env": [
         "VITE_SERVER_URL",
+        "VITE_API_URL",
         "PORT"
       ]
     }
