@@ -1,7 +1,15 @@
-# Starter
+# skills-demo
 
-A working project to start from: ports and adapters in a pnpm monorepo, a
-streaming UI on RxJS and React, and the checks that keep it that way.
+A demo of [bettersoftware-skills](https://github.com/bettersoftware-io/skills):
+a project created by its script, with its three add-ons, and one feature built
+on top by an AI agent that was given only this repository's `AGENTS.md` and
+hooks. The commit history is the record: the project as created, each add-on,
+then [the feature](https://github.com/bettersoftware-io/skills-demo/pull/1).
+The published coverage report is at
+<https://bettersoftware-io.github.io/skills-demo/coverage/>.
+
+It is ports and adapters in a pnpm monorepo, a streaming UI on RxJS and React,
+and the checks that keep it that way.
 
 ```bash
 pnpm install
