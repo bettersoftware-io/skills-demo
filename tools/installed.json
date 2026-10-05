@@ -93,5 +93,33 @@
       "tools/perf/lib/waapi.mts": "feb563f0b2da5aa63f13db9037ba3a7f72781ec92d0a32153d8e1f49497e752d",
       "tools/perf/motion-audit.mts": "cff0cd3b848fa5ce789298836d47cd5b799b3a7fe05434bd03bb8e6bfe9f4908"
     }
+  },
+  "format-lint": {
+    "files": {
+      "tools/format-lint/biome.base.json": "d55b138fdc9e2a888bc24b8f27395c3c7d244f2b1bad7162534bee9d4c1daa92"
+    }
+  },
+  "ci-security": {
+    "files": {
+      ".github/workflows/ci-security.yml": "f3feb41c7f6b5736f31548bdf58c38cbe6bb3b29a00f6fde18f059d7812a2470",
+      ".github/workflows/dependency-review.yml": "d02a97aeedaa88d75c86ae756006f30dad0e57aa95e50c4a64dd85d62bbb5f40",
+      ".github/workflows/scorecard.yml": "75971979909395745f4d7b7c8abe65da9985c868dc41d9766b8bfd2cf4db7dce",
+      "tools/ci-security/lib/install.mts": "0dd644ee915bcd45cd32c1bc196d93cd0ee131460ba4fc70c9e945e12228a751",
+      "tools/ci-security/lib/lint.mts": "47f6d21e29513b78ae3bba5b0b68155f20121d86597e3b1c18336c219f37f097",
+      "tools/ci-security/lib/pins.mts": "9e1ea77163084885c4de91c716c8d94600d2db02d82ca937e99d86706bb380bf",
+      "tools/ci-security/lib/system.mts": "c261036e909cef7ff1dce6b2d2634e0963fb1595e942a3d529e5ee6e28000cba",
+      "tools/ci-security/lint-workflows.mts": "e3cf7ddb033053576320cb9306219d001c20e6af58fb997b0b8e92ade8a8ac41"
+    }
+  },
+  "repo-hygiene": {
+    "files": {
+      "tools/repo-hygiene/check-css.mts": "677776cdda7aa14c55c847adbe1b06a49a6c49b4395cca30e8a0129f67f88ebb",
+      "tools/repo-hygiene/check-doc-links.mts": "8b7e8bad228b4d9572b1138366e10556e7845576d22ebaf183f5cd4ffb9f8200",
+      "tools/repo-hygiene/check-versions.mts": "0403b99dab47866289cb8a5098a9e5ea7c5aab078e6d154c128e40b89ac55d85",
+      "tools/repo-hygiene/lib/files.mts": "2b66d9aa71004f1bec81bb9fb8b42c74e539404c4b8cb153063a430bbcb27596",
+      "tools/repo-hygiene/lib/markdown.mts": "742c94e1adc979818e8f5ae75889c03fcf5c08eb81210ae041e18b3a44877150",
+      "tools/repo-hygiene/lib/run.mts": "70bba5152fc002adb1303a2d405beed8d1610337681e39cd4d4a221e892f1b2f",
+      "tools/repo-hygiene/lib/slug.mts": "1f38db3b299385f169784426d4a1d7eb17ca8db86f2cf289ec3836c784051375"
+    }
   }
 }

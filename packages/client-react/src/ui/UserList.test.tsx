@@ -1,5 +1,6 @@
-import type { DirectorySnapshot } from "@skills-demo/domain";
 import { describe, expect, it } from "vitest";
+
+import type { DirectorySnapshot } from "@skills-demo/domain";
 
 import { mountUserList } from "./UserList.page.tsx";
 
@@ -17,10 +18,18 @@ describe("the user list", () => {
   it("narrows the list to one category, and widens it again", async () => {
     const page = mountUserList(DIRECTORY);
 
-    expect(page.categoryChoices()).toEqual(["All categories", "Design", "Engineering", "Operations"]);
+    expect(page.categoryChoices()).toEqual([
+      "All categories",
+      "Design",
+      "Engineering",
+      "Operations",
+    ]);
 
     await page.show("Engineering");
-    expect(page.rows()).toEqual(["Ada, ada@example.com, Engineering", "Grace, grace@example.com, Engineering"]);
+    expect(page.rows()).toEqual([
+      "Ada, ada@example.com, Engineering",
+      "Grace, grace@example.com, Engineering",
+    ]);
 
     await page.show("Operations");
     expect(page.rows()).toEqual([]);
@@ -58,7 +67,11 @@ describe("the user list", () => {
 
     expect(page.addRefusal()).toBe("This does not look like an email address.");
     expect(page.invalidNewFields()).toEqual(["email"]);
-    expect(page.newUser()).toEqual({ name: "Linus", email: "linus.example.com", category: "Operations" });
+    expect(page.newUser()).toEqual({
+      name: "Linus",
+      email: "linus.example.com",
+      category: "Operations",
+    });
     expect(page.rows()).toHaveLength(3);
   });
 
@@ -94,7 +107,11 @@ describe("the user list", () => {
   it("edits a user, starting from what they have now", async () => {
     const page = mountUserList(DIRECTORY);
 
-    expect(await page.startEdit("Ada")).toEqual({ name: "Ada", email: "ada@example.com", category: "Engineering" });
+    expect(await page.startEdit("Ada")).toEqual({
+      name: "Ada",
+      email: "ada@example.com",
+      category: "Engineering",
+    });
 
     await page.cancelEdit("Ada");
     await page.edit("Ada", { name: "Ada Lovelace", category: "Design" });
@@ -107,7 +124,9 @@ describe("the user list", () => {
 
     await page.edit("Grace", { email: "ada@example.com" });
 
-    expect(page.refusalOn("Grace")).toBe("Another user already has the email address ada@example.com.");
+    expect(page.refusalOn("Grace")).toBe(
+      "Another user already has the email address ada@example.com.",
+    );
     expect(page.addRefusal()).toBeNull();
     expect(page.refusalCount()).toBe(1);
   });
@@ -126,7 +145,10 @@ describe("the user list", () => {
 
     await page.remove("Dieter");
 
-    expect(page.rows()).toEqual(["Ada, ada@example.com, Engineering", "Grace, grace@example.com, Engineering"]);
+    expect(page.rows()).toEqual([
+      "Ada, ada@example.com, Engineering",
+      "Grace, grace@example.com, Engineering",
+    ]);
   });
 
   it("says on the user's row when someone else has already deleted them", async () => {

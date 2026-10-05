@@ -1,8 +1,12 @@
-import { createDirectorySimulator, type DirectoryPort } from "@skills-demo/domain";
 import { firstValueFrom } from "rxjs";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 
-import { createFakeDirectoryServer, type FakeDirectoryServer } from "../testing/fakeDirectoryServer.ts";
+import { createDirectorySimulator, type DirectoryPort } from "@skills-demo/domain";
+
+import {
+  createFakeDirectoryServer,
+  type FakeDirectoryServer,
+} from "../testing/fakeDirectoryServer.ts";
 import { createHttpDirectoryPort } from "./httpDirectory.ts";
 
 describe("the HTTP directory adapter", () => {
@@ -39,14 +43,18 @@ describe("the HTTP directory adapter", () => {
   });
 
   it("uses the browser's fetch when it is given nothing else, and says the body is JSON", async () => {
-    const fetched = vi.fn(async () => new Response(JSON.stringify({ id: "design", name: "Design" }), { status: 201 }));
+    const fetched = vi.fn(
+      async () => new Response(JSON.stringify({ id: "design", name: "Design" }), { status: 201 }),
+    );
 
     vi.stubGlobal("fetch", fetched);
     onTestFinished(() => {
       vi.unstubAllGlobals();
     });
 
-    const outcome = await firstValueFrom(createHttpDirectoryPort(SERVER_URL).addCategory({ name: "Design" }));
+    const outcome = await firstValueFrom(
+      createHttpDirectoryPort(SERVER_URL).addCategory({ name: "Design" }),
+    );
 
     expect(outcome).toEqual({ accepted: true, value: { id: "design", name: "Design" } });
     expect(fetched).toHaveBeenCalledWith("http://example.test/api/categories", {
@@ -63,9 +71,15 @@ describe("the HTTP directory adapter", () => {
 
     expect(await firstValueFrom(port.addCategory({ name: "Design" }))).toEqual({
       accepted: false,
-      refusal: { reason: "unavailable", field: null, message: "The server could not be reached. Try again." },
+      refusal: {
+        reason: "unavailable",
+        field: null,
+        message: "The server could not be reached. Try again.",
+      },
     });
-    expect(await firstValueFrom(port.removeUser("ada"))).toMatchObject({ refusal: { reason: "unavailable" } });
+    expect(await firstValueFrom(port.removeUser("ada"))).toMatchObject({
+      refusal: { reason: "unavailable" },
+    });
   });
 
   it("fails a list when the server cannot be reached", async () => {

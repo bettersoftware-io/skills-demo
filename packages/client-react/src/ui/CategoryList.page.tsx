@@ -1,8 +1,9 @@
+import { render, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
 import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
 import type { DirectorySnapshot } from "@skills-demo/domain";
 import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
-import { render, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import { CategoryList } from "./CategoryList.tsx";
 import { TESTIDS } from "./testids.ts";
@@ -83,8 +84,10 @@ export function mountCategoryList(directory: DirectorySnapshot): CategoryListPag
 
   return {
     rows: (): string[] =>
-      findRows().map((row) => within(row).getAllByText(/./, { selector: "strong, .count" }).map(readText).join(", ")),
-    add: async (name): Promise<void> => {
+      findRows().map((row) =>
+        within(row).getAllByText(/./, { selector: "strong, .count" }).map(readText).join(", "),
+      ),
+    add: async (name: string): Promise<void> => {
       const field = within(findAddForm()).getByRole("textbox", { name: "New category" });
 
       await user.clear(field);
@@ -99,19 +102,21 @@ export function mountCategoryList(directory: DirectorySnapshot): CategoryListPag
       within(findAddForm()).getByRole<HTMLInputElement>("textbox", { name: "New category" }).value,
     addRefusal: (): string | null => readRefusal(findAddForm()),
     newNameIsMarkedInvalid: (): boolean =>
-      within(findAddForm()).getByRole("textbox", { name: "New category" }).getAttribute("aria-invalid") === "true",
+      within(findAddForm())
+        .getByRole("textbox", { name: "New category" })
+        .getAttribute("aria-invalid") === "true",
     typeRename,
-    rename: async (from, to): Promise<void> => {
+    rename: async (from: string, to: string): Promise<void> => {
       await typeRename(from, to);
       await user.click(within(findRow(from)).getByRole("button", { name: "Save" }));
     },
-    cancelRename: async (name): Promise<void> => {
+    cancelRename: async (name: string): Promise<void> => {
       await user.click(within(findRow(name)).getByRole("button", { name: "Cancel" }));
     },
-    remove: async (name): Promise<void> => {
+    remove: async (name: string): Promise<void> => {
       await user.click(within(findRow(name)).getByRole("button", { name: `Delete ${name}` }));
     },
-    refusalOn: (name): string | null => readRefusal(findRow(name)),
+    refusalOn: (name: string): string | null => readRefusal(findRow(name)),
     refusalCount: (): number => rendered.queryAllByTestId(TESTIDS.refusal).length,
   };
 }

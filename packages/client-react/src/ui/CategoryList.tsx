@@ -1,6 +1,7 @@
+import type { ChangeEvent, FormEvent, ReactElement } from "react";
+
 import type { CategoryRow } from "@skills-demo/client-core";
 import { useViewModel } from "@skills-demo/react-bindings";
-import type { ChangeEvent, FormEvent, ReactElement } from "react";
 
 import { RefusalMessage } from "./RefusalMessage.tsx";
 import { TESTIDS } from "./testids.ts";
@@ -62,11 +63,18 @@ function CategoryItem({ category }: CategoryItemProps): ReactElement {
       ) : (
         <div className="entry">
           <strong>{category.name}</strong>
-          <span className="count">{category.userCount === 1 ? "1 user" : `${category.userCount} users`}</span>
+          <span className="count">
+            {category.userCount === 1 ? "1 user" : `${category.userCount} users`}
+          </span>
           <button type="button" aria-label={`Rename ${category.name}`} onClick={form.edit}>
             Rename
           </button>
-          <button type="button" aria-label={`Delete ${category.name}`} disabled={form.state.busy} onClick={form.remove}>
+          <button
+            type="button"
+            aria-label={`Delete ${category.name}`}
+            disabled={form.state.busy}
+            onClick={form.remove}
+          >
             Delete
           </button>
         </div>

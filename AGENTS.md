@@ -279,3 +279,141 @@ fires on real data: "on an event" is not a reason if the event is a tick.
 Do not add an allow-list entry to get past a finding on steady-state motion,
 and do not weaken a check. If a finding looks wrong, say so.
 <!-- /add-on: performance -->
+
+<!-- add-on: format-lint -->
+## Formatting and lint (Biome)
+
+`pnpm biome:check` (part of `gate:fast`) fails a file that is not formatted, an
+import list that is out of order, and a lint finding, warnings included. It
+changes nothing. What it cannot decide is below.
+
+**When to run the fixer.** Run `pnpm biome:fix` after you finish editing and
+before you run the gate. Do not lay code out by hand, and do not sort imports
+by hand. Skip it when you changed no source, JSON or CSS file.
+
+**What the fixer leaves to you.** It applies only the fixes Biome calls safe.
+A finding it prints and does not fix is yours to fix in the code: add the
+braces, write the type, narrow the value. Do not pass `--unsafe` over the
+whole project; an unsafe fix can change what the code does.
+
+**When a rule seems wrong.** Decide which of these it is:
+
+- The code can say the same thing in a way the rule accepts. Do that. For a
+  `!` assertion, check the value and throw with a message that says what was
+  missing.
+- The rule does not fit one kind of file (a framework needs a default export
+  there, say). Add an `overrides` entry for those files to `biome.json` at
+  the root, and write the reason in the commit message.
+- The rule does not fit this project at all. Say so and ask before you turn it
+  off in `biome.json`.
+- One line is a true exception. Only then write
+  `// biome-ignore lint/<group>/<rule>: <reason>` on the line above. The
+  reason says why this line is different, not what the rule is. Never write
+  one without a reason, and never to get a gate to pass.
+
+Do not edit `tools/format-lint/biome.base.json`: an update of the add-on
+replaces it. The project's own rules go in `biome.json`, which extends it.
+
+Biome does not read `tools/`. It does not replace `pnpm lint` (ESLint, the
+architecture rules); both run.
+<!-- /add-on: format-lint -->
+
+<!-- add-on: ci-security -->
+## CI security
+
+Three workflows check the supply chain on GitHub: `CI security` (workflow lint
+and `pnpm audit --prod`), `Dependency Review` and `Scorecard`. They need the
+network, so none of them is in `pnpm gate:full`. This section is what they
+cannot decide.
+
+```bash
+pnpm lint:workflows              # actionlint (valid?) then zizmor (safe?)
+pnpm lint:workflows zizmor       # one of them
+```
+
+Exit 0 is a pass. Exit 1 is a finding, named in the linter's output above the
+`FAIL` line. Exit 2 with a `SKIP` line means the lint did not run here (no
+network on the first run, no build for this machine, a wrong checksum). Report
+a `SKIP` as "not run". Never report it as a pass, and do not retry in a loop: a
+sandbox with no network will not get one.
+
+### When you add or change a workflow
+
+Run `pnpm lint:workflows` before you commit. Skip it only when no file under
+`.github/` changed. In a new workflow:
+
+- Pin every action by its full commit hash, with the version in a comment
+  after it. Take the hash from the action's release, not from memory.
+- Give the workflow `permissions: contents: read`. Grant a write on the one job
+  that needs it, with a comment that says why.
+- Write `persist-credentials: false` on every checkout, unless that job pushes.
+- Put no `${{ … }}` expression in a `run:` line. Pass the value through `env:`
+  and quote the variable.
+- Do not use `pull_request_target` or `workflow_run`. If the task seems to need
+  one, stop and ask the user.
+
+Do not silence a finding with `# zizmor: ignore[…]`, a `zizmor.yml` or an
+`actionlint.yaml` to turn the run green. Fix the workflow. If you believe a
+finding is wrong, say so and leave it red.
+
+### When Dependency Review fails a pull request
+
+Its job summary names the package and the advisory or licence.
+
+- **An advisory:** move to the patched version it names. If the package came
+  in through another one, update that one, or add a pnpm `overrides` entry
+  that lifts only the vulnerable package, with a comment that names the
+  advisory.
+- **No patched version exists:** do not add the dependency. If it is already
+  on main, tell the user; they decide whether to accept it.
+- **A refused licence** (GPL, AGPL, SSPL): do not add the package. Find
+  another. A package offered under two licences, one of them permissive, is
+  the user's decision, not yours.
+
+Never loosen `fail-on-severity`, `fail-on-scopes` or `deny-licenses` to pass.
+
+### When `pnpm audit --prod` fails
+
+The same steps as an advisory above. The weekly run can fail with no change in
+the project: an advisory was published for a version already in the lockfile.
+
+### Moving a linter to a newer release
+
+`tools/ci-security/lib/pins.mts` holds the version, four URLs and four
+checksums of each linter, and its first lines give the command that prints the
+checksums. Change all of them together. If a download is refused for a wrong
+checksum, never copy the new checksum into the file to make it pass: tell the
+user.
+<!-- /add-on: ci-security -->
+
+<!-- add-on: repo-hygiene -->
+## Repo hygiene
+
+Three checks run in `gate:fast`: `pnpm check:versions`, `pnpm check:doc-links`
+and `pnpm lint:css`. Each fails with the file and what to change. What they
+cannot decide is below.
+
+**Versions.** When you add a dependency a second package already has, copy
+that package's range. When the check fails, change the ranges to agree; do not
+add a version group to get past it. A version group in
+`tools/repo-hygiene/syncpack.json` is for a difference the project wants (two
+majors during a migration), and its `label` says why and until when. Skip
+this when the project has one package.
+
+**Links.** When you rename a heading, move a file or delete a document, run
+`pnpm check:doc-links` before you commit, and repair each link it names:
+point it at the new place. Remove a link only when what it pointed to is gone
+for good. Do not work out an anchor in your head. GitHub drops punctuation and
+keeps the spaces around it, so `## A -- B` is `#a----b`; the check prints the
+anchor the file really has. It does not follow `https:` links, and it does not
+read `tools/`. Those are yours to check by reading. Skip this for a change
+that touches no markdown.
+
+**CSS.** Fix what stylelint reports. Turn a rule off in
+`tools/repo-hygiene/stylelint.json` only when the project as a whole does not
+want it, never for one file that breaks it, and say why in the commit message.
+Do not add a `stylelint-disable` comment without a reason after it. Skip this
+for a change that touches no `.css` file.
+
+Do not weaken a check to make it pass. If a finding looks wrong, say so.
+<!-- /add-on: repo-hygiene -->

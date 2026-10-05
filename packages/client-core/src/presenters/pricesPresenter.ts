@@ -1,6 +1,7 @@
-import { type Movement, type PricePort, type PriceTick, trackMovement } from "@skills-demo/domain";
 import { type DefaultedStateObservable, state } from "@rx-state/core";
 import { concat, groupBy, map, mergeMap, type Observable, of, scan, switchMap, timer } from "rxjs";
+
+import { type Movement, type PricePort, type PriceTick, trackMovement } from "@skills-demo/domain";
 
 /** How long a symbol can go without a price before its row is shown as stale. */
 export const STALE_AFTER_MS = 5000;
@@ -32,5 +33,8 @@ export function createPricesPresenter(port: PricePort): PricesPresenter {
 
 /** The row as fresh now, and again as stale if nothing replaces it in time. */
 function showThenAge(tick: PriceTick): Observable<PriceRow> {
-  return concat(of({ ...tick, stale: false }), timer(STALE_AFTER_MS).pipe(map(() => ({ ...tick, stale: true }))));
+  return concat(
+    of({ ...tick, stale: false }),
+    timer(STALE_AFTER_MS).pipe(map(() => ({ ...tick, stale: true }))),
+  );
 }

@@ -1,5 +1,6 @@
-import type { DirectorySnapshot } from "@skills-demo/domain";
 import { describe, expect, it } from "vitest";
+
+import type { DirectorySnapshot } from "@skills-demo/domain";
 
 import { mountCategoryList } from "./CategoryList.page.tsx";
 
@@ -15,7 +16,12 @@ describe("the category list", () => {
 
     await page.add("Billing");
 
-    expect(page.rows()).toEqual(["Billing, 0 users", "Design, 1 user", "Engineering, 2 users", "Operations, 0 users"]);
+    expect(page.rows()).toEqual([
+      "Billing, 0 users",
+      "Design, 1 user",
+      "Engineering, 2 users",
+      "Operations, 0 users",
+    ]);
     expect(page.newName()).toBe("");
     expect(page.refusalCount()).toBe(0);
   });
@@ -92,7 +98,9 @@ describe("the category list", () => {
     await page.remove("Engineering");
 
     expect(page.rows()).toHaveLength(3);
-    expect(page.refusalOn("Engineering")).toBe('"Engineering" still has 2 users. Move or delete them first.');
+    expect(page.refusalOn("Engineering")).toBe(
+      '"Engineering" still has 2 users. Move or delete them first.',
+    );
     expect(page.addRefusal()).toBeNull();
     expect(page.refusalCount()).toBe(1);
   });

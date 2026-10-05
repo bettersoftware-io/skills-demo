@@ -1,9 +1,10 @@
+import { defer, finalize, firstValueFrom, Subject, timeout } from "rxjs";
+import { describe, expect, it, onTestFinished } from "vitest";
+
 import { createWsConnection, createWsPricePort } from "@skills-demo/client-core";
 import { createDirectorySimulator, type Price, type PricePort } from "@skills-demo/domain";
 import { startServer } from "@skills-demo/server/startServer.ts";
 import { WS_PATH } from "@skills-demo/shared";
-import { defer, finalize, firstValueFrom, Subject, timeout } from "rxjs";
-import { describe, expect, it, onTestFinished } from "vitest";
 
 // Each side has its own tests against the shared protocol: the adapter against
 // a scripted connection, the server against a raw socket. Neither shows that
@@ -72,7 +73,7 @@ async function startBothEnds(): Promise<BothEnds> {
 
   return {
     port: createWsPricePort(createWsConnection(`ws://localhost:${server.port}${WS_PATH}`)),
-    produce: (price): void => {
+    produce: (price: Price): void => {
       source$.next(price);
     },
     feedOpened: opened.promise,

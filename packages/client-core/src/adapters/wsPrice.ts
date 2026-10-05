@@ -1,6 +1,7 @@
+import { filter, map, type Observable } from "rxjs";
+
 import type { Price, PricePort } from "@skills-demo/domain";
 import { decodePrice, parseServerMessage } from "@skills-demo/shared";
-import { filter, map, type Observable } from "rxjs";
 
 import type { WsConnection } from "./wsConnection.ts";
 

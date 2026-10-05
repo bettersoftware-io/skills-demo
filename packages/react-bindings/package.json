@@ -11,8 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@skills-demo/client-core": "workspace:*",
     "@react-rxjs/core": "^0.10.7",
+    "@skills-demo/client-core": "workspace:*",
     "react": "^19.2.3"
   },
   "devDependencies": {

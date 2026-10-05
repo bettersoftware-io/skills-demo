@@ -1,3 +1,5 @@
+import { catchError, defer, from, map, type Observable, of } from "rxjs";
+
 import {
   accept,
   type Category,
@@ -21,7 +23,6 @@ import {
   parseUser,
   parseUserList,
 } from "@skills-demo/shared";
-import { catchError, defer, from, map, type Observable, of } from "rxjs";
 
 /** As much of an HTTP response as the adapter reads. */
 export interface HttpAnswer {
@@ -51,12 +52,16 @@ const NOT_UNDERSTOOD: Refusal = {
  */
 export function createHttpDirectoryPort(
   baseUrl: string,
-  send: SendRequest = (url, request) => fetch(url, request),
+  send: SendRequest = (url: string, request: HttpRequest) => fetch(url, request),
 ): DirectoryPort {
   const root = baseUrl.replace(/\/+$/, "");
 
   /** The answer's status and its body as JSON, or null where there is no JSON. */
-  async function ask(method: string, path: string, body?: object): Promise<{ status: number; body: unknown }> {
+  async function ask(
+    method: string,
+    path: string,
+    body?: object,
+  ): Promise<{ status: number; body: unknown }> {
     const answer = await send(`${root}${path}`, {
       method,
       headers: body === undefined ? { Accept: "application/json" } : JSON_BODY,
@@ -72,7 +77,9 @@ export function createHttpDirectoryPort(
         const listed = status === 200 ? parse(body) : undefined;
 
         if (listed === undefined) {
-          throw new Error(`the directory answered ${status} to GET ${path} with no list the app understands`);
+          throw new Error(
+            `the directory answered ${status} to GET ${path} with no list the app understands`,
+          );
         }
 
         return listed;
@@ -106,7 +113,12 @@ export function createHttpDirectoryPort(
     addCategory: (draft: CategoryDraft): Observable<Outcome<Category>> =>
       change("POST", API_PATH.categories, encodeCategoryDraft(draft), parseCategory),
     renameCategory: (id: string, draft: CategoryDraft): Observable<Outcome<Category>> =>
-      change("PUT", locateEntry(API_PATH.categories, id), encodeCategoryDraft(draft), parseCategory),
+      change(
+        "PUT",
+        locateEntry(API_PATH.categories, id),
+        encodeCategoryDraft(draft),
+        parseCategory,
+      ),
     removeCategory: (id: string): Observable<Outcome<null>> =>
       change("DELETE", locateEntry(API_PATH.categories, id), undefined, parseNothing),
     addUser: (draft: UserDraft): Observable<Outcome<User>> =>

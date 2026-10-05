@@ -1,4 +1,11 @@
-import { createDirectorySimulator, type DirectoryPort, type DirectorySnapshot } from "@skills-demo/domain";
+import { throwError } from "rxjs";
+import { describe, expect, it } from "vitest";
+
+import {
+  createDirectorySimulator,
+  type DirectoryPort,
+  type DirectorySnapshot,
+} from "@skills-demo/domain";
 import {
   API_PATH,
   encodeCategoryDraft,
@@ -10,8 +17,6 @@ import {
   parseUser,
   parseUserList,
 } from "@skills-demo/shared";
-import { throwError } from "rxjs";
-import { describe, expect, it } from "vitest";
 
 import { createDirectoryApi } from "./directoryApi.ts";
 
@@ -25,7 +30,10 @@ describe("the directory API: categories", () => {
 
   it("creates a category and answers 201 with it", async () => {
     const client = createClient();
-    const response = await client.post(API_PATH.categories, encodeCategoryDraft({ name: " Design " }));
+    const response = await client.post(
+      API_PATH.categories,
+      encodeCategoryDraft({ name: " Design " }),
+    );
     const created = parseCategory(response.body);
 
     expect(response.status).toBe(201);
@@ -34,7 +42,10 @@ describe("the directory API: categories", () => {
   });
 
   it("answers 422 with the reason when the name is empty", async () => {
-    const response = await createClient().post(API_PATH.categories, encodeCategoryDraft({ name: "" }));
+    const response = await createClient().post(
+      API_PATH.categories,
+      encodeCategoryDraft({ name: "" }),
+    );
 
     expect(response.status).toBe(422);
     expect(parseRefusal(response.body)).toEqual({
@@ -45,7 +56,10 @@ describe("the directory API: categories", () => {
   });
 
   it("answers 409 when another category has the name, whatever its case", async () => {
-    const response = await createClient().post(API_PATH.categories, encodeCategoryDraft({ name: "engineering" }));
+    const response = await createClient().post(
+      API_PATH.categories,
+      encodeCategoryDraft({ name: "engineering" }),
+    );
 
     expect(response.status).toBe(409);
     expect(parseRefusal(response.body)?.reason).toBe("duplicate-name");
@@ -53,7 +67,10 @@ describe("the directory API: categories", () => {
 
   it("renames a category", async () => {
     const client = createClient();
-    const response = await client.put(locateEntry(API_PATH.categories, "ops"), encodeCategoryDraft({ name: "Support" }));
+    const response = await client.put(
+      locateEntry(API_PATH.categories, "ops"),
+      encodeCategoryDraft({ name: "Support" }),
+    );
 
     expect(response.status).toBe(200);
     expect(parseCategory(response.body)).toEqual({ id: "ops", name: "Support" });
@@ -65,7 +82,10 @@ describe("the directory API: categories", () => {
 
   it("answers 404 when the category to rename or delete is not there", async () => {
     const client = createClient();
-    const renamed = await client.put(locateEntry(API_PATH.categories, "sales"), encodeCategoryDraft({ name: "Sales" }));
+    const renamed = await client.put(
+      locateEntry(API_PATH.categories, "sales"),
+      encodeCategoryDraft({ name: "Sales" }),
+    );
     const removed = await client.delete(locateEntry(API_PATH.categories, "sales"));
 
     expect(renamed.status).toBe(404);
@@ -79,7 +99,9 @@ describe("the directory API: categories", () => {
 
     expect(response.status).toBe(204);
     expect(response.body).toBeNull();
-    expect(parseCategoryList((await client.get(API_PATH.categories)).body)).toEqual([SEED.categories[0]]);
+    expect(parseCategoryList((await client.get(API_PATH.categories)).body)).toEqual([
+      SEED.categories[0],
+    ]);
   });
 
   it("answers 409 and says why when the category to delete still has users", async () => {
@@ -92,7 +114,9 @@ describe("the directory API: categories", () => {
       field: null,
       message: '"Engineering" still has 1 user. Move or delete them first.',
     });
-    expect(parseCategoryList((await client.get(API_PATH.categories)).body)).toEqual(SEED.categories);
+    expect(parseCategoryList((await client.get(API_PATH.categories)).body)).toEqual(
+      SEED.categories,
+    );
   });
 });
 
@@ -116,20 +140,35 @@ describe("the directory API: users", () => {
 
   it("answers 422 when the email address does not look like one, or the category is not there", async () => {
     const client = createClient();
-    const badEmail = await client.post(API_PATH.users, encodeUserDraft({ ...GRACE, email: "grace" }));
-    const noCategory = await client.post(API_PATH.users, encodeUserDraft({ ...GRACE, categoryId: "sales" }));
+    const badEmail = await client.post(
+      API_PATH.users,
+      encodeUserDraft({ ...GRACE, email: "grace" }),
+    );
+    const noCategory = await client.post(
+      API_PATH.users,
+      encodeUserDraft({ ...GRACE, categoryId: "sales" }),
+    );
 
     expect(badEmail.status).toBe(422);
     expect(parseRefusal(badEmail.body)).toMatchObject({ reason: "invalid-email", field: "email" });
     expect(noCategory.status).toBe(422);
-    expect(parseRefusal(noCategory.body)).toMatchObject({ reason: "unknown-category", field: "category" });
+    expect(parseRefusal(noCategory.body)).toMatchObject({
+      reason: "unknown-category",
+      field: "category",
+    });
   });
 
   it("answers 409 when another user has the email address, whatever its case", async () => {
-    const response = await createClient().post(API_PATH.users, encodeUserDraft({ ...GRACE, email: "ADA@example.com" }));
+    const response = await createClient().post(
+      API_PATH.users,
+      encodeUserDraft({ ...GRACE, email: "ADA@example.com" }),
+    );
 
     expect(response.status).toBe(409);
-    expect(parseRefusal(response.body)).toMatchObject({ reason: "duplicate-email", field: "email" });
+    expect(parseRefusal(response.body)).toMatchObject({
+      reason: "duplicate-email",
+      field: "email",
+    });
   });
 
   it("changes a user", async () => {
@@ -139,13 +178,17 @@ describe("the directory API: users", () => {
 
     expect(response.status).toBe(200);
     expect(parseUser(response.body)).toEqual({ id: "ada", ...moved });
-    expect(parseUserList((await client.get(API_PATH.users)).body)).toEqual([{ id: "ada", ...moved }]);
+    expect(parseUserList((await client.get(API_PATH.users)).body)).toEqual([
+      { id: "ada", ...moved },
+    ]);
   });
 
   it("answers 404 when the user to change or delete is not there", async () => {
     const client = createClient();
 
-    expect((await client.put(locateEntry(API_PATH.users, "grace"), encodeUserDraft(GRACE))).status).toBe(404);
+    expect(
+      (await client.put(locateEntry(API_PATH.users, "grace"), encodeUserDraft(GRACE))).status,
+    ).toBe(404);
     expect((await client.delete(locateEntry(API_PATH.users, "grace"))).status).toBe(404);
   });
 
@@ -194,10 +237,13 @@ describe("the directory API: requests it cannot serve", () => {
   });
 
   it("lets a page from another origin send a change", async () => {
-    const response = await createDirectoryApi(createDirectorySimulator(SEED)).request(API_PATH.categories, {
-      method: "OPTIONS",
-      headers: { Origin: "http://localhost:5173", "Access-Control-Request-Method": "PUT" },
-    });
+    const response = await createDirectoryApi(createDirectorySimulator(SEED)).request(
+      API_PATH.categories,
+      {
+        method: "OPTIONS",
+        headers: { Origin: "http://localhost:5173", "Access-Control-Request-Method": "PUT" },
+      },
+    );
 
     expect(response.headers.get("access-control-allow-origin")).toBe("*");
     expect(response.headers.get("access-control-allow-methods")).toBe("GET,POST,PUT,DELETE");
@@ -244,9 +290,9 @@ function createClient(directory: DirectoryPort = createDirectorySimulator(SEED))
   }
 
   return {
-    get: (path) => send("GET", path),
-    post: (path, body) => send("POST", path, body),
-    put: (path, body) => send("PUT", path, body),
-    delete: (path) => send("DELETE", path),
+    get: (path: string) => send("GET", path),
+    post: (path: string, body: object | string): Promise<Answer> => send("POST", path, body),
+    put: (path: string, body: object | string): Promise<Answer> => send("PUT", path, body),
+    delete: (path: string): Promise<Answer> => send("DELETE", path),
   };
 }

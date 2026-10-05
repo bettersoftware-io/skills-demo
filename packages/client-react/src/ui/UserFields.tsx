@@ -1,9 +1,15 @@
-import type { CategoryRow } from "@skills-demo/client-core";
-import type { RefusalField, UserDraft } from "@skills-demo/domain";
 import type { ChangeEvent, ReactElement } from "react";
 
+import type { CategoryRow } from "@skills-demo/client-core";
+import type { RefusalField, UserDraft } from "@skills-demo/domain";
+
 /** The three fields of a user, for the form that adds one and the form that edits one. */
-export function UserFields({ draft, categories, invalid, onChange }: UserFieldsProps): ReactElement {
+export function UserFields({
+  draft,
+  categories,
+  invalid,
+  onChange,
+}: UserFieldsProps): ReactElement {
   function changeName(event: ChangeEvent<HTMLInputElement>): void {
     onChange({ name: event.target.value });
   }
@@ -28,7 +34,11 @@ export function UserFields({ draft, categories, invalid, onChange }: UserFieldsP
       </label>
       <label>
         Category
-        <select aria-invalid={invalid === "category"} value={draft.categoryId} onChange={changeCategory}>
+        <select
+          aria-invalid={invalid === "category"}
+          value={draft.categoryId}
+          onChange={changeCategory}
+        >
           <option value="">Choose a category</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>

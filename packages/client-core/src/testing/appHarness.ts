@@ -1,5 +1,11 @@
-import { createDirectorySimulator, type DirectoryPort, type DirectorySnapshot, type Price } from "@skills-demo/domain";
 import { NEVER, Subject, throwError } from "rxjs";
+
+import {
+  createDirectorySimulator,
+  type DirectoryPort,
+  type DirectorySnapshot,
+  type Price,
+} from "@skills-demo/domain";
 
 import { type App, createApp } from "../composition.ts";
 
@@ -34,7 +40,10 @@ const EMPTY: DirectorySnapshot = { categories: [], users: [] };
  * For tests above the core (bindings, UI): everything real except the outside
  * world. Lives here so those tests need no stream library of their own.
  */
-export function createAppHarness({ directory = EMPTY, directoryLink = "connected" }: AppHarnessOptions = {}): AppHarness {
+export function createAppHarness({
+  directory = EMPTY,
+  directoryLink = "connected",
+}: AppHarnessOptions = {}): AppHarness {
   const prices$ = new Subject<Price>();
   const kept = createDirectorySimulator(directory);
   let link = directoryLink;
@@ -49,7 +58,9 @@ export function createAppHarness({ directory = EMPTY, directoryLink = "connected
             return kept.categories();
           }
 
-          return link === "unanswered" ? NEVER : throwError(() => new Error("the directory cannot be reached"));
+          return link === "unanswered"
+            ? NEVER
+            : throwError(() => new Error("the directory cannot be reached"));
         },
       },
     }),

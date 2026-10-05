@@ -1,7 +1,8 @@
-import { createApp } from "@skills-demo/client-core";
-import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+
+import { createApp } from "@skills-demo/client-core";
+import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
 
 import { App } from "../ui/App.tsx";
 import { buildPorts } from "./buildPorts.ts";

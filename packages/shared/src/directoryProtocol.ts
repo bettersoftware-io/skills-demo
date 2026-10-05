@@ -1,9 +1,9 @@
 import {
   type Category,
   type CategoryDraft,
-  type Refusal,
   REFUSAL_FIELDS,
   REFUSAL_REASONS,
+  type Refusal,
   type RefusalField,
   type RefusalReason,
   type User,
@@ -166,7 +166,11 @@ export function readCategoryDraft(raw: unknown): CategoryDraft {
 export function readUserDraft(raw: unknown): UserDraft {
   const body = isRecord(raw) ? raw : {};
 
-  return { name: readText(body.name), email: readText(body.email), categoryId: readText(body.categoryId) };
+  return {
+    name: readText(body.name),
+    email: readText(body.email),
+    categoryId: readText(body.categoryId),
+  };
 }
 
 function parseList<T>(raw: unknown, parseOne: (entry: unknown) => T | undefined): T[] | undefined {

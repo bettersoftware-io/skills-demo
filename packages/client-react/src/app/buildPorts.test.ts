@@ -1,7 +1,8 @@
-import type { AppPorts } from "@skills-demo/client-core";
-import { type Category, type Price, SEED_DIRECTORY } from "@skills-demo/domain";
-import { installFakeWebSocket } from "@skills-demo/client-core/testing/fakeWebSocket.ts";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
+
+import type { AppPorts } from "@skills-demo/client-core";
+import { installFakeWebSocket } from "@skills-demo/client-core/testing/fakeWebSocket.ts";
+import { type Category, type Price, SEED_DIRECTORY } from "@skills-demo/domain";
 
 import { buildPorts } from "./buildPorts.ts";
 
@@ -52,7 +53,9 @@ describe("choosing what stands behind the ports", () => {
 
   it("asks the server for the directory when there is an API URL, whatever the price source", async () => {
     const said = silenceInfo();
-    const fetched = vi.fn(async () => new Response(JSON.stringify([{ id: "design", name: "Design" }])));
+    const fetched = vi.fn(
+      async () => new Response(JSON.stringify([{ id: "design", name: "Design" }])),
+    );
     vi.stubGlobal("fetch", fetched);
     onTestFinished(() => {
       vi.unstubAllGlobals();
@@ -61,7 +64,10 @@ describe("choosing what stands behind the ports", () => {
     const categories = await firstCategories(buildPorts(undefined, "http://example.test"));
 
     expect(categories).toEqual([{ id: "design", name: "Design" }]);
-    expect(fetched).toHaveBeenCalledWith("http://example.test/api/categories", expect.objectContaining({ method: "GET" }));
+    expect(fetched).toHaveBeenCalledWith(
+      "http://example.test/api/categories",
+      expect.objectContaining({ method: "GET" }),
+    );
     expect(said).toHaveBeenCalledWith("[directory] composed live from http://example.test");
     expect(said).toHaveBeenCalledWith("[data] composed sim: no VITE_SERVER_URL");
   });

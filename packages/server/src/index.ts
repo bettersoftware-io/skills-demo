@@ -1,12 +1,12 @@
 import { createDirectorySimulator, createPriceSimulator } from "@skills-demo/domain";
 import { API_ROOT, WS_PATH } from "@skills-demo/shared";
 
-import { startServer } from "./startServer.ts";
+import { type RunningServer, startServer } from "./startServer.ts";
 
 // The server's composition root: read the configuration, pick the sources,
 // start. The directory is kept in memory, so it starts again from its few
 // categories and users each time the server does.
-const server = await startServer({
+const server: RunningServer = await startServer({
   port: Number(process.env.PORT ?? 4000),
   prices: createPriceSimulator(),
   directory: createDirectorySimulator(),

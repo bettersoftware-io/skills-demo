@@ -164,13 +164,17 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
   }
 
   return {
-    categories: (): Observable<Category[]> => defer(() => of(categories.map((category) => ({ ...category })))),
+    categories: (): Observable<Category[]> =>
+      defer(() => of(categories.map((category) => ({ ...category })))),
     users: (): Observable<User[]> => defer(() => of(users.map((user) => ({ ...user })))),
-    addCategory: (draft): Observable<Outcome<Category>> => defer(() => of(addCategory(draft))),
-    renameCategory: (id, draft): Observable<Outcome<Category>> => defer(() => of(renameCategory(id, draft))),
-    removeCategory: (id): Observable<Outcome<null>> => defer(() => of(removeCategory(id))),
-    addUser: (draft): Observable<Outcome<User>> => defer(() => of(addUser(draft))),
-    changeUser: (id, draft): Observable<Outcome<User>> => defer(() => of(changeUser(id, draft))),
-    removeUser: (id): Observable<Outcome<null>> => defer(() => of(removeUser(id))),
+    addCategory: (draft: CategoryDraft): Observable<Outcome<Category>> =>
+      defer(() => of(addCategory(draft))),
+    renameCategory: (id: string, draft: CategoryDraft): Observable<Outcome<Category>> =>
+      defer(() => of(renameCategory(id, draft))),
+    removeCategory: (id: string): Observable<Outcome<null>> => defer(() => of(removeCategory(id))),
+    addUser: (draft: UserDraft): Observable<Outcome<User>> => defer(() => of(addUser(draft))),
+    changeUser: (id: string, draft: UserDraft): Observable<Outcome<User>> =>
+      defer(() => of(changeUser(id, draft))),
+    removeUser: (id: string): Observable<Outcome<null>> => defer(() => of(removeUser(id))),
   };
 }

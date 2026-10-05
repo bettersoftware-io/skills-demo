@@ -25,7 +25,8 @@ export function createPriceSimulator({
   nextPrice = createRandomWalk(),
 }: PriceSimulatorOptions = {}): PricePort {
   return {
-    prices: (): Observable<Price> => defer(() => timer(intervalMs, intervalMs).pipe(map(() => nextPrice()))),
+    prices: (): Observable<Price> =>
+      defer(() => timer(intervalMs, intervalMs).pipe(map(() => nextPrice()))),
   };
 }
 
@@ -35,7 +36,7 @@ export function createRandomWalk(random: () => number = Math.random): () => Pric
 
   return (): Price => {
     // `random()` is below 1, so the index is always inside the list.
-    const price = latest[Math.floor(random() * latest.length)]!;
+    const price = latest[Math.floor(random() * latest.length)];
 
     price.mid = roundToPips(price.mid * (1 + (random() * 2 - 1) * 0.001));
 

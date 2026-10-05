@@ -1,3 +1,18 @@
+import { type DefaultedStateObservable, state } from "@rx-state/core";
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  forkJoin,
+  map,
+  type Observable,
+  of,
+  Subject,
+  startWith,
+  switchMap,
+  tap,
+} from "rxjs";
+
 import {
   type Category,
   type CategoryDraft,
@@ -10,20 +25,6 @@ import {
   type User,
   type UserDraft,
 } from "@skills-demo/domain";
-import { type DefaultedStateObservable, state } from "@rx-state/core";
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  forkJoin,
-  map,
-  type Observable,
-  of,
-  startWith,
-  Subject,
-  switchMap,
-  tap,
-} from "rxjs";
 
 /** One row of the category list, ready to render. */
 export interface CategoryRow {
@@ -83,7 +84,12 @@ export const BLANK_USER: UserDraft = { name: "", email: "", categoryId: "" };
 
 type Loaded = { reached: true; categories: Category[]; users: User[] } | { reached: false };
 
-const LOADING: DirectoryView = { status: "loading", categories: [], users: [], shownCategory: null };
+const LOADING: DirectoryView = {
+  status: "loading",
+  categories: [],
+  users: [],
+  shownCategory: null,
+};
 
 export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresenter {
   const reload$ = new Subject<void>();
@@ -106,7 +112,10 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
   );
 
   /** Refuses a flawed draft without asking; otherwise asks, and reloads once the change is made. */
-  function perform<T>(flaw: Refusal | null, change: () => Observable<Outcome<T>>): Observable<Outcome<T>> {
+  function perform<T>(
+    flaw: Refusal | null,
+    change: () => Observable<Outcome<T>>,
+  ): Observable<Outcome<T>> {
     if (flaw !== null) {
       return of(refuse(flaw));
     }
@@ -122,27 +131,32 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
 
   return {
     view$,
-    showCategory: (id): void => {
+    showCategory: (id: string | null): void => {
       shown$.next(id);
     },
     reload: (): void => {
       reload$.next();
     },
-    addCategory: (draft) => perform(checkCategoryDraft(draft), () => port.addCategory(draft)),
-    renameCategory: (id, draft) => perform(checkCategoryDraft(draft), () => port.renameCategory(id, draft)),
-    removeCategory: (id) => perform(null, () => port.removeCategory(id)),
-    addUser: (draft) => perform(checkUserDraft(draft), () => port.addUser(draft)),
-    changeUser: (id, draft) => perform(checkUserDraft(draft), () => port.changeUser(id, draft)),
-    removeUser: (id) => perform(null, () => port.removeUser(id)),
-    categoryDraft: (id): CategoryDraft => {
+    addCategory: (draft: CategoryDraft) =>
+      perform(checkCategoryDraft(draft), () => port.addCategory(draft)),
+    renameCategory: (id: string, draft: CategoryDraft) =>
+      perform(checkCategoryDraft(draft), () => port.renameCategory(id, draft)),
+    removeCategory: (id: string) => perform(null, () => port.removeCategory(id)),
+    addUser: (draft: UserDraft) => perform(checkUserDraft(draft), () => port.addUser(draft)),
+    changeUser: (id: string, draft: UserDraft) =>
+      perform(checkUserDraft(draft), () => port.changeUser(id, draft)),
+    removeUser: (id: string) => perform(null, () => port.removeUser(id)),
+    categoryDraft: (id: string): CategoryDraft => {
       const row = view$.getValue().categories.find((category) => category.id === id);
 
       return row === undefined ? BLANK_CATEGORY : { name: row.name };
     },
-    userDraft: (id): UserDraft => {
+    userDraft: (id: string): UserDraft => {
       const row = view$.getValue().users.find((user) => user.id === id);
 
-      return row === undefined ? BLANK_USER : { name: row.name, email: row.email, categoryId: row.categoryId };
+      return row === undefined
+        ? BLANK_USER
+        : { name: row.name, email: row.email, categoryId: row.categoryId };
     },
   };
 }

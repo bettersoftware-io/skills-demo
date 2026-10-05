@@ -15,7 +15,7 @@
     "test": "turbo run test",
     "lint": "eslint --flag unstable_native_nodejs_ts_config .",
     "gates": "node tools/arch/gates/run.mts",
-    "gate:fast": "pnpm gates && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check",
+    "gate:fast": "pnpm gates && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check && pnpm biome:check && pnpm check:versions && pnpm check:doc-links && pnpm lint:css",
     "gate:full": "pnpm gate:fast && pnpm test && pnpm build && pnpm coverage",
     "coverage": "node tools/coverage/run.mts",
     "coverage:gaps": "node tools/coverage/gaps.mts",
@@ -25,19 +25,31 @@
     "visual:jitter": "node tools/visual/jitter.mts",
     "visual:check": "node tools/visual/check-pin.mts && pnpm --dir packages/client-react run typecheck:visual",
     "perf:check": "node tools/perf/check-animations.mts",
-    "perf:motion-audit": "node tools/perf/motion-audit.mts"
+    "perf:motion-audit": "node tools/perf/motion-audit.mts",
+    "biome:format": "biome format --write .",
+    "biome:fix": "biome check --write .",
+    "biome:check": "biome ci --error-on-warnings .",
+    "lint:workflows": "node tools/ci-security/lint-workflows.mts",
+    "check:versions": "node tools/repo-hygiene/check-versions.mts",
+    "check:doc-links": "node tools/repo-hygiene/check-doc-links.mts",
+    "lint:css": "node tools/repo-hygiene/check-css.mts"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.14",
+    "@manypkg/cli": "^0.25.1",
     "@types/node": "^26.2.0",
     "@typescript-eslint/utils": "^8.70.1",
     "@typescript/native": "npm:typescript@^7.0.2",
+    "@vitest/coverage-v8": "^5.0.3",
     "dependency-cruiser": "^18.0.0",
     "eslint": "^10.5.0",
+    "playwright": "1.63.0",
+    "stylelint": "^17.13.0",
+    "stylelint-config-standard": "^40.0.0",
+    "syncpack": "^15.3.2",
     "turbo": "^2.4",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "typescript-eslint": "^8.61.1",
-    "vitest": "^5.0.3",
-    "@vitest/coverage-v8": "^5.0.3",
-    "playwright": "1.63.0"
+    "vitest": "^5.0.3"
   }
 }

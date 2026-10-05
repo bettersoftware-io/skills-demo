@@ -1,6 +1,7 @@
+import type { ReactElement } from "react";
+
 import type { PriceRow } from "@skills-demo/client-core";
 import { useViewModel } from "@skills-demo/react-bindings";
-import type { ReactElement } from "react";
 
 import { TESTIDS } from "./testids.ts";
 
@@ -47,7 +48,12 @@ function PriceRowView({ row, selected, onSelect }: PriceRowViewProps): ReactElem
   }
 
   return (
-    <tr data-testid={TESTIDS.priceRow} data-selected={selected} data-stale={row.stale} onClick={selectRow}>
+    <tr
+      data-testid={TESTIDS.priceRow}
+      data-selected={selected}
+      data-stale={row.stale}
+      onClick={selectRow}
+    >
       <th scope="row">{row.symbol}</th>
       <td data-movement={row.movement}>{row.mid.toFixed(4)}</td>
     </tr>

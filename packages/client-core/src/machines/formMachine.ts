@@ -1,6 +1,7 @@
-import { type Outcome, type Refusal, UNAVAILABLE } from "@skills-demo/domain";
 import { state } from "@rx-state/core";
-import { type Observable, scan, Subject, Subscription } from "rxjs";
+import { type Observable, Subject, Subscription, scan } from "rxjs";
+
+import { type Outcome, type Refusal, UNAVAILABLE } from "@skills-demo/domain";
 
 import type { Machine } from "./machine.ts";
 
@@ -50,7 +51,10 @@ export type FormAction<TDraft> =
   | { type: "refused"; refusal: Refusal }
   | { type: "settled"; rest: FormState<TDraft> };
 
-export function reduceForm<TDraft>(current: FormState<TDraft>, action: FormAction<TDraft>): FormState<TDraft> {
+export function reduceForm<TDraft>(
+  current: FormState<TDraft>,
+  action: FormAction<TDraft>,
+): FormState<TDraft> {
   switch (action.type) {
     case "opened":
       return { open: true, draft: action.draft, refusal: null, busy: false };
@@ -145,10 +149,10 @@ function createForm<TDraft>(rest: FormState<TDraft>): Form<TDraft> {
     state$,
     dispatch,
     settle,
-    change: (patch): void => {
+    change: (patch: Partial<TDraft>): void => {
       dispatch({ type: "changed", patch });
     },
-    send: (change): void => {
+    send: (change: () => Observable<Outcome<unknown>>): void => {
       if (state$.getValue().busy) {
         return;
       }
@@ -156,7 +160,7 @@ function createForm<TDraft>(rest: FormState<TDraft>): Form<TDraft> {
       dispatch({ type: "sent" });
       subscriptions.add(
         change().subscribe({
-          next: (outcome) => {
+          next: (outcome: Outcome<unknown>) => {
             if (outcome.accepted) {
               settle();
             } else {
