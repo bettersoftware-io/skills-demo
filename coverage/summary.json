@@ -1,8 +1,8 @@
 {
-  "commit": "ed139c0ef2afa53631c1f6fa06da35e2ef52758a",
+  "commit": "bbd25414057eddde6039a4f03e49c1ec28dc9f23",
   "uncommittedChanges": false,
   "ref": "main",
-  "builtAt": "2026-10-05T10:00:15.080Z",
+  "builtAt": "2026-10-05T13:05:33.770Z",
   "thresholds": {
     "lines": 95,
     "statements": 95,
@@ -46,6 +46,16 @@
       "reason": "5 files at or above the bar",
       "measuredFiles": 5,
       "emptyFiles": 4,
+      "underTheBar": [],
+      "unexplainedIgnores": [],
+      "failedTests": []
+    },
+    {
+      "directory": "packages/integration",
+      "verdict": "SKIP",
+      "reason": "no file to measure: none matches `include`, or every one is excluded",
+      "measuredFiles": 0,
+      "emptyFiles": 0,
       "underTheBar": [],
       "unexplainedIgnores": [],
       "failedTests": []
