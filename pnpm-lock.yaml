@@ -273,6 +273,24 @@ importers:
         specifier: ^7.8.2
         version: 7.8.2
 
+  packages/integration:
+    devDependencies:
+      '@skills-demo/client-core':
+        specifier: workspace:*
+        version: link:../client-core
+      '@skills-demo/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@skills-demo/server':
+        specifier: workspace:*
+        version: link:../server
+      '@skills-demo/shared':
+        specifier: workspace:*
+        version: link:../shared
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+
   packages/react-bindings:
     dependencies:
       '@react-rxjs/core':
