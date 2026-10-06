@@ -56,4 +56,10 @@ pnpm e2e          # end-to-end: the built client in a browser, on the simulator 
 pnpm visual       # screenshots of the UI against the committed goldens
 ```
 
+The end-to-end specs cover the price list and the directory in both modes. In
+full-stack mode they compare the screen with what the server answered, and
+load the page afresh to show the server kept it. Each directory spec is shown
+able to fail: `pnpm mutation-check packages/e2e/mutants.json` breaks the app
+one way at a time and expects the spec to go red.
+
 The checks live in `tools/arch` and are described in its README.

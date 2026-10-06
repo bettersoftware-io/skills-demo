@@ -1,6 +1,14 @@
 import { test as base, expect, type Page } from "@playwright/test";
 
 import {
+  createDirectoryPage,
+  type DirectoryPage,
+} from "../pages/Directory.page.ts";
+import {
+  type DirectoryApiPage,
+  watchDirectoryApi,
+} from "../pages/DirectoryApi.page.ts";
+import {
   createPriceListPage,
   type PriceListPage,
 } from "../pages/PriceList.page.ts";
@@ -22,6 +30,8 @@ export interface ModeOptions {
 interface PageObjects {
   priceList: PriceListPage;
   serverFeed: ServerFeedPage;
+  directory: DirectoryPage;
+  directoryApi: DirectoryApiPage;
   /** Fails a test whose page threw. Every test has it, asked for or not. */
   crashes: string[];
 }
@@ -45,6 +55,20 @@ export const test = base.extend<PageObjects & ModeOptions>({
     use: Use<ServerFeedPage>,
   ): Promise<void> => {
     await use(watchServerFeed(page, serverUrl));
+  },
+
+  directory: async (
+    { page }: WithPage,
+    use: Use<DirectoryPage>,
+  ): Promise<void> => {
+    await use(createDirectoryPage(page));
+  },
+
+  directoryApi: async (
+    { page, serverUrl }: WithPage & ModeOptions,
+    use: Use<DirectoryApiPage>,
+  ): Promise<void> => {
+    await use(watchDirectoryApi(page, serverUrl));
   },
 
   crashes: [
