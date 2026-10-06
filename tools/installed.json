@@ -1,7 +1,13 @@
 {
   "kit": {
     "files": {
-      "tools/arch/README.md": "64eaf2dbc6a314067872aa4fdb2acd5a913b32dc3aa93fb90b303893d6052264",
+      "tools/arch/README.md": "156220bd50f41236a813711938a5a82fb5264ad1c69097db602d6a58a472e460",
+      "tools/arch/check-compiler.mts": "e98d7c2d26d317e28061b59d909da00f887644f5fab67984f9d7b5c9f7eb7c04",
+      "tools/arch/check-react-policies.mts": "2c7376e49cef4368b946ad39c24784994b47965907f94a9a19c2e4f9157726e9",
+      "tools/arch/ci/corepack/package-lock.json": "e832aaa8d3c5beb67be8887533a3eaaa327beebbc6a6ab447eae0c2da39bab35",
+      "tools/arch/ci/corepack/package.json": "0e6a36f6156ab759f1237ca6ea293c88d3e5110265e28b2bb394d2b52be68cce",
+      "tools/arch/ci/enable-corepack.mts": "fb39770927805de1ac39d90fd00e0771959341b57f2f612e225daecbc5459c5a",
+      "tools/arch/ci/pin-package-manager.mts": "55244482902bbd2f4bac221b91c94f6b046e6144d10ce0c5da24806ce1d0296a",
       "tools/arch/docs/handler-naming.md": "eb42398985e010ea302ee0bded7de227d334b0339d4d76694a70b7f95983a40f",
       "tools/arch/docs/review.md": "c0cacc16c37e5060180af1ae48b9a3304279bcd7acd16488fbbff5e00c03d567",
       "tools/arch/eslint-rules/class-filename-match.mts": "7255b0f1c69417b073465ccbb1546d6de3fe3881069e0df8dca50f07d4b9dbc5",
@@ -11,32 +17,46 @@
       "tools/arch/eslint-rules/name-functions-by-effect.mts": "058b3a9d359fb1b6f251e5d06d2bdb40ab5d037a171710c219631d7d425fcca0",
       "tools/arch/eslint-rules/name-jsx-handlers.mts": "f2c7e5bd2139081579c46d16d4f9c2017c95cdc4394ba4d1df499eafc0269c39",
       "tools/arch/eslint-rules/newspaper-order.mts": "ef43bc6e8ff64f734f486a2117108bc1f2bd0c9e81eee29358e4688b9b6cb03a",
+      "tools/arch/eslint-rules/no-browser-driver-in-specs.mts": "b4b1f56c5abf36dcad1f8f44f902ea0a5ae66855bad1479635039963d7316efd",
       "tools/arch/eslint-rules/no-framework-calls-in-specs.mts": "9947f1dead91ba79e04ea31202d5c8231af83078bfd51675a4bea29b5c9eb328",
       "tools/arch/eslint-rules/no-minified-json-literal.mts": "fc140d3e07108d7432f66dbc80919c05e1c5a2819a2437d2d7e44f4120e89022",
       "tools/arch/eslint-rules/no-real-sleeps-in-tests.mts": "8b64014b43d31e3d70f219c1aa12549fcf49df062d0551bd2dbf8da5b07863fe",
       "tools/arch/eslint-rules/no-render-functions.mts": "8a8fdd17c383f9b3bafb078b6103241dfdf30eea9f9146e4e4d214492cf604e9",
+      "tools/arch/eslint-rules/one-import-per-module.mts": "2ff9d8a85fb9a7ed4e0044050782584371fa4cd4d974e90614cd873fed4e6ea8",
       "tools/arch/eslint-rules/page-objects-own-their-component.mts": "c149be0134a5839b50718ae4ee3cb4cb751094db376b9c1caf7e89f8c66836a3",
-      "tools/arch/eslint.config.mts": "41bca297bf2f710e6a71f700e2548bdc4d17cddf8bce29ab821e4512767ba236",
-      "tools/arch/gates/lib/config.mts": "b1d93aae045dda281d5b020b6a116ffbae5d613c0bdd51454df6e107e5e7a555",
-      "tools/arch/gates/lib/contracts.mts": "1eda4d1e923094f65afa9d203cf3fad0bf706efcc58f6bf77f9cf19c539dc588",
-      "tools/arch/gates/lib/depcruise.mts": "908d2a8f26c93c0e3d08ab2042855b32595a675033c9e13e58cb260c722b1dc2",
-      "tools/arch/gates/lib/files.mts": "62d22ba4d4baaae2899632033478513740db7621be160afbc761b874e585bfed",
+      "tools/arch/eslint.config.mts": "88659bb997d98934dc98a2421e02748dd4fc4702db27784c9caa38015dc927fa",
+      "tools/arch/gates/gates.json": "09e7a7ba6a5934f08288ba7f4ea18ed6a776ce8286167185977e3983d6d8fa06",
+      "tools/arch/gates/lib/app-harness.mts": "eb5f70719281663aa6a414560d4cd3c907a346bc363ef6b75ddfce998ed1a42c",
+      "tools/arch/gates/lib/config.mts": "612a0ec161a46a39a577522b49b4190f9dbd8fd8794e46874042e39e80db9a63",
+      "tools/arch/gates/lib/contracts.mts": "334c6a06b512f59b6d645083bfd672eaa4047308b2e142436141af0b3a513efe",
+      "tools/arch/gates/lib/depcruise.mts": "79582e7189ab280a73257380c7ac4ff06a961b9954e0a0a2da5c8b7468867199",
+      "tools/arch/gates/lib/files.mts": "c4594b2dcacb2681bd10d07c68fcc61909a1aed3a9b1b2188751c0e96b06d36e",
       "tools/arch/gates/lib/instructions.mts": "c038d0c981033aaa976ee8d67ec0c01a04c62f4cb2601926eaf6c345fb65810f",
       "tools/arch/gates/lib/language.mts": "f718fdddbc04a1058b78820a98e10fde2fcf1ae6ba338608319e06bfd8bcec32",
-      "tools/arch/gates/lib/structure.mts": "0184fae2e77647b2c024778ad8c6dbeb2a9390f6f61da5cd06d74668dae27e77",
+      "tools/arch/gates/lib/node-floor.mts": "1212a8a39e1e05370b57db297a6251cece4f21134a8779ef71c6df04214b2725",
+      "tools/arch/gates/lib/package-manager.mts": "3a18d3589727b315f8200aefa1bd883bb333d0cd90a2c93114d1a016cfb80ec1",
+      "tools/arch/gates/lib/package-scripts.mts": "b3dc8ea6479acc48ce1e9873d2a0ef9557aa29d1227a801361ffef1a52c0385f",
+      "tools/arch/gates/lib/playwright-pin.mts": "d31048ef201f4f6fcc4dc482c298c230b60a07355c1dc11672bdf90dd86b243f",
+      "tools/arch/gates/lib/structure.mts": "8b82261835f556f048a035040df831f3878c15e4e207cd6e6bf897460ccd7ca2",
       "tools/arch/gates/lib/task-cache.mts": "a25ea796f3e71f5e29bf13991a2a2dc90c24747cddadf323d2e1d94c28a8fe6c",
+      "tools/arch/gates/lib/test-ids.mts": "fb08ca4148b059fd411087c918064e11235c4af33e91c62d93375fe749d5bd33",
+      "tools/arch/gates/lib/types-only.mts": "fc3207813793f440ec3233e8183fba3f3e272dd296b570baa88244ebb8e5089f",
       "tools/arch/gates/lib/ui-bans.mts": "b8aea78943e779a05913db1f0db0840ddfe45979fe8e39c4b7568d859e960357",
-      "tools/arch/gates/run.mts": "1f081d46611aa1ec060d6ee2a7deaeba090ed23d23bbf7a29cdbf1031e0cff30",
+      "tools/arch/gates/quiet.mts": "0b1bc587c460e39b831f21e0b78365d1ce914c4f828d651898e6e58561d3780a",
+      "tools/arch/gates/run.mts": "f2f44eee8fc39701a45f86504e10bf26b63f37a4c55cd2383d7fb4b467e82049",
       "tools/arch/hooks/after-edit.mts": "1de0ed2f2bc8d104a09d250bcf8efc3e883d936c0a58ad407e868a0eb4d416ea",
-      "tools/arch/hooks/before-stop.mts": "385fed5debaa0e02039a6a821be175fbb188957d699e4fe5990fda7149a620c8",
+      "tools/arch/hooks/before-stop.mts": "b0271a46b7cd19346f7327dc467b30ffb3f9722f75de5de781899b58f077393f",
       "tools/arch/hooks/claude.settings.json": "6e11703439c3bb4265b5c0bea7bf94a1962414db2f5617d5924d7047bd3ed7ea",
       "tools/arch/hooks/codex.hooks.json": "14b3bc4e19d7ce1ef510a9e530dff00c25cbc9ddee830484bbba87c22e646545",
+      "tools/arch/lint-dependencies.mts": "41675af6a8a05207d002f587c027518bb69d89d9d3af28bf791b0722d2269672",
+      "tools/arch/templates/AGENTS.md.txt": "3b41a8ddb919304fe5b18af927a9db4f855d750ab661afe5a53b341dac949481",
+      "tools/arch/templates/architecture.config.mts.txt": "cd31e9939135f78bae56b56940e914d018f9540c7e64510693b8fc12141f7d58",
       "tools/arch/testing/portTests.mts": "81fba3da26074db268fb24c81bf3d521cd68b39b61eb9c472304ef3642d8c1b5"
     }
   },
   "coverage": {
     "files": {
-      ".github/workflows/coverage.yml": "a705c37c4ad4efc12b91d731fed36b80e6563acdeadd2158d0f6b2eba8a85c17",
+      ".github/workflows/coverage.yml": "dd54cf763e8deee63c51ae448b2512e54c98ec2e9a51e0df5bbe436251cbb77d",
       "tools/.gitignore": "4424513510f3bbbe04155cd812f9a7bb6731a8c06ccb25cd3b20de9512c556eb",
       "tools/coverage/gaps.mts": "20f229aac0bfc5e42a69a8f6806f580382d5eabd1515f3b8f3a2880c1a423b86",
       "tools/coverage/lib/config.mts": "106bf9ccecb16de01d8f08c7c238c9712c534788826a27460e8c4a7666320d29",
@@ -47,28 +67,31 @@
       "tools/coverage/lib/measure.mts": "81b3e2c41f384790dcd09cc0b8845cf4517f3be08b73017f675bc70679a21450",
       "tools/coverage/lib/report.mts": "de83c9b68d153fdbd25af2b224b42b31f9c6145b3c91ea8db6965caef0a77291",
       "tools/coverage/lib/site.mts": "855e11fa5388cbe6f9022a79892bf2d14ad01c6fbf0dc1b98609f82117b203cf",
-      "tools/coverage/lib/workspace.mts": "62fd854d59951423f41d6437deffdc61187d180dc62213ac23155fd12e6561fe",
-      "tools/coverage/mutation-check.mts": "39f03006f5050db5c6938fb4c6df7277b0c88050026fb582844494970e3d2bd6",
+      "tools/coverage/lib/workspace.mts": "5ebdd7291cfeb30d2ee4516dccf91bb02083c4c6558a6ec9f07a72ece6fddea8",
+      "tools/coverage/mutation-check.mts": "91c79da7b8a6dd7de014f47ac21659e2f83ad25868d343fdee5a7d38586e3d3e",
       "tools/coverage/publish-to-pages.mts": "005e5a8f60cbb66275b47a5bee7a636a6e848362ae492d86948f05a309ef9383",
-      "tools/coverage/run.mts": "e6aa25defbb358ab0bccce6bfd42107820290369cdbc8374fa00646a0de5ca6a"
+      "tools/coverage/run.mts": "71a720658afa7fb70a7cfbb5c7492756b54cde7a3572c17c43a3f573ad739039",
+      "tools/templates/coverage.tools__coverage.config.mts.txt": "c2a2446495d7557fb6ec7761ae199900e7a1744c025f32eaeda42c3fe848bb7f"
     }
   },
   "visual": {
     "files": {
-      ".github/workflows/update-visual-goldens.yml": "faa7613f0aa3c745d28f63bc6a79078189bbd2173cb0d4050d846a7570173243",
-      ".github/workflows/visual.yml": "0ca09d7bf4d5d03760d03558fd3662550e83f83d5ea285644eac5a7241157e13",
+      ".github/workflows/update-visual-goldens.yml": "0225e94dadf3e1c60822ee2c3dad5e75b6d2a8eee0fe158a8e1e63247ab0a75d",
+      ".github/workflows/visual.yml": "2682244ec23f5817be2fd0ef1aba9de6148e2c248303eedc0835afafae30a3bd",
       "packages/client-react/tests/visual/.gitignore": "8f3de1e507d277f725b13858f0c46932e42bed12a7aeaf6adc57fb7089023581",
-      "packages/client-react/tests/visual/goldens.ts": "36f7b23eed29ec22968e239f7307c6336383aeeeba832bb15b02956d7944be25",
-      "packages/client-react/tests/visual/host/ScenarioFrame.tsx": "8e2ff957638c028169abcd87a057b6a9b899d4f30cd81c4aef5e999cd0fb4d5c",
+      "packages/client-react/tests/visual/goldens.ts": "846057710f268a451fd36ce1424ceef72c3c8b369e089e877016c4ec266d675e",
+      "packages/client-react/tests/visual/host/ScenarioFrame.tsx": "36739ccfdd3bb19cad2e6ea4b1e2cd09ae1ce4aad8ad8b02e98300fd7c74b214",
       "packages/client-react/tests/visual/host/address.ts": "ec71443e6bcee33648c734ed652f9ef7ff7f93141b64569f5bf10869d2307e96",
       "packages/client-react/tests/visual/host/host.css": "d1bc10f4e3695d04bed182dd19a3827b0d41e57c16d29af4d13874a183946145",
       "packages/client-react/tests/visual/host/index.html": "05d2386ef0a3b73da06339dceeb191726c8e03c1db87d0c4dab0680c35e1ba23",
-      "packages/client-react/tests/visual/host/main.tsx": "b6443808b74f110641c3458de0a33b6583e73c2b61e3debbc81993a431e9257e",
-      "packages/client-react/tests/visual/host/vite.config.ts": "27deef25fb8abf01ed904f813953822ff01580cd07bb76828b37ed1027e3a8de",
+      "packages/client-react/tests/visual/host/main.tsx": "895d47e955f9c369e0404275f8562488cfe021e71813d8effacbe916e5481079",
+      "packages/client-react/tests/visual/host/vite.config.ts": "4343bcc7ca015ab2b8e30f6187998e8b7267e5419a923426192123eface35611",
       "packages/client-react/tests/visual/playwright.config.ts": "2abaf90d0d666e3e9b67513e43af5df6dfcff4b7dd970b293e3fa486f4506c09",
       "packages/client-react/tests/visual/tsconfig.json": "a0a6a1cd826b12ed3c33226f18216641b5bbae249053cf0c4eaf31edfa5e2d82",
-      "packages/client-react/tests/visual/visual.pw.ts": "842327eef654c6ca48dfaa5b92767446ae65f4f9762d746a292a28df2fc5198d",
-      "tools/visual/check-pin.mts": "c5077dbc00d665328a589cca335f0e74938811f9c5eadaabb2ba523bdf32c136",
+      "packages/client-react/tests/visual/visual.pw.ts": "f9dbe9475f1e32ce51a212f965d31f8f439d06da9a13d2bcd2c1812830e992fc",
+      "tools/templates/visual.packages__client-react__tests__visual__scenarios.ts.txt": "9e57628de473c2be8537e0fc42ae1c15693aa7638e2aac48c7878e7b7caaeeb2",
+      "tools/templates/visual.packages__client-react__tests__visual__tolerance.ts.txt": "deac82178a23be629bfa4649a2197134c29c6ed38e5d687e32b19875665fe2b5",
+      "tools/visual/check-server.mts": "2a25c00126f585a889d409128404cc201a158d68b192676117ff1dbb0f580325",
       "tools/visual/jitter.mts": "26f21500df1e879d846ea706e1c88777de928cbc25eeb1c237d948b5dff3c9fa",
       "tools/visual/lib/arguments.mts": "ef3da4c459975f347c05df4483f4766d0095adf94e1b0e665bd2667597817d77",
       "tools/visual/lib/measure.mts": "873303992ebeb6a41c2f0b719019bbfc5c8d5e9e3831ccea30573cb1e9dc1a72",
@@ -79,7 +102,7 @@
   },
   "performance": {
     "files": {
-      ".github/workflows/perf.yml": "c7e7d32e2eb2fe8cba5f4be94bcfc688673887e084545bef3ab9fa0e45b9b3bd",
+      ".github/workflows/perf.yml": "f1646fb1fce76826d6be4304f52e3bae2826f542f2bd96c35b46fd5e90b53b97",
       "docs/performance.md": "6761e09ece28855a5a475a8d62e4b1c86928dfeea47fedb8011dc18de83b4499",
       "tools/perf/check-animations.mts": "e2d8ba99dbc36e1476377cea1aaf32140aff5fe9bf05e861e6d21fe02a73048a",
       "tools/perf/lib/allowed.mts": "19f265c3667cbf690643366c10b8748287a4e66eee41274fbcdd65943339bd1f",
@@ -91,35 +114,77 @@
       "tools/perf/lib/rules.mts": "f03a3c175dad08e6bf97d6157f87dd4d8451dac19a61add20762d63218c7b62e",
       "tools/perf/lib/server.mts": "603435cd2d9e12db02bf46c90636c6e8e88b8a9156030762384851bbab302344",
       "tools/perf/lib/waapi.mts": "feb563f0b2da5aa63f13db9037ba3a7f72781ec92d0a32153d8e1f49497e752d",
-      "tools/perf/motion-audit.mts": "cff0cd3b848fa5ce789298836d47cd5b799b3a7fe05434bd03bb8e6bfe9f4908"
+      "tools/perf/motion-audit.mts": "cff0cd3b848fa5ce789298836d47cd5b799b3a7fe05434bd03bb8e6bfe9f4908",
+      "tools/templates/performance.tools__perf__allowed.mts.txt": "452928e9a2982102edf1cfa4770f3c2b805704f4c7a55ed2ff2d452e9c5d8371"
     }
   },
   "format-lint": {
     "files": {
-      "tools/format-lint/biome.base.json": "d55b138fdc9e2a888bc24b8f27395c3c7d244f2b1bad7162534bee9d4c1daa92"
+      "tools/format-lint/biome.base.json": "a4b9f180133a5c855acb56980de3eff6759dc4ec3bd4bdadcbeea9c1eede42fb",
+      "tools/templates/format-lint.biome.json.txt": "837989065b90202735ec8a433beaeaab8610fe4bf2d3c4a6862282d0ea4dedbf"
     }
   },
   "ci-security": {
     "files": {
-      ".github/workflows/ci-security.yml": "f3feb41c7f6b5736f31548bdf58c38cbe6bb3b29a00f6fde18f059d7812a2470",
-      ".github/workflows/dependency-review.yml": "d02a97aeedaa88d75c86ae756006f30dad0e57aa95e50c4a64dd85d62bbb5f40",
+      ".github/workflows/ci-security.yml": "43e8b4770dc6274f4ff920344fbb5c84b21241d2d3dfc7c0784bea8c965b8f62",
+      ".github/workflows/dependency-review.yml": "775d67ae2fb061a8a5dd93b9acacdcfa8e85d3a90f08e36e385e29e0f56c6c7b",
       ".github/workflows/scorecard.yml": "75971979909395745f4d7b7c8abe65da9985c868dc41d9766b8bfd2cf4db7dce",
+      "tools/ci-security/check-dockerfiles.mts": "932ac146a2defc999611db86ddcf7f5921ddf51adc6fc24c976bb3406e578bf7",
       "tools/ci-security/lib/install.mts": "0dd644ee915bcd45cd32c1bc196d93cd0ee131460ba4fc70c9e945e12228a751",
       "tools/ci-security/lib/lint.mts": "47f6d21e29513b78ae3bba5b0b68155f20121d86597e3b1c18336c219f37f097",
-      "tools/ci-security/lib/pins.mts": "9e1ea77163084885c4de91c716c8d94600d2db02d82ca937e99d86706bb380bf",
+      "tools/ci-security/lib/pins.mts": "f795c255b8bc1f8121cf3374a40d4a9a26a73dd8e8045f4a9bc14cfcb178b682",
       "tools/ci-security/lib/system.mts": "c261036e909cef7ff1dce6b2d2634e0963fb1595e942a3d529e5ee6e28000cba",
-      "tools/ci-security/lint-workflows.mts": "e3cf7ddb033053576320cb9306219d001c20e6af58fb997b0b8e92ade8a8ac41"
-    }
+      "tools/ci-security/lint-workflows.mts": "e3cf7ddb033053576320cb9306219d001c20e6af58fb997b0b8e92ade8a8ac41",
+      "tools/templates/ci-security..github__dependabot.yml.txt": "35b9a68389c356c3a95959358055f7de6beec0bb3d7dca8d8c454dd6add9b918",
+      "tools/templates/ci-security.SECURITY.md.txt": "79147381b2f995afcb6122cc7874604c7d78a0097ff2516757545fa38d681c96"
+    },
+    "choice": "dependabot"
   },
   "repo-hygiene": {
     "files": {
-      "tools/repo-hygiene/check-css.mts": "677776cdda7aa14c55c847adbe1b06a49a6c49b4395cca30e8a0129f67f88ebb",
+      "tools/repo-hygiene/check-css.mts": "54fc445759d45ff888a1fd7883321a586800b89aeac64a87a0b94d1fd60b6847",
       "tools/repo-hygiene/check-doc-links.mts": "8b7e8bad228b4d9572b1138366e10556e7845576d22ebaf183f5cd4ffb9f8200",
       "tools/repo-hygiene/check-versions.mts": "0403b99dab47866289cb8a5098a9e5ea7c5aab078e6d154c128e40b89ac55d85",
       "tools/repo-hygiene/lib/files.mts": "2b66d9aa71004f1bec81bb9fb8b42c74e539404c4b8cb153063a430bbcb27596",
       "tools/repo-hygiene/lib/markdown.mts": "742c94e1adc979818e8f5ae75889c03fcf5c08eb81210ae041e18b3a44877150",
       "tools/repo-hygiene/lib/run.mts": "70bba5152fc002adb1303a2d405beed8d1610337681e39cd4d4a221e892f1b2f",
-      "tools/repo-hygiene/lib/slug.mts": "1f38db3b299385f169784426d4a1d7eb17ca8db86f2cf289ec3836c784051375"
+      "tools/repo-hygiene/lib/slug.mts": "1f38db3b299385f169784426d4a1d7eb17ca8db86f2cf289ec3836c784051375",
+      "tools/repo-hygiene/stylelint.base.json": "9defab3c0488e96e6a31761f089d3629614ecc1c33510e7deebf56572bf725e2",
+      "tools/templates/repo-hygiene.tools__repo-hygiene__stylelint.json.txt": "3f5948821caf872971488ab89b0df3a2ef531c09b75adbdb1c6ca8f41c59e696",
+      "tools/templates/repo-hygiene.tools__repo-hygiene__syncpack.json.txt": "2bb932ca623dc94d6d4f30ae35f62c56a1af7a9290da88a1b667de539843a038"
+    }
+  },
+  "strict-lint": {
+    "files": {
+      "tools/strict-lint/check-dead.mts": "87a4fc27c69ef23161e33b4e4d7948780897dd21a46dfd2ab133edd76905f3e5",
+      "tools/strict-lint/check-types.mts": "09a1c69fb99307875dcd5b490927c94b3e3b17166a28e0644d5c4aad462856da",
+      "tools/strict-lint/eslint.typed.base.mts": "f265b39804a36095116d869d8c473edacc0774722340646d3c3e4f6e36dbe8eb",
+      "tools/strict-lint/lib/files.mts": "71fe26dc7e77dcef4c2217aae9d9891061edce27a2f124dbd96a53b2f2038d96",
+      "tools/strict-lint/lib/run.mts": "70bba5152fc002adb1303a2d405beed8d1610337681e39cd4d4a221e892f1b2f",
+      "tools/templates/strict-lint.tools__strict-lint__eslint.config.mts.txt": "feb93ba515024fd0ba08a2f5b90157b3e56a825c25d770252c22e1959a17e8c1",
+      "tools/templates/strict-lint.tools__strict-lint__knip.jsonc.txt": "d2c59e626ed7930d845ced2d540b12f3421dad28f27d793c91f65b97686ffd4b"
+    }
+  },
+  "e2e": {
+    "files": {
+      ".github/workflows/e2e.yml": "3107ccf320adc1ae80a6f9607c4b8186d78e0a34d1ee981e5fd0b483dbc5a0b3",
+      "packages/e2e/notStarted.setup.ts": "6cdd4a1e0a82009d569c424f92b6d972b4fe4ea54b1ec882514e335976e59b7d",
+      "packages/e2e/playwright.config.ts": "8bf349b2480cd556f1d911112af0ca696a7f700a946b2b98da98c3b84bbaa6b9",
+      "packages/e2e/tsconfig.json": "4ece0153f0ce930a46a62b75fdb6d7be3828f873c0712ab67ab55848d1253db7",
+      "tools/e2e/lib/arguments.mts": "04c9fe98ec579457d4b88913651165796676334dbd6983a537b7a3412b6f6327",
+      "tools/e2e/lib/config.mts": "cb34d3d36a4ff053dde35ba094482def2da627ebe63e5295cec46730dc1c05ec",
+      "tools/e2e/lib/counts.mts": "e985e512e6e6da1538f5afa71211c53d25f93ad88b6ae9d84a14667ff0cf5b6d",
+      "tools/e2e/lib/processes.mts": "f70dee4cca7e55c9bfecc867de8abfaa2c1a629f50378e63a5621b3f783e286d",
+      "tools/e2e/lib/stack.mts": "17c013f8b88098cbcd34b3c9604919ae786d7cf91a68b8c42389519a4457c9a8",
+      "tools/e2e/run.mts": "fd9d10cf6fd667b5c58f09c6fa1151d02c8e0492b01c04cd077f2a9bddb7d16f",
+      "tools/templates/e2e.packages__e2e__package.json.txt": "da983f9b384bdb4c38f29490a96cba5f7c2471bdcfa69bbf12a83ef023f3d3d8",
+      "tools/templates/e2e.packages__e2e__src__fullstack__serverPrices.spec.ts.txt": "c6cc6dcefa4c591da5c141bea08ca71541908a66f29e6ca41795fdb7642abd55",
+      "tools/templates/e2e.packages__e2e__src__pages__PriceList.page.ts.txt": "e14bc16b81e96913e0338af83dd99ea98902a5f8ffe7f0338157206f4f30fcca",
+      "tools/templates/e2e.packages__e2e__src__pages__ServerFeed.page.ts.txt": "2a1664f7f8bc86e78a41253e062f925329191880fa18e6e015d8646cfb413e50",
+      "tools/templates/e2e.packages__e2e__src__sim__priceList.spec.ts.txt": "2d6a3c6d29a4a440a21fd391b6b2847ef3e03e41d1974cd0f43308d903fbf0d5",
+      "tools/templates/e2e.packages__e2e__src__sim__selection.spec.ts.txt": "5da2200fc4d31431d8fbdd42ecc8f0a6979901420bcd90ef5f693e44085ae5b8",
+      "tools/templates/e2e.packages__e2e__src__testing__test.ts.txt": "9374a8e031890b3d8ff1b6c39e23e8b91a913de824ac052b842996bab665db15",
+      "tools/templates/e2e.tools__e2e.config.mts.txt": "2bf8adc81b357ca2ad4e7a574f9a06215b8a3d315b9417990c00f01ec04d10ca"
     }
   }
 }

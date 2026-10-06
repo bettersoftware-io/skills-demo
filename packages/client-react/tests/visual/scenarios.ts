@@ -44,9 +44,24 @@ const PEOPLE: DirectorySnapshot = {
     { id: "support", name: "Support" },
   ],
   users: [
-    { id: "ada", name: "Ada Lovelace", email: "ada@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter Rams", email: "dieter@example.com", categoryId: "design" },
-    { id: "grace", name: "Grace Hopper", email: "grace@example.com", categoryId: "eng" },
+    {
+      id: "ada",
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      categoryId: "eng",
+    },
+    {
+      id: "dieter",
+      name: "Dieter Rams",
+      email: "dieter@example.com",
+      categoryId: "design",
+    },
+    {
+      id: "grace",
+      name: "Grace Hopper",
+      email: "grace@example.com",
+      categoryId: "eng",
+    },
   ],
 };
 
@@ -83,6 +98,10 @@ export const scenarios: Record<string, Scenario> = {
   "user-email-refused": {
     prices: [],
     directory: PEOPLE,
-    userSent: { name: "Linus Torvalds", email: "linus.example.com", categoryId: "support" },
+    userSent: {
+      name: "Linus Torvalds",
+      email: "linus.example.com",
+      categoryId: "support",
+    },
   },
 };

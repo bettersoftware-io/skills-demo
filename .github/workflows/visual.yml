@@ -22,6 +22,10 @@ concurrency:
   group: visual-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  # pnpm comes from Corepack; without this its first run can stop to ask.
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
 jobs:
   visual:
     name: visual goldens (linux-x64)
@@ -30,7 +34,7 @@ jobs:
     # libraries are fixed, so the same commit draws the same pixels on every
     # run. The goldens are drawn in this same image by update-visual-goldens.yml.
     # The tag must be the @playwright/test version in packages/client-react;
-    # `pnpm visual:check` (part of gate:fast) fails when they differ.
+    # the playwright-pin gate (part of gate:fast) fails when they differ.
     container: mcr.microsoft.com/playwright:v1.63.0-noble
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -39,10 +43,13 @@ jobs:
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24
+          node-version: 26
 
+      # Node 25 and later ship without Corepack. This installs it from a
+      # lockfile, so its version is pinned like every other. After checkout: the
+      # script is in the repository.
       - name: Enable Corepack (provisions the pnpm pinned by the packageManager field)
-        run: corepack enable
+        run: node tools/arch/ci/enable-corepack.mts
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

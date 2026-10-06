@@ -1,0 +1,17 @@
+{
+  "name": "@skills-demo/e2e",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@skills-demo/client-react": "workspace:*",
+    "@skills-demo/shared": "workspace:*",
+    "@types/node": "^26.2.0"
+  }
+}

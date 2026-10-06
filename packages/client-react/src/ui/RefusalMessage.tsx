@@ -5,7 +5,9 @@ import type { Refusal } from "@skills-demo/domain";
 import { TESTIDS } from "./testids.ts";
 
 /** Why a form's change was refused, shown next to that form. Nothing when it was not. */
-export function RefusalMessage({ refusal }: RefusalMessageProps): ReactElement | null {
+export function RefusalMessage({
+  refusal,
+}: RefusalMessageProps): ReactElement | null {
   if (refusal === null) {
     return null;
   }

@@ -13,10 +13,13 @@ import { UserFields } from "./UserFields.tsx";
  * adds a user. Which users are shown, and in what order, is decided by the core.
  */
 export function UserList(): ReactElement {
-  const directory = useViewModel().useDirectory();
+  const { useDirectory } = useViewModel();
+  const directory = useDirectory();
 
   function showCategory(event: ChangeEvent<HTMLSelectElement>): void {
-    directory.showCategory(event.target.value === "" ? null : event.target.value);
+    directory.showCategory(
+      event.target.value === "" ? null : event.target.value,
+    );
   }
 
   return (
@@ -26,11 +29,13 @@ export function UserList(): ReactElement {
         Show
         <select value={directory.shownCategory ?? ""} onChange={showCategory}>
           <option value="">All categories</option>
-          {directory.categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
+          {directory.categories.map((category) => {
+            return (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            );
+          })}
         </select>
       </label>
       <table>
@@ -43,9 +48,15 @@ export function UserList(): ReactElement {
           </tr>
         </thead>
         <tbody>
-          {directory.users.map((user) => (
-            <UserItem key={user.id} user={user} categories={directory.categories} />
-          ))}
+          {directory.users.map((user) => {
+            return (
+              <UserItem
+                key={user.id}
+                user={user}
+                categories={directory.categories}
+              />
+            );
+          })}
         </tbody>
       </table>
       <AddUserForm categories={directory.categories} />
@@ -59,7 +70,8 @@ interface UserItemProps {
 }
 
 function UserItem({ user, categories }: UserItemProps): ReactElement {
-  const form = useViewModel().useUserRow(user.id);
+  const { useUserRow } = useViewModel();
+  const form = useUserRow(user.id);
 
   function saveUser(event: FormEvent): void {
     event.preventDefault();
@@ -96,7 +108,11 @@ function UserItem({ user, categories }: UserItemProps): ReactElement {
       <td>{user.email}</td>
       <td>{user.categoryName}</td>
       <td>
-        <button type="button" aria-label={`Edit ${user.name}`} onClick={form.edit}>
+        <button
+          type="button"
+          aria-label={`Edit ${user.name}`}
+          onClick={form.edit}
+        >
           Edit
         </button>
         <button
@@ -118,7 +134,8 @@ interface AddUserFormProps {
 }
 
 function AddUserForm({ categories }: AddUserFormProps): ReactElement {
-  const form = useViewModel().useUserForm();
+  const { useUserForm } = useViewModel();
+  const form = useUserForm();
 
   function addUser(event: FormEvent): void {
     event.preventDefault();
@@ -126,7 +143,11 @@ function AddUserForm({ categories }: AddUserFormProps): ReactElement {
   }
 
   return (
-    <form data-testid={TESTIDS.userForm} aria-label="Add a user" onSubmit={addUser}>
+    <form
+      data-testid={TESTIDS.userForm}
+      aria-label="Add a user"
+      onSubmit={addUser}
+    >
       <UserFields
         draft={form.state.draft}
         categories={categories}

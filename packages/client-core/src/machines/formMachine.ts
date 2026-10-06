@@ -60,7 +60,11 @@ export function reduceForm<TDraft>(
       return { open: true, draft: action.draft, refusal: null, busy: false };
     case "changed":
       // What was refused is no longer what is in the fields.
-      return { ...current, draft: { ...current.draft, ...action.patch }, refusal: null };
+      return {
+        ...current,
+        draft: { ...current.draft, ...action.patch },
+        refusal: null,
+      };
     case "sent":
       return { ...current, refusal: null, busy: true };
     case "refused":
@@ -75,14 +79,21 @@ export function createAddFormMachine<TDraft>({
   blank,
   add,
 }: AddFormConfig<TDraft>): Machine<FormState<TDraft>, FormIntents<TDraft>> {
-  const form = createForm<TDraft>({ open: true, draft: blank, refusal: null, busy: false });
+  const form = createForm<TDraft>({
+    open: true,
+    draft: blank,
+    refusal: null,
+    busy: false,
+  });
 
   return {
     state$: form.state$,
     intents: {
       change: form.change,
       save: (): void => {
-        form.send(() => add(form.state$.getValue().draft));
+        form.send(() => {
+          return add(form.state$.getValue().draft);
+        });
       },
     },
     dispose: form.dispose,
@@ -95,14 +106,21 @@ export function createRowFormMachine<TDraft>({
   save,
   remove,
 }: RowFormConfig<TDraft>): Machine<FormState<TDraft>, RowFormIntents<TDraft>> {
-  const form = createForm<TDraft>({ open: false, draft: current(), refusal: null, busy: false });
+  const form = createForm<TDraft>({
+    open: false,
+    draft: current(),
+    refusal: null,
+    busy: false,
+  });
 
   return {
     state$: form.state$,
     intents: {
       change: form.change,
       save: (): void => {
-        form.send(() => save(form.state$.getValue().draft));
+        form.send(() => {
+          return save(form.state$.getValue().draft);
+        });
       },
       edit: (): void => {
         form.dispatch({ type: "opened", draft: current() });

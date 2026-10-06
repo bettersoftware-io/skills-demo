@@ -1,0 +1,121 @@
+[
+  {
+    "name": "fullstack: the client keeps the directory in the browser although it was given the server's address",
+    "file": "packages/client-react/src/app/buildPorts.ts",
+    "find": "    return createHttpDirectoryPort(apiUrl);",
+    "replace": "    return createDirectorySimulator();",
+    "test": "pnpm e2e --mode fullstack -g \"adds a user\""
+  },
+  {
+    "name": "fullstack: the composition root does not pass on the address of the directory's API",
+    "file": "packages/client-react/src/app/startApp.tsx",
+    "find": "buildPorts(import.meta.env.VITE_SERVER_URL, import.meta.env.VITE_API_URL)",
+    "replace": "buildPorts(import.meta.env.VITE_SERVER_URL)",
+    "test": "pnpm e2e --mode fullstack -g \"adds a user\""
+  },
+  {
+    "name": "fullstack: the server answers that a user was added and keeps nothing",
+    "file": "packages/server/src/directoryApi.ts",
+    "find": "      await firstValueFrom(\n        directory.addUser(readUserDraft(await readBody(context))),\n      ),",
+    "replace": "      {\n        accepted: true,\n        value: { id: \"user-0\", ...readUserDraft(await readBody(context)) },\n      },",
+    "test": "pnpm e2e --mode fullstack -g \"adds a user\""
+  },
+  {
+    "name": "fullstack: the list on screen is not brought up to date after a change is accepted",
+    "file": "packages/client-core/src/presenters/directoryPresenter.ts",
+    "find": "        if (outcome.accepted) {\n          reload$.next();\n        }",
+    "replace": "",
+    "test": "pnpm e2e --mode fullstack -g \"adds a user\""
+  },
+  {
+    "name": "fullstack: the adapter sends a user's change to the address of the whole list",
+    "file": "packages/client-core/src/adapters/httpDirectory.ts",
+    "find": "        \"PUT\",\n        locateEntry(API_PATH.users, id),",
+    "replace": "        \"PUT\",\n        API_PATH.users,",
+    "test": "pnpm e2e --mode fullstack -g \"changes a user\""
+  },
+  {
+    "name": "fullstack: the server answers a user's change with the user as they were",
+    "file": "packages/server/src/directoryApi.ts",
+    "find": "      await firstValueFrom(\n        directory.changeUser(\n          context.req.param(\"id\"),\n          readUserDraft(await readBody(context)),\n        ),\n      ),",
+    "replace": "      {\n        accepted: true,\n        value: (await firstValueFrom(directory.users())).find((user) => {\n          return user.id === context.req.param(\"id\");\n        }),\n      },",
+    "test": "pnpm e2e --mode fullstack -g \"changes a user\""
+  },
+  {
+    "name": "fullstack: the edit form of a user saves nothing",
+    "file": "packages/client-react/src/ui/UserList.tsx",
+    "find": "    event.preventDefault();\n    form.save();\n  }\n\n  if (form.state.open) {",
+    "replace": "    event.preventDefault();\n  }\n\n  if (form.state.open) {",
+    "test": "pnpm e2e --mode fullstack -g \"changes a user\""
+  },
+  {
+    "name": "fullstack: the Delete button of a user reaches nothing",
+    "file": "packages/client-react/src/ui/UserList.tsx",
+    "find": "          onClick={form.remove}\n",
+    "replace": "",
+    "test": "pnpm e2e --mode fullstack -g \"deletes a user\""
+  },
+  {
+    "name": "fullstack: the server answers that a user was deleted and keeps them",
+    "file": "packages/server/src/directoryApi.ts",
+    "find": "      await firstValueFrom(directory.removeUser(context.req.param(\"id\"))),",
+    "replace": "      { accepted: true, value: null },",
+    "test": "pnpm e2e --mode fullstack -g \"deletes a user\""
+  },
+  {
+    "name": "fullstack: a category that still has users can be deleted",
+    "file": "packages/domain/src/useCases/directoryRules.ts",
+    "find": "  if (members === 0) {\n    return null;\n  }\n\n  return {\n    reason: \"category-in-use\",",
+    "replace": "  if (members >= 0) {\n    return null;\n  }\n\n  return {\n    reason: \"category-in-use\",",
+    "test": "pnpm e2e --mode fullstack -g \"keeps a category\""
+  },
+  {
+    "name": "fullstack: the reason a category was not deleted is not shown on its row",
+    "file": "packages/client-react/src/ui/CategoryList.tsx",
+    "find": "      )}\n      <RefusalMessage refusal={form.state.refusal} />\n",
+    "replace": "      )}\n",
+    "test": "pnpm e2e --mode fullstack -g \"keeps a category\""
+  },
+  {
+    "name": "fullstack: the server refuses to delete a category even when it is empty",
+    "file": "packages/server/src/directoryApi.ts",
+    "find": "      await firstValueFrom(directory.removeCategory(context.req.param(\"id\"))),",
+    "replace": "      { accepted: false, refusal: UNAVAILABLE },",
+    "test": "pnpm e2e --mode fullstack -g \"keeps a category\""
+  },
+  {
+    "name": "sim: the app no longer draws the users and categories",
+    "file": "packages/client-react/src/ui/App.tsx",
+    "find": "      <Directory />\n",
+    "replace": "",
+    "test": "pnpm e2e --mode sim -g \"lists the directory\""
+  },
+  {
+    "name": "sim: the form that adds a user sends nothing",
+    "file": "packages/client-react/src/ui/UserList.tsx",
+    "find": "  function addUser(event: FormEvent): void {\n    event.preventDefault();\n    form.save();",
+    "replace": "  function addUser(event: FormEvent): void {\n    event.preventDefault();",
+    "test": "pnpm e2e --mode sim -g \"lists the directory\""
+  },
+  {
+    "name": "sim: the page asks a server for the users although it runs on the simulator",
+    "file": "packages/client-react/src/app/buildPorts.ts",
+    "find": "  console.info(\"[directory] composed sim: no VITE_API_URL\");\n",
+    "replace": "  console.info(\"[directory] composed sim: no VITE_API_URL\");\n  fetch(\"/api/users\").catch(() => {\n    return null;\n  });\n",
+    "test": "pnpm e2e --mode sim -g \"lists the directory\""
+  },
+  {
+    "name": "sim: the page asks another address for the users although it runs on the simulator",
+    "file": "packages/client-react/src/app/buildPorts.ts",
+    "find": "  return createDirectorySimulator();\n}",
+    "replace": "  fetch(\"http://127.0.0.1:9/api/users\").catch(() => {\n    return null;\n  });\n\n  return createDirectorySimulator();\n}",
+    "test": "pnpm e2e --mode sim -g \"lists the directory\""
+  },
+  {
+    "name": "sim: a category that still has users can be deleted",
+    "file": "packages/domain/src/useCases/directoryRules.ts",
+    "find": "  const members = users.filter((user) => {\n    return user.categoryId === category.id;\n  }).length;\n\n  if (members === 0) {",
+    "replace": "  const members = users.filter((user) => {\n    return user.categoryId === category.id;\n  }).length;\n\n  if (members >= 0) {",
+    "test": "pnpm e2e --mode sim -g \"keeps a category\""
+  }
+]

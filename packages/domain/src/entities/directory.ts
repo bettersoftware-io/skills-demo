@@ -51,7 +51,9 @@ export interface Refusal {
 }
 
 /** A change is either made, and here is the result, or refused, and here is why. */
-export type Outcome<T> = { accepted: true; value: T } | { accepted: false; refusal: Refusal };
+export type Outcome<T> =
+  | { accepted: true; value: T }
+  | { accepted: false; refusal: Refusal };
 
 export function accept<T>(value: T): Outcome<T> {
   return { accepted: true, value };

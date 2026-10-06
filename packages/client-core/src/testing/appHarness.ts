@@ -50,7 +50,11 @@ export function createAppHarness({
 
   return {
     app: createApp({
-      price: { prices: () => prices$ },
+      price: {
+        prices: () => {
+          return prices$;
+        },
+      },
       directory: {
         ...kept,
         categories: () => {
@@ -60,7 +64,9 @@ export function createAppHarness({
 
           return link === "unanswered"
             ? NEVER
-            : throwError(() => new Error("the directory cannot be reached"));
+            : throwError(() => {
+                return new Error("the directory cannot be reached");
+              });
         },
       },
     }),

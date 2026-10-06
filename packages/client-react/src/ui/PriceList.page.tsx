@@ -3,7 +3,10 @@ import userEvent from "@testing-library/user-event";
 
 import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
 import type { Movement, Price } from "@skills-demo/domain";
-import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
+import {
+  createViewModel,
+  ViewModelProvider,
+} from "@skills-demo/react-bindings";
 
 import { PriceList } from "./PriceList.tsx";
 import { TESTIDS } from "./testids.ts";
@@ -32,13 +35,15 @@ export function mountPriceList(): PriceListPage {
   );
 
   function findRows(): HTMLElement[] {
-    return within(rendered.getByTestId(TESTIDS.priceList)).queryAllByTestId(TESTIDS.priceRow);
+    return within(rendered.getByTestId(TESTIDS.priceList)).queryAllByTestId(
+      TESTIDS.priceRow,
+    );
   }
 
   function findRow(symbol: string): HTMLElement {
-    const row = findRows().find(
-      (candidate) => within(candidate).queryByRole("rowheader")?.textContent === symbol,
-    );
+    const row = findRows().find((candidate) => {
+      return within(candidate).queryByRole("rowheader")?.textContent === symbol;
+    });
 
     if (row === undefined) {
       throw new Error(`no row for ${symbol}`);
@@ -53,14 +58,23 @@ export function mountPriceList(): PriceListPage {
         harness.deliverPrice(price);
       });
     },
-    symbols: (): string[] =>
-      findRows().map((row) => within(row).getByRole("rowheader").textContent ?? ""),
-    movementOf: (symbol: string): Movement =>
-      within(findRow(symbol)).getByRole("cell").dataset.movement as Movement,
+    symbols: (): string[] => {
+      return findRows().map((row) => {
+        return within(row).getByRole("rowheader").textContent ?? "";
+      });
+    },
+    movementOf: (symbol: string): Movement => {
+      return within(findRow(symbol)).getByRole("cell").dataset
+        .movement as Movement;
+    },
     selectedSymbol: (): string | null => {
-      const selected = findRows().find((row) => row.dataset.selected === "true");
+      const selected = findRows().find((row) => {
+        return row.dataset.selected === "true";
+      });
 
-      return selected ? (within(selected).getByRole("rowheader").textContent ?? null) : null;
+      return selected
+        ? (within(selected).getByRole("rowheader").textContent ?? null)
+        : null;
     },
     clickRow: async (symbol: string): Promise<void> => {
       await user.click(findRow(symbol));

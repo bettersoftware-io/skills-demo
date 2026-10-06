@@ -5,7 +5,10 @@ import {
   type AppHarnessOptions,
   createAppHarness,
 } from "@skills-demo/client-core/testing/appHarness.ts";
-import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
+import {
+  createViewModel,
+  ViewModelProvider,
+} from "@skills-demo/react-bindings";
 
 import { Directory } from "./Directory.tsx";
 import { TESTIDS } from "./testids.ts";
@@ -21,7 +24,9 @@ export interface DirectoryPage {
 }
 
 /** Mounts the directory screen on the real application, with the directory linked as the test says. */
-export function mountDirectory(directoryLink: AppHarnessOptions["directoryLink"]): DirectoryPage {
+export function mountDirectory(
+  directoryLink: AppHarnessOptions["directoryLink"],
+): DirectoryPage {
   const harness = createAppHarness({ directoryLink });
   const user = userEvent.setup();
 
@@ -32,11 +37,19 @@ export function mountDirectory(directoryLink: AppHarnessOptions["directoryLink"]
   );
 
   return {
-    status: (): string | null =>
-      rendered.queryByTestId(TESTIDS.directoryStatus)?.firstChild?.textContent?.trim() ?? null,
-    showsLists: (): boolean =>
-      rendered.queryByTestId(TESTIDS.categoryList) !== null &&
-      rendered.queryByTestId(TESTIDS.userList) !== null,
+    status: (): string | null => {
+      return (
+        rendered
+          .queryByTestId(TESTIDS.directoryStatus)
+          ?.firstChild?.textContent?.trim() ?? null
+      );
+    },
+    showsLists: (): boolean => {
+      return (
+        rendered.queryByTestId(TESTIDS.categoryList) !== null &&
+        rendered.queryByTestId(TESTIDS.userList) !== null
+      );
+    },
     tryAgainOnceReachable: async (): Promise<void> => {
       harness.connectDirectory();
       await user.click(rendered.getByRole("button", { name: "Try again" }));

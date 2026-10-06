@@ -2,7 +2,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { createApp } from "@skills-demo/client-core";
-import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
+import {
+  createViewModel,
+  ViewModelProvider,
+} from "@skills-demo/react-bindings";
 
 import { App } from "../ui/App.tsx";
 import { buildPorts } from "./buildPorts.ts";
@@ -23,7 +26,9 @@ export function startApp(): () => void {
   }
 
   const viewModel = createViewModel(
-    createApp(buildPorts(import.meta.env.VITE_SERVER_URL, import.meta.env.VITE_API_URL)),
+    createApp(
+      buildPorts(import.meta.env.VITE_SERVER_URL, import.meta.env.VITE_API_URL),
+    ),
   );
 
   const root = createRoot(container);

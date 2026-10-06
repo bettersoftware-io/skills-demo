@@ -3,7 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Price } from "@skills-demo/domain";
 
-import { createPricesPresenter, type PriceRow, STALE_AFTER_MS } from "./pricesPresenter.ts";
+import {
+  createPricesPresenter,
+  type PriceRow,
+  STALE_AFTER_MS,
+} from "./pricesPresenter.ts";
 
 describe("the prices presenter", () => {
   beforeEach(() => {
@@ -53,7 +57,11 @@ describe("the prices presenter", () => {
     prices$.next({ symbol: "GBPUSD", mid: 1.25 });
     vi.advanceTimersByTime(2000);
 
-    expect(latest().map((row) => row.stale)).toEqual([true, false]);
+    expect(
+      latest().map((row) => {
+        return row.stale;
+      }),
+    ).toEqual([true, false]);
   });
 
   it("makes a stale row fresh again when a price arrives", () => {
@@ -63,7 +71,9 @@ describe("the prices presenter", () => {
     vi.advanceTimersByTime(STALE_AFTER_MS);
     prices$.next({ symbol: "EURUSD", mid: 1.2 });
 
-    expect(latest()).toEqual([{ symbol: "EURUSD", mid: 1.2, movement: "up", stale: false }]);
+    expect(latest()).toEqual([
+      { symbol: "EURUSD", mid: 1.2, movement: "up", stale: false },
+    ]);
   });
 
   it("opens one feed however many readers there are, and closes it when the last leaves", () => {
@@ -98,12 +108,21 @@ interface Presented {
 
 function createPresented(): Presented {
   const prices$ = new Subject<Price>();
-  const presenter = createPricesPresenter({ prices: () => prices$ });
+  const presenter = createPricesPresenter({
+    prices: () => {
+      return prices$;
+    },
+  });
   let rows: PriceRow[] = [];
 
   presenter.rows$.subscribe((next) => {
     rows = next;
   });
 
-  return { prices$, latest: () => rows };
+  return {
+    prices$,
+    latest: () => {
+      return rows;
+    },
+  };
 }

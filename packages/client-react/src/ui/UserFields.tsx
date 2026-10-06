@@ -26,11 +26,19 @@ export function UserFields({
     <>
       <label>
         Name
-        <input aria-invalid={invalid === "name"} value={draft.name} onChange={changeName} />
+        <input
+          aria-invalid={invalid === "name"}
+          value={draft.name}
+          onChange={changeName}
+        />
       </label>
       <label>
         Email
-        <input aria-invalid={invalid === "email"} value={draft.email} onChange={changeEmail} />
+        <input
+          aria-invalid={invalid === "email"}
+          value={draft.email}
+          onChange={changeEmail}
+        />
       </label>
       <label>
         Category
@@ -40,11 +48,13 @@ export function UserFields({
           onChange={changeCategory}
         >
           <option value="">Choose a category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
+          {categories.map((category) => {
+            return (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            );
+          })}
         </select>
       </label>
     </>

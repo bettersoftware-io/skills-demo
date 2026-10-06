@@ -72,7 +72,7 @@ export interface UserDraftDto {
   categoryId: string;
 }
 
-export interface RefusalDto {
+interface RefusalDto {
   reason: RefusalReason;
   field: RefusalField | null;
   message: string;
@@ -88,7 +88,12 @@ export function encodeCategory(category: Category): CategoryDto {
 }
 
 export function encodeUser(user: User): UserDto {
-  return { id: user.id, name: user.name, email: user.email, categoryId: user.categoryId };
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    categoryId: user.categoryId,
+  };
 }
 
 export function encodeCategoryDraft(draft: CategoryDraft): CategoryDraftDto {
@@ -100,12 +105,20 @@ export function encodeUserDraft(draft: UserDraft): UserDraftDto {
 }
 
 export function encodeRefusal(refusal: Refusal): ErrorBody {
-  return { error: { reason: refusal.reason, field: refusal.field, message: refusal.message } };
+  return {
+    error: {
+      reason: refusal.reason,
+      field: refusal.field,
+      message: refusal.message,
+    },
+  };
 }
 
 /** The category, if `raw` is one; otherwise undefined. */
 export function parseCategory(raw: unknown): Category | undefined {
-  return isRecord(raw) && typeof raw.id === "string" && typeof raw.name === "string"
+  return isRecord(raw) &&
+    typeof raw.id === "string" &&
+    typeof raw.name === "string"
     ? { id: raw.id, name: raw.name }
     : undefined;
 }
@@ -143,10 +156,20 @@ export function parseRefusal(raw: unknown): Refusal | undefined {
   }
 
   const { reason, field, message } = raw.error;
-  const knownReason = REFUSAL_REASONS.find((known) => known === reason);
-  const knownField = field === null ? null : REFUSAL_FIELDS.find((known) => known === field);
+  const knownReason = REFUSAL_REASONS.find((known) => {
+    return known === reason;
+  });
 
-  return knownReason !== undefined && knownField !== undefined && typeof message === "string"
+  const knownField =
+    field === null
+      ? null
+      : REFUSAL_FIELDS.find((known) => {
+          return known === field;
+        });
+
+  return knownReason !== undefined &&
+    knownField !== undefined &&
+    typeof message === "string"
     ? { reason: knownReason, field: knownField, message }
     : undefined;
 }
@@ -173,12 +196,17 @@ export function readUserDraft(raw: unknown): UserDraft {
   };
 }
 
-function parseList<T>(raw: unknown, parseOne: (entry: unknown) => T | undefined): T[] | undefined {
+function parseList<T>(
+  raw: unknown,
+  parseOne: (entry: unknown) => T | undefined,
+): T[] | undefined {
   if (!Array.isArray(raw)) {
     return undefined;
   }
 
-  const parsed = raw.map(parseOne).filter((entry) => entry !== undefined);
+  const parsed = raw.map(parseOne).filter((entry) => {
+    return entry !== undefined;
+  });
 
   return parsed.length === raw.length ? parsed : undefined;
 }

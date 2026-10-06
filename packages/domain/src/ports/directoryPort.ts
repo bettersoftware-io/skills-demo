@@ -1,6 +1,12 @@
 import type { Observable } from "rxjs";
 
-import type { Category, CategoryDraft, Outcome, User, UserDraft } from "../entities/directory.ts";
+import type {
+  Category,
+  CategoryDraft,
+  Outcome,
+  User,
+  UserDraft,
+} from "../entities/directory.ts";
 
 /**
  * Where categories and users are kept. The domain declares this; a simulator
@@ -14,7 +20,10 @@ export interface DirectoryPort {
   categories(): Observable<Category[]>;
   users(): Observable<User[]>;
   addCategory(draft: CategoryDraft): Observable<Outcome<Category>>;
-  renameCategory(id: string, draft: CategoryDraft): Observable<Outcome<Category>>;
+  renameCategory(
+    id: string,
+    draft: CategoryDraft,
+  ): Observable<Outcome<Category>>;
   /** Refused while the category still has users. */
   removeCategory(id: string): Observable<Outcome<null>>;
   addUser(draft: UserDraft): Observable<Outcome<User>>;

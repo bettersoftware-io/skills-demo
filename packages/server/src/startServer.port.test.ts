@@ -4,7 +4,12 @@ import { Subject } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
 
 import { createDirectorySimulator, type Price } from "@skills-demo/domain";
-import { API_PATH, encodePrice, parseCategoryList, WS_PATH } from "@skills-demo/shared";
+import {
+  API_PATH,
+  encodePrice,
+  parseCategoryList,
+  WS_PATH,
+} from "@skills-demo/shared";
 
 import { type RunningServer, startServer } from "./startServer.ts";
 
@@ -35,7 +40,9 @@ describe("the price server", () => {
       },
     });
 
-    onTestFinished(() => server.close());
+    onTestFinished(() => {
+      return server.close();
+    });
 
     const first = await connectClient(server.port);
     const second = await connectClient(server.port);
@@ -72,7 +79,11 @@ describe("the price server", () => {
     expect(prices$.observed).toBe(true);
 
     await client.close();
-    await expect.poll(() => prices$.observed).toBe(false);
+    await expect
+      .poll(() => {
+        return prices$.observed;
+      })
+      .toBe(false);
   });
 });
 
@@ -83,9 +94,12 @@ describe("the server's two faces", () => {
     const client = await connectClient(server.port);
     const message = client.nextMessage();
 
-    const response = await fetch(`http://localhost:${server.port}${API_PATH.categories}`, {
-      headers: { Origin: "http://localhost:5173" },
-    });
+    const response = await fetch(
+      `http://localhost:${server.port}${API_PATH.categories}`,
+      {
+        headers: { Origin: "http://localhost:5173" },
+      },
+    );
     prices$.next({ symbol: "EURUSD", mid: 1.1 });
 
     expect(response.status).toBe(200);
@@ -97,7 +111,11 @@ describe("the server's two faces", () => {
   it("stops answering once it is closed, though a client has used it", async () => {
     const server = await startServer({
       port: 0,
-      prices: { prices: () => new Subject<Price>() },
+      prices: {
+        prices: () => {
+          return new Subject<Price>();
+        },
+      },
       directory: createDirectorySimulator(),
     });
     const address = `http://localhost:${server.port}${API_PATH.users}`;
@@ -114,7 +132,11 @@ describe("the server's two faces", () => {
     await expect(
       startServer({
         port: taken.port,
-        prices: { prices: () => new Subject<Price>() },
+        prices: {
+          prices: () => {
+            return new Subject<Price>();
+          },
+        },
         directory: createDirectorySimulator(),
       }),
     ).rejects.toThrow("EADDRINUSE");
@@ -122,14 +144,22 @@ describe("the server's two faces", () => {
 });
 
 /** A server on a free port, fed by hand and closed when the test ends. */
-async function startTestServer(prices$: Subject<Price>): Promise<RunningServer> {
+async function startTestServer(
+  prices$: Subject<Price>,
+): Promise<RunningServer> {
   const server = await startServer({
     port: 0,
-    prices: { prices: () => prices$ },
+    prices: {
+      prices: () => {
+        return prices$;
+      },
+    },
     directory: createDirectorySimulator(),
   });
 
-  onTestFinished(() => server.close());
+  onTestFinished(() => {
+    return server.close();
+  });
 
   return server;
 }
@@ -180,8 +210,8 @@ function connectClient(port: number): Promise<ConnectedClient> {
     });
     socket.addEventListener("open", () => {
       resolve({
-        nextMessage: () =>
-          new Promise((received) => {
+        nextMessage: () => {
+          return new Promise((received) => {
             socket.addEventListener(
               "message",
               (event) => {
@@ -189,14 +219,16 @@ function connectClient(port: number): Promise<ConnectedClient> {
               },
               { once: true },
             );
-          }),
-        close: () =>
-          new Promise<void>((closed) => {
+          });
+        },
+        close: () => {
+          return new Promise<void>((closed) => {
             socket.addEventListener("close", () => {
               closed();
             });
             socket.close();
-          }),
+          });
+        },
       });
     });
   });

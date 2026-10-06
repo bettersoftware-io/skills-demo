@@ -3,7 +3,7 @@ import type { Price } from "@skills-demo/domain";
 /** The path the server listens on. */
 export const WS_PATH = "/ws";
 
-export const SERVER_MSG = {
+const SERVER_MSG = {
   PRICE: "price",
 } as const;
 
@@ -22,7 +22,10 @@ export interface PriceMessage {
 export type ServerMessage = PriceMessage;
 
 export function encodePrice(price: Price): PriceMessage {
-  return { type: SERVER_MSG.PRICE, payload: { symbol: price.symbol, mid: price.mid } };
+  return {
+    type: SERVER_MSG.PRICE,
+    payload: { symbol: price.symbol, mid: price.mid },
+  };
 }
 
 export function decodePrice(dto: PriceDto): Price {
@@ -31,7 +34,11 @@ export function decodePrice(dto: PriceDto): Price {
 
 /** The message, if `raw` is one this protocol knows; otherwise undefined. */
 export function parseServerMessage(raw: unknown): ServerMessage | undefined {
-  if (!isRecord(raw) || raw.type !== SERVER_MSG.PRICE || !isRecord(raw.payload)) {
+  if (
+    !isRecord(raw) ||
+    raw.type !== SERVER_MSG.PRICE ||
+    !isRecord(raw.payload)
+  ) {
     return undefined;
   }
 

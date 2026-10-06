@@ -32,9 +32,15 @@ export interface RunningServer {
  * The server takes its sources as ports, like the client does, so a test
  * drives it by hand and production runs it on the simulators.
  */
-export function startServer({ port, prices, directory }: ServerOptions): Promise<RunningServer> {
+export function startServer({
+  port,
+  prices,
+  directory,
+}: ServerOptions): Promise<RunningServer> {
   // The adaptor is given no options that would make it anything but a plain HTTP server.
-  const http = createAdaptorServer({ fetch: createDirectoryApi(directory).fetch }) as Server;
+  const http = createAdaptorServer({
+    fetch: createDirectoryApi(directory).fetch,
+  }) as Server;
   const server = new WebSocketServer({ server: http, path: WS_PATH });
   const prices$ = prices.prices().pipe(share());
 
@@ -60,8 +66,8 @@ export function startServer({ port, prices, directory }: ServerOptions): Promise
       resolve({
         // A server listening on a TCP port always reports an address object.
         port: (http.address() as AddressInfo).port,
-        close: () =>
-          new Promise<void>((closed) => {
+        close: () => {
+          return new Promise<void>((closed) => {
             for (const client of server.clients) {
               client.terminate();
             }
@@ -70,7 +76,8 @@ export function startServer({ port, prices, directory }: ServerOptions): Promise
             http.close(() => {
               closed();
             });
-          }),
+          });
+        },
       });
     });
     http.listen(port);

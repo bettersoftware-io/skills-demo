@@ -2,7 +2,12 @@ import { type Context, Hono } from "hono";
 import { cors } from "hono/cors";
 import { firstValueFrom } from "rxjs";
 
-import { type DirectoryPort, type Outcome, type Refusal, UNAVAILABLE } from "@skills-demo/domain";
+import {
+  type DirectoryPort,
+  type Outcome,
+  type Refusal,
+  UNAVAILABLE,
+} from "@skills-demo/domain";
 import {
   API_PATH,
   API_ROOT,
@@ -31,23 +36,30 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
 
   // The client is served from another origin (Vite's, in development), and
   // the API has no credentials to protect, so any origin may read it.
-  api.use(`${API_ROOT}/*`, cors({ origin: "*", allowMethods: ["GET", "POST", "PUT", "DELETE"] }));
-
-  api.get(API_PATH.categories, async (context) =>
-    context.json((await firstValueFrom(directory.categories())).map(encodeCategory)),
+  api.use(
+    `${API_ROOT}/*`,
+    cors({ origin: "*", allowMethods: ["GET", "POST", "PUT", "DELETE"] }),
   );
 
-  api.post(API_PATH.categories, async (context) =>
-    answerWithEntry(
+  api.get(API_PATH.categories, async (context) => {
+    return context.json(
+      (await firstValueFrom(directory.categories())).map(encodeCategory),
+    );
+  });
+
+  api.post(API_PATH.categories, async (context) => {
+    return answerWithEntry(
       context,
-      await firstValueFrom(directory.addCategory(readCategoryDraft(await readBody(context)))),
+      await firstValueFrom(
+        directory.addCategory(readCategoryDraft(await readBody(context))),
+      ),
       201,
       encodeCategory,
-    ),
-  );
+    );
+  });
 
-  api.put(`${API_PATH.categories}/:id`, async (context) =>
-    answerWithEntry(
+  api.put(`${API_PATH.categories}/:id`, async (context) => {
+    return answerWithEntry(
       context,
       await firstValueFrom(
         directory.renameCategory(
@@ -57,52 +69,71 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
       ),
       200,
       encodeCategory,
-    ),
-  );
+    );
+  });
 
-  api.delete(`${API_PATH.categories}/:id`, async (context) =>
-    answerRemoval(context, await firstValueFrom(directory.removeCategory(context.req.param("id")))),
-  );
-
-  api.get(API_PATH.users, async (context) =>
-    context.json((await firstValueFrom(directory.users())).map(encodeUser)),
-  );
-
-  api.post(API_PATH.users, async (context) =>
-    answerWithEntry(
+  api.delete(`${API_PATH.categories}/:id`, async (context) => {
+    return answerRemoval(
       context,
-      await firstValueFrom(directory.addUser(readUserDraft(await readBody(context)))),
-      201,
-      encodeUser,
-    ),
-  );
+      await firstValueFrom(directory.removeCategory(context.req.param("id"))),
+    );
+  });
 
-  api.put(`${API_PATH.users}/:id`, async (context) =>
-    answerWithEntry(
+  api.get(API_PATH.users, async (context) => {
+    return context.json(
+      (await firstValueFrom(directory.users())).map(encodeUser),
+    );
+  });
+
+  api.post(API_PATH.users, async (context) => {
+    return answerWithEntry(
       context,
       await firstValueFrom(
-        directory.changeUser(context.req.param("id"), readUserDraft(await readBody(context))),
+        directory.addUser(readUserDraft(await readBody(context))),
+      ),
+      201,
+      encodeUser,
+    );
+  });
+
+  api.put(`${API_PATH.users}/:id`, async (context) => {
+    return answerWithEntry(
+      context,
+      await firstValueFrom(
+        directory.changeUser(
+          context.req.param("id"),
+          readUserDraft(await readBody(context)),
+        ),
       ),
       200,
       encodeUser,
-    ),
-  );
+    );
+  });
 
-  api.delete(`${API_PATH.users}/:id`, async (context) =>
-    answerRemoval(context, await firstValueFrom(directory.removeUser(context.req.param("id")))),
-  );
+  api.delete(`${API_PATH.users}/:id`, async (context) => {
+    return answerRemoval(
+      context,
+      await firstValueFrom(directory.removeUser(context.req.param("id"))),
+    );
+  });
 
-  api.notFound((context) => answerRefusal(context, NO_SUCH_ADDRESS));
+  api.notFound((context) => {
+    return answerRefusal(context, NO_SUCH_ADDRESS);
+  });
 
   // The port's lists fail when whatever keeps the data cannot be reached.
-  api.onError((_error, context) => answerRefusal(context, UNAVAILABLE));
+  api.onError((_error, context) => {
+    return answerRefusal(context, UNAVAILABLE);
+  });
 
   return api;
 }
 
 /** The body as JSON, or null when it is not JSON; the protocol reads null as a blank draft. */
 function readBody(context: Context): Promise<unknown> {
-  return context.req.json().catch(() => null);
+  return context.req.json().catch(() => {
+    return null;
+  });
 }
 
 function answerWithEntry<T>(
@@ -117,7 +148,9 @@ function answerWithEntry<T>(
 }
 
 function answerRemoval(context: Context, outcome: Outcome<null>): Response {
-  return outcome.accepted ? context.body(null, 204) : answerRefusal(context, outcome.refusal);
+  return outcome.accepted
+    ? context.body(null, 204)
+    : answerRefusal(context, outcome.refusal);
 }
 
 function answerRefusal(context: Context, refusal: Refusal): Response {

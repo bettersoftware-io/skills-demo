@@ -37,13 +37,22 @@ export interface HttpRequest {
 }
 
 /** Sends one HTTP request. The browser's `fetch` is one; a test supplies its own. */
-export type SendRequest = (url: string, request: HttpRequest) => Promise<HttpAnswer>;
+export type SendRequest = (
+  url: string,
+  request: HttpRequest,
+) => Promise<HttpAnswer>;
 
 const NOT_UNDERSTOOD: Refusal = {
   reason: "unavailable",
   field: null,
   message: "The server gave an answer the app does not understand.",
 };
+
+/** An answer's status and its body as JSON, or null where there is no JSON. */
+interface ParsedAnswer {
+  status: number;
+  body: unknown;
+}
 
 /**
  * The real DirectoryPort: categories and users kept by a server, behind its
@@ -52,7 +61,9 @@ const NOT_UNDERSTOOD: Refusal = {
  */
 export function createHttpDirectoryPort(
   baseUrl: string,
-  send: SendRequest = (url: string, request: HttpRequest) => fetch(url, request),
+  send: SendRequest = (url: string, request: HttpRequest) => {
+    return fetch(url, request);
+  },
 ): DirectoryPort {
   const root = baseUrl.replace(/\/+$/, "");
 
@@ -61,18 +72,28 @@ export function createHttpDirectoryPort(
     method: string,
     path: string,
     body?: object,
-  ): Promise<{ status: number; body: unknown }> {
+  ): Promise<ParsedAnswer> {
     const answer = await send(`${root}${path}`, {
       method,
       headers: body === undefined ? { Accept: "application/json" } : JSON_BODY,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
 
-    return { status: answer.status, body: await answer.json().catch(() => null) };
+    return {
+      status: answer.status,
+      body: await answer.json().catch(() => {
+        return null;
+      }),
+    };
   }
 
-  function list<T>(path: string, parse: (raw: unknown) => T[] | undefined): Observable<T[]> {
-    return defer(() => from(ask("GET", path))).pipe(
+  function list<T>(
+    path: string,
+    parse: (raw: unknown) => T[] | undefined,
+  ): Observable<T[]> {
+    return defer(() => {
+      return from(ask("GET", path));
+    }).pipe(
       map(({ status, body }) => {
         const listed = status === 200 ? parse(body) : undefined;
 
@@ -93,7 +114,9 @@ export function createHttpDirectoryPort(
     body: object | undefined,
     parse: (raw: unknown) => T | undefined,
   ): Observable<Outcome<T>> {
-    return defer(() => from(ask(method, path, body))).pipe(
+    return defer(() => {
+      return from(ask(method, path, body));
+    }).pipe(
       map((answer): Outcome<T> => {
         if (answer.status >= 400) {
           return refuse(parseRefusal(answer.body) ?? NOT_UNDERSTOOD);
@@ -103,34 +126,72 @@ export function createHttpDirectoryPort(
 
         return result === undefined ? refuse(NOT_UNDERSTOOD) : accept(result);
       }),
-      catchError(() => of(refuse(UNAVAILABLE))),
+      catchError(() => {
+        return of(refuse(UNAVAILABLE));
+      }),
     );
   }
 
   return {
-    categories: (): Observable<Category[]> => list(API_PATH.categories, parseCategoryList),
-    users: (): Observable<User[]> => list(API_PATH.users, parseUserList),
-    addCategory: (draft: CategoryDraft): Observable<Outcome<Category>> =>
-      change("POST", API_PATH.categories, encodeCategoryDraft(draft), parseCategory),
-    renameCategory: (id: string, draft: CategoryDraft): Observable<Outcome<Category>> =>
-      change(
+    categories: (): Observable<Category[]> => {
+      return list(API_PATH.categories, parseCategoryList);
+    },
+    users: (): Observable<User[]> => {
+      return list(API_PATH.users, parseUserList);
+    },
+    addCategory: (draft: CategoryDraft): Observable<Outcome<Category>> => {
+      return change(
+        "POST",
+        API_PATH.categories,
+        encodeCategoryDraft(draft),
+        parseCategory,
+      );
+    },
+    renameCategory: (
+      id: string,
+      draft: CategoryDraft,
+    ): Observable<Outcome<Category>> => {
+      return change(
         "PUT",
         locateEntry(API_PATH.categories, id),
         encodeCategoryDraft(draft),
         parseCategory,
-      ),
-    removeCategory: (id: string): Observable<Outcome<null>> =>
-      change("DELETE", locateEntry(API_PATH.categories, id), undefined, parseNothing),
-    addUser: (draft: UserDraft): Observable<Outcome<User>> =>
-      change("POST", API_PATH.users, encodeUserDraft(draft), parseUser),
-    changeUser: (id: string, draft: UserDraft): Observable<Outcome<User>> =>
-      change("PUT", locateEntry(API_PATH.users, id), encodeUserDraft(draft), parseUser),
-    removeUser: (id: string): Observable<Outcome<null>> =>
-      change("DELETE", locateEntry(API_PATH.users, id), undefined, parseNothing),
+      );
+    },
+    removeCategory: (id: string): Observable<Outcome<null>> => {
+      return change(
+        "DELETE",
+        locateEntry(API_PATH.categories, id),
+        undefined,
+        parseNothing,
+      );
+    },
+    addUser: (draft: UserDraft): Observable<Outcome<User>> => {
+      return change("POST", API_PATH.users, encodeUserDraft(draft), parseUser);
+    },
+    changeUser: (id: string, draft: UserDraft): Observable<Outcome<User>> => {
+      return change(
+        "PUT",
+        locateEntry(API_PATH.users, id),
+        encodeUserDraft(draft),
+        parseUser,
+      );
+    },
+    removeUser: (id: string): Observable<Outcome<null>> => {
+      return change(
+        "DELETE",
+        locateEntry(API_PATH.users, id),
+        undefined,
+        parseNothing,
+      );
+    },
   };
 }
 
-const JSON_BODY = { Accept: "application/json", "Content-Type": "application/json" };
+const JSON_BODY = {
+  Accept: "application/json",
+  "Content-Type": "application/json",
+};
 
 /** A deletion is answered with no body, and there is nothing to read from it. */
 function parseNothing(): null {

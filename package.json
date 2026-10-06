@@ -2,9 +2,13 @@
   "name": "skills-demo",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.6.0",
-  "engines": {
-    "node": ">=24"
+  "packageManager": "pnpm@12.6.0+sha512.3ef68f951cb111ac204b4a5a16f0b2ddf0da56a96e0413e81d855d9f0b55ef926714709028e1cd00c405c2c5fb7b9e8ec4dc46777c805d0373c2f2ff00fd20ec",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=26",
+      "onFail": "error"
+    }
   },
   "scripts": {
     "dev": "pnpm --filter @skills-demo/client-react dev",
@@ -13,9 +17,11 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck && tsc --noEmit -p tsconfig.tooling.json",
     "test": "turbo run test",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config .",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config --max-warnings 0 .",
     "gates": "node tools/arch/gates/run.mts",
-    "gate:fast": "pnpm gates && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check && pnpm biome:check && pnpm check:versions && pnpm check:doc-links && pnpm lint:css",
+    "check:react-policies": "node tools/arch/check-react-policies.mts",
+    "check:compiler": "node tools/arch/check-compiler.mts",
+    "gate:fast": "pnpm gates && pnpm check:react-policies && pnpm check:compiler && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check && pnpm biome:check && pnpm check:versions && pnpm check:doc-links && pnpm lint:css && pnpm visual:check:server && pnpm check:dockerfiles && pnpm lint:types && pnpm lint:dead",
     "gate:full": "pnpm gate:fast && pnpm test && pnpm build && pnpm coverage",
     "coverage": "node tools/coverage/run.mts",
     "coverage:gaps": "node tools/coverage/gaps.mts",
@@ -23,7 +29,7 @@
     "visual": "pnpm --dir packages/client-react exec playwright test --config tests/visual/playwright.config.ts",
     "visual:update": "pnpm --dir packages/client-react exec playwright test --config tests/visual/playwright.config.ts --update-snapshots=all",
     "visual:jitter": "node tools/visual/jitter.mts",
-    "visual:check": "node tools/visual/check-pin.mts && pnpm --dir packages/client-react run typecheck:visual",
+    "visual:check": "pnpm --dir packages/client-react run typecheck:visual",
     "perf:check": "node tools/perf/check-animations.mts",
     "perf:motion-audit": "node tools/perf/motion-audit.mts",
     "biome:format": "biome format --write .",
@@ -32,7 +38,15 @@
     "lint:workflows": "node tools/ci-security/lint-workflows.mts",
     "check:versions": "node tools/repo-hygiene/check-versions.mts",
     "check:doc-links": "node tools/repo-hygiene/check-doc-links.mts",
-    "lint:css": "node tools/repo-hygiene/check-css.mts"
+    "lint:css": "node tools/repo-hygiene/check-css.mts",
+    "gate:fast:quiet": "node tools/arch/gates/quiet.mts gate:fast",
+    "gate:full:quiet": "node tools/arch/gates/quiet.mts gate:full",
+    "visual:check:server": "node tools/visual/check-server.mts",
+    "check:dockerfiles": "node tools/ci-security/check-dockerfiles.mts",
+    "lint:types": "node tools/strict-lint/check-types.mts",
+    "lint:dead": "node tools/strict-lint/check-dead.mts",
+    "e2e": "node tools/e2e/run.mts",
+    "e2e:install": "pnpm --dir packages/e2e exec playwright install chromium"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
@@ -43,9 +57,12 @@
     "@vitest/coverage-v8": "^5.0.3",
     "dependency-cruiser": "^18.0.0",
     "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "knip": "^6.17.1",
     "playwright": "1.63.0",
     "stylelint": "^17.13.0",
     "stylelint-config-standard": "^40.0.0",
+    "stylelint-declaration-strict-value": "^1.12.1",
     "syncpack": "^15.3.2",
     "turbo": "^2.4",
     "typescript": "npm:@typescript/typescript6@^6.0.2",

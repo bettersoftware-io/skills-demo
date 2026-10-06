@@ -1,8 +1,15 @@
 import { defer, finalize, firstValueFrom, Subject, timeout } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
 
-import { createWsConnection, createWsPricePort } from "@skills-demo/client-core";
-import { createDirectorySimulator, type Price, type PricePort } from "@skills-demo/domain";
+import {
+  createWsConnection,
+  createWsPricePort,
+} from "@skills-demo/client-core";
+import {
+  createDirectorySimulator,
+  type Price,
+  type PricePort,
+} from "@skills-demo/domain";
 import { startServer } from "@skills-demo/server/startServer.ts";
 import { WS_PATH } from "@skills-demo/shared";
 
@@ -13,7 +20,9 @@ import { WS_PATH } from "@skills-demo/shared";
 describe("the client's price adapter against the real server", () => {
   it("receives a price the server's source produces, unchanged", async () => {
     const { port, produce, feedOpened } = await startBothEnds();
-    const received = firstValueFrom(port.prices().pipe(timeout(GIVE_UP_AFTER_MS)));
+    const received = firstValueFrom(
+      port.prices().pipe(timeout(GIVE_UP_AFTER_MS)),
+    );
 
     await feedOpened;
     produce({ symbol: "EURUSD", mid: 1.1 });
@@ -56,8 +65,8 @@ async function startBothEnds(): Promise<BothEnds> {
     port: 0,
     directory: createDirectorySimulator(),
     prices: {
-      prices: () =>
-        defer(() => {
+      prices: () => {
+        return defer(() => {
           opened.settle();
 
           return source$;
@@ -65,14 +74,19 @@ async function startBothEnds(): Promise<BothEnds> {
           finalize(() => {
             closed.settle("closed");
           }),
-        ),
+        );
+      },
     },
   });
 
-  onTestFinished(() => server.close());
+  onTestFinished(() => {
+    return server.close();
+  });
 
   return {
-    port: createWsPricePort(createWsConnection(`ws://localhost:${server.port}${WS_PATH}`)),
+    port: createWsPricePort(
+      createWsConnection(`ws://localhost:${server.port}${WS_PATH}`),
+    ),
     produce: (price: Price): void => {
       source$.next(price);
     },
@@ -87,10 +101,13 @@ interface Signal<T> {
 }
 
 function createSignal<T>(): Signal<T> {
-  let settle: (value: T) => void = () => {};
+  let settle: (value: T) => void = settleNothing;
   const promise = new Promise<T>((resolve) => {
     settle = resolve;
   });
 
   return { promise, settle };
 }
+
+/** Stands in until the promise hands over its real `resolve`. */
+function settleNothing(): void {}

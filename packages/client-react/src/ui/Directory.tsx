@@ -11,10 +11,13 @@ import { UserList } from "./UserList.tsx";
  * component: whether the lists are loaded is the core's to say.
  */
 export function Directory(): ReactElement {
-  const directory = useViewModel().useDirectory();
+  const { useDirectory } = useViewModel();
+  const directory = useDirectory();
 
   if (directory.status === "loading") {
-    return <p data-testid={TESTIDS.directoryStatus}>Loading users and categories…</p>;
+    return (
+      <p data-testid={TESTIDS.directoryStatus}>Loading users and categories…</p>
+    );
   }
 
   if (directory.status === "unavailable") {

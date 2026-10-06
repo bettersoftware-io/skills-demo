@@ -41,10 +41,18 @@ describe("the user list", () => {
   it("adds a user, and clears the form for the next one", async () => {
     const page = mountUserList(DIRECTORY);
 
-    await page.add({ name: "Linus", email: "linus@example.com", category: "Operations" });
+    await page.add({
+      name: "Linus",
+      email: "linus@example.com",
+      category: "Operations",
+    });
 
     expect(page.rows()).toContain("Linus, linus@example.com, Operations");
-    expect(page.newUser()).toEqual({ name: "", email: "", category: "Choose a category" });
+    expect(page.newUser()).toEqual({
+      name: "",
+      email: "",
+      category: "Choose a category",
+    });
     expect(page.refusalCount()).toBe(0);
   });
 
@@ -63,7 +71,11 @@ describe("the user list", () => {
   it("refuses an email address that does not look like one, and keeps what was typed", async () => {
     const page = mountUserList(DIRECTORY);
 
-    await page.add({ name: "Linus", email: "linus.example.com", category: "Operations" });
+    await page.add({
+      name: "Linus",
+      email: "linus.example.com",
+      category: "Operations",
+    });
 
     expect(page.addRefusal()).toBe("This does not look like an email address.");
     expect(page.invalidNewFields()).toEqual(["email"]);
@@ -87,9 +99,15 @@ describe("the user list", () => {
   it("refuses an email address another user has, whatever its case", async () => {
     const page = mountUserList(DIRECTORY);
 
-    await page.add({ name: "Other Ada", email: "ADA@example.com", category: "Design" });
+    await page.add({
+      name: "Other Ada",
+      email: "ADA@example.com",
+      category: "Design",
+    });
 
-    expect(page.addRefusal()).toBe("Another user already has the email address ADA@example.com.");
+    expect(page.addRefusal()).toBe(
+      "Another user already has the email address ADA@example.com.",
+    );
     expect(page.refusalCount()).toBe(1);
     expect(page.rows()).toHaveLength(3);
   });
@@ -168,8 +186,18 @@ const DIRECTORY: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
+    {
+      id: "grace",
+      name: "Grace",
+      email: "grace@example.com",
+      categoryId: "eng",
+    },
+    {
+      id: "dieter",
+      name: "Dieter",
+      email: "dieter@example.com",
+      categoryId: "design",
+    },
     { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
   ],
 };

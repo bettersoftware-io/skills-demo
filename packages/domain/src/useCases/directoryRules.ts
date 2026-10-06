@@ -1,4 +1,10 @@
-import type { Category, CategoryDraft, Refusal, User, UserDraft } from "../entities/directory.ts";
+import type {
+  Category,
+  CategoryDraft,
+  Refusal,
+  User,
+  UserDraft,
+} from "../entities/directory.ts";
 
 // The rules of the directory, as pure functions. Whoever keeps the data (the
 // simulator, and through it the server) asks these before it changes anything,
@@ -31,20 +37,32 @@ export function tidyCategoryDraft(draft: CategoryDraft): CategoryDraft {
 }
 
 export function tidyUserDraft(draft: UserDraft): UserDraft {
-  return { name: draft.name.trim(), email: draft.email.trim(), categoryId: draft.categoryId };
+  return {
+    name: draft.name.trim(),
+    email: draft.email.trim(),
+    categoryId: draft.categoryId,
+  };
 }
 
 /** What is wrong with the draft on its own, before anyone looks at the other categories. */
 export function checkCategoryDraft(draft: CategoryDraft): Refusal | null {
   return draft.name.trim() === ""
-    ? { reason: "empty-name", field: "name", message: "A category needs a name." }
+    ? {
+        reason: "empty-name",
+        field: "name",
+        message: "A category needs a name.",
+      }
     : null;
 }
 
 /** What is wrong with the draft on its own, before anyone looks at the other users. */
 export function checkUserDraft(draft: UserDraft): Refusal | null {
   if (draft.name.trim() === "") {
-    return { reason: "empty-name", field: "name", message: "A user needs a name." };
+    return {
+      reason: "empty-name",
+      field: "name",
+      message: "A user needs a name.",
+    };
   }
 
   if (!LOOKS_LIKE_EMAIL.test(draft.email.trim())) {
@@ -56,7 +74,11 @@ export function checkUserDraft(draft: UserDraft): Refusal | null {
   }
 
   return draft.categoryId === ""
-    ? { reason: "unknown-category", field: "category", message: "Choose a category." }
+    ? {
+        reason: "unknown-category",
+        field: "category",
+        message: "Choose a category.",
+      }
     : null;
 }
 
@@ -73,7 +95,9 @@ export function judgeCategoryDraft(
 
   return (
     checkCategoryDraft(draft) ??
-    (others.some((other) => sameIgnoringCase(other.name, name))
+    (others.some((other) => {
+      return sameIgnoringCase(other.name, name);
+    })
       ? {
           reason: "duplicate-name",
           field: "name",
@@ -99,7 +123,11 @@ export function judgeUserDraft(
     return flaw;
   }
 
-  if (!categories.some((category) => category.id === draft.categoryId)) {
+  if (
+    !categories.some((category) => {
+      return category.id === draft.categoryId;
+    })
+  ) {
     return {
       reason: "unknown-category",
       field: "category",
@@ -109,7 +137,9 @@ export function judgeUserDraft(
 
   const email = draft.email.trim();
 
-  return others.some((other) => sameIgnoringCase(other.email, email))
+  return others.some((other) => {
+    return sameIgnoringCase(other.email, email);
+  })
     ? {
         reason: "duplicate-email",
         field: "email",
@@ -119,8 +149,13 @@ export function judgeUserDraft(
 }
 
 /** Why this category cannot be deleted, or null if it can: a category that still has users stays. */
-export function judgeCategoryRemoval(category: Category, users: readonly User[]): Refusal | null {
-  const members = users.filter((user) => user.categoryId === category.id).length;
+export function judgeCategoryRemoval(
+  category: Category,
+  users: readonly User[],
+): Refusal | null {
+  const members = users.filter((user) => {
+    return user.categoryId === category.id;
+  }).length;
 
   if (members === 0) {
     return null;

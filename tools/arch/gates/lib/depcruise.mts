@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 import type { Finding, Project, ResolvedConfig, WorkspacePackage } from "./config.mts";
 import { declaredPackages, packagesWithRole, ROLE_MAY_IMPORT } from "./config.mts";
+import { TEST_SCAFFOLDING_SOURCE } from "./files.mts";
 
 const GATE = "dependencies";
 
@@ -59,7 +60,23 @@ export function buildRules(config: ResolvedConfig, workspace: WorkspacePackage[]
     },
   ];
 
-  for (const pkg of declared) {
+  for (const e2e of packagesWithRole(config, "e2e")) {
+    const testIds = packagesWithRole(config, "client").map((client) => `${client.path}/${client.ui}/${client.testIds}`);
+    const own = `${escape(e2e.path)}/`;
+
+    rules.push({
+      name: `${slug(e2e.path)}-imports-test-ids-only`,
+      severity: "error",
+      comment: `An e2e package drives the built application from outside, so it imports none of its source${
+        testIds.length > 0 ? `, except the test ids (${testIds.join(", ")})` : ""
+      }. A test that imports the code it tests stops being a test of what a user gets. Drive the screen through a page object, and import a type with \`import type\`: a type is not an edge.`,
+      // The whole package, its Playwright config included.
+      from: { path: `^${own}` },
+      to: { path: anyOf(everyPackage), pathNot: `^(${[own, ...testIds.map((file) => `${escape(file)}$`)].join("|")})` },
+    });
+  }
+
+  for (const pkg of declared.filter(({ role }) => role !== "e2e")) {
     const allowed = [
       pkg.path,
       ...declared.filter((other) => ROLE_MAY_IMPORT[pkg.role].includes(other.role)).map(({ path }) => path),
@@ -75,13 +92,34 @@ export function buildRules(config: ResolvedConfig, workspace: WorkspacePackage[]
     });
   }
 
-  for (const domain of packagesWithRole(config, "domain")) {
+  for (const pkg of declared.filter(({ noNodeBuiltins }) => noNodeBuiltins)) {
     rules.push({
-      name: `${slug(domain.path)}-no-node-builtins`,
+      name: `${slug(pkg.path)}-no-node-builtins`,
       severity: "error",
-      comment: "The domain runs in any JavaScript environment, so its production code uses no Node built-in. Reach the platform through a port.",
-      from: { path: `^${escape(domain.path)}/src`, pathNot: "(\\.(test|spec)\\.[cm]?tsx?$|/__tests__/|/__testUtils__/)" },
+      comment: `${pkg.role === "domain" ? "The domain" : "This package"} runs in any JavaScript environment, a browser included, so its production code uses no Node built-in. Reach the platform through a port.`,
+      from: { path: `^${escape(pkg.path)}/src`, pathNot: TEST_SCAFFOLDING_SOURCE },
       to: { dependencyTypes: ["core"] },
+    });
+  }
+
+  rules.push({
+    name: "no-test-scaffolding-in-production",
+    severity: "error",
+    comment: "Production code imports something written for tests (a testing folder, a page object, a test helper, a test). A fake would ship in the product, and the code could come to depend on it. Move what production needs into a production file, and keep the scaffolding for tests.",
+    from: { path: `${anyOf(declared.map(({ path }) => path))}src/`, pathNot: TEST_SCAFFOLDING_SOURCE },
+    to: { path: `${anyOf(everyPackage)}.*${TEST_SCAFFOLDING_SOURCE}` },
+  });
+
+  for (const [vendor, allowed] of Object.entries(config.vendorOnlyIn)) {
+    const name = escape(vendor.replace(/\/$/, ""));
+
+    rules.push({
+      name: `${vendor.replace(/^@/, "").replace(/\/$/, "").replace(/\//g, "-")}-only-in-its-packages`,
+      severity: "error",
+      comment: `"${vendor}" may be imported only from: ${allowed.join(", ") || "nowhere"}. Keeping a library in the packages that own it is what lets it be replaced by changing those alone. Reach it through what one of them exports, or extend vendorOnlyIn in architecture.config.mts deliberately.`,
+      from: { path: anyOf(everyPackage), ...(allowed.length > 0 ? { pathNot: anyOf(allowed) } : {}) },
+      // Resolved, the path runs through node_modules; unresolved, it is the bare name.
+      to: { path: `(^|node_modules/)${name}(/|$)` },
     });
   }
 
@@ -93,6 +131,22 @@ export function buildRules(config: ResolvedConfig, workspace: WorkspacePackage[]
       from: { path: `^${escape(core.path)}/src` },
       to: { path: `node_modules/(${config.frameworks.map(escape).join("|")})/` },
     });
+
+    if (config.adapters.length > 0) {
+      const mayImport = [
+        ...config.adapters.map((folder) => `^${escape(folder)}/`),
+        ...core.mayImportAdapters.map((file) => `^${escape(`${core.path}/${file}`)}$`),
+        TEST_SCAFFOLDING_SOURCE,
+      ];
+
+      rules.push({
+        name: `${slug(core.path)}-takes-ports-as-arguments`,
+        severity: "error",
+        comment: `A presenter, a state machine or the composition imports an adapter. The core is handed its ports as arguments, which is what lets a test, or another client, put anything behind them. Take the port as a parameter; only ${core.mayImportAdapters.join(", ")} names an adapter, to export it for the client's composition root.`,
+        from: { path: `^${escape(core.path)}/src/`, pathNot: `(${mayImport.join("|")})` },
+        to: { path: anyOf(config.adapters) },
+      });
+    }
   }
 
   for (const client of packagesWithRole(config, "client")) {
@@ -235,6 +289,18 @@ function findDormantRules(report: CruiseReport, workspace: WorkspacePackage[]): 
 
   for (const module of modules) {
     for (const dependency of module.dependencies ?? []) {
+      // An alias of the package itself (`#/adapters/x.ts`) is read from the
+      // "imports" of its package.json. One that leads nowhere is an edge no
+      // rule sees, the same as a workspace import that misses the source.
+      if (dependency.module.startsWith("#") && dependency.couldNotResolve && !seen.has(`${module.source} ${dependency.module}`)) {
+        seen.add(`${module.source} ${dependency.module}`);
+        findings.push({
+          gate: GATE,
+          file: module.source,
+          message: `The import "${dependency.module}" did not resolve. Rules about where it lands cannot see this edge, so a clean result here would mean nothing. A "#…" import is read from the "imports" of the package's own package.json: check the path, and that the package declares "imports": { "#/*": "./src/*" }.`,
+        });
+      }
+
       const owner = workspace.find(({ name }) => dependency.module === name || dependency.module.startsWith(`${name}/`));
 
       if (!owner) {

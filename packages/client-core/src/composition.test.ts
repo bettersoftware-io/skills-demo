@@ -1,31 +1,28 @@
-import { Subject } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
 
-import { createDirectorySimulator, type DirectorySnapshot, type Price } from "@skills-demo/domain";
+import type { DirectorySnapshot } from "@skills-demo/domain";
 
-import { type App, createApp } from "./composition.ts";
+import type { App } from "./composition.ts";
+import { createAppHarness } from "./testing/appHarness.ts";
 
 describe("the application", () => {
   it("shows the prices its price port produces", () => {
-    const prices$ = new Subject<Price>();
-    const app = createApp({
-      price: { prices: () => prices$ },
-      directory: createDirectorySimulator(),
-    });
+    const { app, deliverPrice } = createAppHarness();
     const subscription = app.presenters.prices.rows$.subscribe();
 
-    prices$.next({ symbol: "EURUSD", mid: 1.1 });
+    deliverPrice({ symbol: "EURUSD", mid: 1.1 });
 
-    expect(app.presenters.prices.rows$.getValue().map((row) => row.symbol)).toEqual(["EURUSD"]);
+    expect(
+      app.presenters.prices.rows$.getValue().map((row) => {
+        return row.symbol;
+      }),
+    ).toEqual(["EURUSD"]);
 
     subscription.unsubscribe();
   });
 
   it("builds a separate selection machine for each component that asks", () => {
-    const app = createApp({
-      price: { prices: () => new Subject<Price>() },
-      directory: createDirectorySimulator(),
-    });
+    const { app } = createAppHarness();
     const first = app.machines.createSelection();
     const second = app.machines.createSelection();
 
@@ -41,7 +38,10 @@ describe("the application", () => {
   it("shows the categories and users its directory port holds", () => {
     const app = createDirectoryApp();
 
-    expect(namesOf(app)).toEqual({ categories: ["Design", "Engineering"], users: ["Ada"] });
+    expect(namesOf(app)).toEqual({
+      categories: ["Design", "Engineering"],
+      users: ["Ada"],
+    });
   });
 
   it("adds a category through the category form, which is then blank again", () => {
@@ -51,7 +51,11 @@ describe("the application", () => {
     form.intents.change({ name: "Support" });
     form.intents.save();
 
-    expect(namesOf(app).categories).toEqual(["Design", "Engineering", "Support"]);
+    expect(namesOf(app).categories).toEqual([
+      "Design",
+      "Engineering",
+      "Support",
+    ]);
     expect(form.state$.getValue().draft).toEqual({ name: "" });
 
     form.dispose();
@@ -101,7 +105,11 @@ describe("the application", () => {
     const app = createDirectoryApp();
     const form = app.machines.createUserForm();
 
-    form.intents.change({ name: "Grace", email: "ADA@example.com", categoryId: "design" });
+    form.intents.change({
+      name: "Grace",
+      email: "ADA@example.com",
+      categoryId: "design",
+    });
     form.intents.save();
     expect(form.state$.getValue().refusal).toMatchObject({
       reason: "duplicate-email",
@@ -142,15 +150,14 @@ const SEED: DirectorySnapshot = {
     { id: "eng", name: "Engineering" },
     { id: "design", name: "Design" },
   ],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+  ],
 };
 
 /** The application on a small directory, with a reader on the directory screen until the test ends. */
 function createDirectoryApp(): App {
-  const app = createApp({
-    price: { prices: () => new Subject<Price>() },
-    directory: createDirectorySimulator(SEED),
-  });
+  const { app } = createAppHarness({ directory: SEED });
   const subscription = app.presenters.directory.view$.subscribe();
 
   onTestFinished(() => {
@@ -160,11 +167,20 @@ function createDirectoryApp(): App {
   return app;
 }
 
-function namesOf(app: App): { categories: string[]; users: string[] } {
+interface Names {
+  categories: string[];
+  users: string[];
+}
+
+function namesOf(app: App): Names {
   const view = app.presenters.directory.view$.getValue();
 
   return {
-    categories: view.categories.map((category) => category.name),
-    users: view.users.map((user) => user.name),
+    categories: view.categories.map((category) => {
+      return category.name;
+    }),
+    users: view.users.map((user) => {
+      return user.name;
+    }),
   };
 }
