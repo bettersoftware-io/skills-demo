@@ -189,7 +189,20 @@
 <a name='L124'></a><a href='#L124'>124</a>
 <a name='L125'></a><a href='#L125'>125</a>
 <a name='L126'></a><a href='#L126'>126</a>
-<a name='L127'></a><a href='#L127'>127</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -248,6 +261,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">55x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -264,6 +281,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
@@ -299,6 +318,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
@@ -315,7 +339,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { catchError, defer, from, map, type Observable, of } from "rxjs";
+&nbsp;
+import {
   accept,
   type Category,
   type CategoryDraft,
@@ -338,7 +364,6 @@ import {
   parseUser,
   parseUserList,
 } from "@skills-demo/shared";
-import { catchError, defer, from, map, type Observable, of } from "rxjs";
 &nbsp;
 /** As much of an HTTP response as the adapter reads. */
 export interface HttpAnswer {
@@ -368,12 +393,16 @@ const NOT_UNDERSTOOD: Refusal = {
  */
 export function createHttpDirectoryPort(
   baseUrl: string,
-  send: SendRequest = (url, request) =&gt; fetch(url, request),
+  send: SendRequest = (url: string, request: HttpRequest) =&gt; fetch(url, request),
 ): DirectoryPort {
   const root = baseUrl.replace(/\/+$/, "");
 &nbsp;
   /** The answer's status and its body as JSON, or null where there is no JSON. */
-  async function ask(method: string, path: string, body?: object): Promise&lt;{ status: number; body: unknown }&gt; {
+  async function ask(
+    method: string,
+    path: string,
+    body?: object,
+  ): Promise&lt;{ status: number; body: unknown }&gt; {
     const answer = await send(`${root}${path}`, {
       method,
       headers: body === undefined ? { Accept: "application/json" } : JSON_BODY,
@@ -389,7 +418,9 @@ export function createHttpDirectoryPort(
         const listed = status === 200 ? parse(body) : undefined;
 &nbsp;
         if (listed === undefined) {
-          throw new Error(`the directory answered ${status} to GET ${path} with no list the app understands`);
+          throw new Error(
+            `the directory answered ${status} to GET ${path} with no list the app understands`,
+          );
         }
 &nbsp;
         return listed;
@@ -423,7 +454,12 @@ export function createHttpDirectoryPort(
     addCategory: (draft: CategoryDraft): Observable&lt;Outcome&lt;Category&gt;&gt; =&gt;
       change("POST", API_PATH.categories, encodeCategoryDraft(draft), parseCategory),
     renameCategory: (id: string, draft: CategoryDraft): Observable&lt;Outcome&lt;Category&gt;&gt; =&gt;
-      change("PUT", locateEntry(API_PATH.categories, id), encodeCategoryDraft(draft), parseCategory),
+      change(
+        "PUT",
+        locateEntry(API_PATH.categories, id),
+        encodeCategoryDraft(draft),
+        parseCategory,
+      ),
     removeCategory: (id: string): Observable&lt;Outcome&lt;null&gt;&gt; =&gt;
       change("DELETE", locateEntry(API_PATH.categories, id), undefined, parseNothing),
     addUser: (draft: UserDraft): Observable&lt;Outcome&lt;User&gt;&gt; =&gt;
@@ -448,7 +484,7 @@ function parseNothing(): null {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-10-05T22:39:01.296Z
+                at 2026-10-06T02:11:28.748Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

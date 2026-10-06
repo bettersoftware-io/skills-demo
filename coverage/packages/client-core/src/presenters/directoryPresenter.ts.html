@@ -241,7 +241,22 @@
 <a name='L176'></a><a href='#L176'>176</a>
 <a name='L177'></a><a href='#L177'>177</a>
 <a name='L178'></a><a href='#L178'>178</a>
-<a name='L179'></a><a href='#L179'>179</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -327,6 +342,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
@@ -345,6 +365,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">41x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -371,10 +394,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -386,6 +412,8 @@
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -419,7 +447,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">126x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { type DefaultedStateObservable, state } from "@rx-state/core";
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  forkJoin,
+  map,
+  type Observable,
+  of,
+  Subject,
+  startWith,
+  switchMap,
+  tap,
+} from "rxjs";
+&nbsp;
+import {
   type Category,
   type CategoryDraft,
   checkCategoryDraft,
@@ -431,20 +474,6 @@
   type User,
   type UserDraft,
 } from "@skills-demo/domain";
-import { type DefaultedStateObservable, state } from "@rx-state/core";
-import {
-  BehaviorSubject,
-  catchError,
-  combineLatest,
-  forkJoin,
-  map,
-  type Observable,
-  of,
-  startWith,
-  Subject,
-  switchMap,
-  tap,
-} from "rxjs";
 &nbsp;
 /** One row of the category list, ready to render. */
 export interface CategoryRow {
@@ -504,7 +533,12 @@ export const BLANK_USER: UserDraft = { name: "", email: "", categoryId: "" };
 &nbsp;
 type Loaded = { reached: true; categories: Category[]; users: User[] } | { reached: false };
 &nbsp;
-const LOADING: DirectoryView = { status: "loading", categories: [], users: [], shownCategory: null };
+const LOADING: DirectoryView = {
+  status: "loading",
+  categories: [],
+  users: [],
+  shownCategory: null,
+};
 &nbsp;
 export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresenter {
   const reload$ = new Subject&lt;void&gt;();
@@ -527,7 +561,10 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
   );
 &nbsp;
   /** Refuses a flawed draft without asking; otherwise asks, and reloads once the change is made. */
-  function perform&lt;T&gt;(flaw: Refusal | null, change: () =&gt; Observable&lt;Outcome&lt;T&gt;&gt;): Observable&lt;Outcome&lt;T&gt;&gt; {
+  function perform&lt;T&gt;(
+    flaw: Refusal | null,
+    change: () =&gt; Observable&lt;Outcome&lt;T&gt;&gt;,
+  ): Observable&lt;Outcome&lt;T&gt;&gt; {
     if (flaw !== null) {
       return of(refuse(flaw));
     }
@@ -543,27 +580,32 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
 &nbsp;
   return {
     view$,
-    showCategory: (id): void =&gt; {
+    showCategory: (id: string | null): void =&gt; {
       shown$.next(id);
     },
     reload: (): void =&gt; {
       reload$.next();
     },
-    addCategory: (draft) =&gt; perform(checkCategoryDraft(draft), () =&gt; port.addCategory(draft)),
-    renameCategory: (id, draft) =&gt; perform(checkCategoryDraft(draft), () =&gt; port.renameCategory(id, draft)),
-    removeCategory: (id) =&gt; perform(null, () =&gt; port.removeCategory(id)),
-    addUser: (draft) =&gt; perform(checkUserDraft(draft), () =&gt; port.addUser(draft)),
-    changeUser: (id, draft) =&gt; perform(checkUserDraft(draft), () =&gt; port.changeUser(id, draft)),
-    removeUser: (id) =&gt; perform(null, () =&gt; port.removeUser(id)),
-    categoryDraft: (id): CategoryDraft =&gt; {
+    addCategory: (draft: CategoryDraft) =&gt;
+      perform(checkCategoryDraft(draft), () =&gt; port.addCategory(draft)),
+    renameCategory: (id: string, draft: CategoryDraft) =&gt;
+      perform(checkCategoryDraft(draft), () =&gt; port.renameCategory(id, draft)),
+    removeCategory: (id: string) =&gt; perform(null, () =&gt; port.removeCategory(id)),
+    addUser: (draft: UserDraft) =&gt; perform(checkUserDraft(draft), () =&gt; port.addUser(draft)),
+    changeUser: (id: string, draft: UserDraft) =&gt;
+      perform(checkUserDraft(draft), () =&gt; port.changeUser(id, draft)),
+    removeUser: (id: string) =&gt; perform(null, () =&gt; port.removeUser(id)),
+    categoryDraft: (id: string): CategoryDraft =&gt; {
       const row = view$.getValue().categories.find((category) =&gt; category.id === id);
 &nbsp;
       return row === undefined ? BLANK_CATEGORY : { name: row.name };
     },
-    userDraft: (id): UserDraft =&gt; {
+    userDraft: (id: string): UserDraft =&gt; {
       const row = view$.getValue().users.find((user) =&gt; user.id === id);
 &nbsp;
-      return row === undefined ? BLANK_USER : { name: row.name, email: row.email, categoryId: row.categoryId };
+      return row === undefined
+        ? BLANK_USER
+        : { name: row.name, email: row.email, categoryId: row.categoryId };
     },
   };
 }
@@ -604,7 +646,7 @@ function byName(one: { name: string }, other: { name: string }): number {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-10-05T22:39:01.296Z
+                at 2026-10-06T02:11:28.748Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
