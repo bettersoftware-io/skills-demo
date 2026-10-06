@@ -1,4 +1,7 @@
-import { createDirectorySimulator, createPriceSimulator } from "@skills-demo/domain";
+import {
+  createDirectorySimulator,
+  createPriceSimulator,
+} from "@skills-demo/domain";
 import { API_ROOT, WS_PATH } from "@skills-demo/shared";
 
 import { type RunningServer, startServer } from "./startServer.ts";
@@ -12,5 +15,9 @@ const server: RunningServer = await startServer({
   directory: createDirectorySimulator(),
 });
 
-console.info(`price server listening on ws://localhost:${server.port}${WS_PATH}`);
-console.info(`directory API listening on http://localhost:${server.port}${API_ROOT}`);
+console.info(
+  `price server listening on ws://localhost:${server.port}${WS_PATH}`,
+);
+console.info(
+  `directory API listening on http://localhost:${server.port}${API_ROOT}`,
+);

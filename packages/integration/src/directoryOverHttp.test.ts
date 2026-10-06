@@ -9,13 +9,16 @@ import { createDirectoryApi } from "@skills-demo/server/directoryApi.ts";
 // real routes.
 
 // The whole contract, with no socket: Hono answers a request in-process.
-describeDirectoryPortContract("the HTTP adapter against the real API", (seed) => {
-  const api = createDirectoryApi(createDirectorySimulator(seed));
+describeDirectoryPortContract(
+  "the HTTP adapter against the real API",
+  (seed) => {
+    const api = createDirectoryApi(createDirectorySimulator(seed));
 
-  return {
-    port: createHttpDirectoryPort("http://directory.test", (url, request) =>
-      Promise.resolve(api.request(url, request)),
-    ),
-    teardown: (): void => {},
-  };
-});
+    return {
+      port: createHttpDirectoryPort("http://directory.test", (url, request) => {
+        return Promise.resolve(api.request(url, request));
+      }),
+      teardown: (): void => {},
+    };
+  },
+);

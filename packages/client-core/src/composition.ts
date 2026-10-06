@@ -1,4 +1,9 @@
-import type { CategoryDraft, DirectoryPort, PricePort, UserDraft } from "@skills-demo/domain";
+import type {
+  CategoryDraft,
+  DirectoryPort,
+  PricePort,
+  UserDraft,
+} from "@skills-demo/domain";
 
 import {
   createAddFormMachine,
@@ -19,7 +24,10 @@ import {
   createDirectoryPresenter,
   type DirectoryPresenter,
 } from "./presenters/directoryPresenter.ts";
-import { createPricesPresenter, type PricesPresenter } from "./presenters/pricesPresenter.ts";
+import {
+  createPricesPresenter,
+  type PricesPresenter,
+} from "./presenters/pricesPresenter.ts";
 
 /** Everything the application needs from the outside world. The client's
  * composition root decides what stands behind each port. */
@@ -29,12 +37,24 @@ export interface AppPorts {
 }
 
 /** The form that adds a category, and the form of one category in the list. */
-export type CategoryFormMachine = Machine<FormState<CategoryDraft>, FormIntents<CategoryDraft>>;
-export type CategoryRowMachine = Machine<FormState<CategoryDraft>, RowFormIntents<CategoryDraft>>;
+export type CategoryFormMachine = Machine<
+  FormState<CategoryDraft>,
+  FormIntents<CategoryDraft>
+>;
+export type CategoryRowMachine = Machine<
+  FormState<CategoryDraft>,
+  RowFormIntents<CategoryDraft>
+>;
 
 /** The form that adds a user, and the form of one user in the list. */
-export type UserFormMachine = Machine<FormState<UserDraft>, FormIntents<UserDraft>>;
-export type UserRowMachine = Machine<FormState<UserDraft>, RowFormIntents<UserDraft>>;
+export type UserFormMachine = Machine<
+  FormState<UserDraft>,
+  FormIntents<UserDraft>
+>;
+export type UserRowMachine = Machine<
+  FormState<UserDraft>,
+  RowFormIntents<UserDraft>
+>;
 
 /** The application, built once at startup. Presenters are shared; machine
  * factories build one machine per component that asks. */
@@ -62,21 +82,44 @@ export function createApp(ports: AppPorts): App {
     },
     machines: {
       createSelection: createSelectionMachine,
-      createCategoryForm: () =>
-        createAddFormMachine({ blank: BLANK_CATEGORY, add: directory.addCategory }),
-      createCategoryRow: (id: string) =>
-        createRowFormMachine({
-          current: () => directory.categoryDraft(id),
-          save: (draft: CategoryDraft) => directory.renameCategory(id, draft),
-          remove: () => directory.removeCategory(id),
-        }),
-      createUserForm: () => createAddFormMachine({ blank: BLANK_USER, add: directory.addUser }),
-      createUserRow: (id: string) =>
-        createRowFormMachine({
-          current: () => directory.userDraft(id),
-          save: (draft: UserDraft) => directory.changeUser(id, draft),
-          remove: () => directory.removeUser(id),
-        }),
+      createCategoryForm: () => {
+        return createAddFormMachine({
+          blank: BLANK_CATEGORY,
+          add: directory.addCategory,
+        });
+      },
+      createCategoryRow: (id: string) => {
+        return createRowFormMachine({
+          current: () => {
+            return directory.categoryDraft(id);
+          },
+          save: (draft: CategoryDraft) => {
+            return directory.renameCategory(id, draft);
+          },
+          remove: () => {
+            return directory.removeCategory(id);
+          },
+        });
+      },
+      createUserForm: () => {
+        return createAddFormMachine({
+          blank: BLANK_USER,
+          add: directory.addUser,
+        });
+      },
+      createUserRow: (id: string) => {
+        return createRowFormMachine({
+          current: () => {
+            return directory.userDraft(id);
+          },
+          save: (draft: UserDraft) => {
+            return directory.changeUser(id, draft);
+          },
+          remove: () => {
+            return directory.removeUser(id);
+          },
+        });
+      },
     },
   };
 }

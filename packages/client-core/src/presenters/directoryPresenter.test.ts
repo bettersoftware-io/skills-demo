@@ -71,8 +71,16 @@ describe("the directory presenter: what it shows", () => {
 
     presenter.showCategory("eng");
     expect(latest().shownCategory).toBe("eng");
-    expect(latest().users.map((user) => user.name)).toEqual(["Ada", "Grace"]);
-    expect(latest().categories.map((category) => category.userCount)).toEqual([1, 2, 0]);
+    expect(
+      latest().users.map((user) => {
+        return user.name;
+      }),
+    ).toEqual(["Ada", "Grace"]);
+    expect(
+      latest().categories.map((category) => {
+        return category.userCount;
+      }),
+    ).toEqual([1, 2, 0]);
 
     presenter.showCategory(null);
     expect(latest().shownCategory).toBeNull();
@@ -106,20 +114,28 @@ describe("the directory presenter: changes", () => {
 
     presenter.addCategory({ name: "Billing" }).subscribe();
     presenter.renameCategory("ops", { name: "Support" }).subscribe();
-    presenter.addUser({ name: "Linus", email: "linus@example.com", categoryId: "ops" }).subscribe();
     presenter
-      .changeUser("ada", { name: "Ada Lovelace", email: "ada@example.com", categoryId: "design" })
+      .addUser({ name: "Linus", email: "linus@example.com", categoryId: "ops" })
+      .subscribe();
+    presenter
+      .changeUser("ada", {
+        name: "Ada Lovelace",
+        email: "ada@example.com",
+        categoryId: "design",
+      })
       .subscribe();
     presenter.removeUser("grace").subscribe();
 
-    expect(latest().categories.map((category) => `${category.name} ${category.userCount}`)).toEqual(
-      ["Billing 0", "Design 2", "Engineering 0", "Support 1"],
-    );
-    expect(latest().users.map((user) => `${user.name}, ${user.categoryName}`)).toEqual([
-      "Ada Lovelace, Design",
-      "Dieter, Design",
-      "Linus, Support",
-    ]);
+    expect(
+      latest().categories.map((category) => {
+        return `${category.name} ${category.userCount}`;
+      }),
+    ).toEqual(["Billing 0", "Design 2", "Engineering 0", "Support 1"]);
+    expect(
+      latest().users.map((user) => {
+        return `${user.name}, ${user.categoryName}`;
+      }),
+    ).toEqual(["Ada Lovelace, Design", "Dieter, Design", "Linus, Support"]);
   });
 
   it("does nothing until the change is subscribed to", () => {
@@ -149,18 +165,28 @@ describe("the directory presenter: changes", () => {
 
   it("refuses a draft that is wrong on its own without sending it", () => {
     const { presenter, asked } = createPresented();
-    const linus = { name: "Linus", email: "linus@example.com", categoryId: "ops" };
+    const linus = {
+      name: "Linus",
+      email: "linus@example.com",
+      categoryId: "ops",
+    };
 
     expect(answerOf(presenter.addCategory({ name: " " }))).toMatchObject({
       refusal: { reason: "empty-name" },
     });
-    expect(answerOf(presenter.renameCategory("ops", { name: "" }))).toMatchObject({
+    expect(
+      answerOf(presenter.renameCategory("ops", { name: "" })),
+    ).toMatchObject({
       refusal: { reason: "empty-name", field: "name" },
     });
-    expect(answerOf(presenter.addUser({ ...linus, email: "linus" }))).toMatchObject({
+    expect(
+      answerOf(presenter.addUser({ ...linus, email: "linus" })),
+    ).toMatchObject({
       refusal: { reason: "invalid-email", field: "email" },
     });
-    expect(answerOf(presenter.changeUser("ada", { ...linus, categoryId: "" }))).toMatchObject({
+    expect(
+      answerOf(presenter.changeUser("ada", { ...linus, categoryId: "" })),
+    ).toMatchObject({
       refusal: { reason: "unknown-category", field: "category" },
     });
     expect(asked.changes).toBe(0);
@@ -183,20 +209,32 @@ describe("the directory presenter: changes", () => {
       categories: () => {
         asked += 1;
 
-        return asked === 1 ? createDirectorySimulator(SEED).categories() : answers$;
+        return asked === 1
+          ? createDirectorySimulator(SEED).categories()
+          : answers$;
       },
     });
     const seen: DirectoryView[] = [];
 
-    presenter.view$.subscribe((view) => seen.push(view));
+    presenter.view$.subscribe((view) => {
+      return seen.push(view);
+    });
     presenter.reload();
 
-    expect(seen.map((view) => view.status)).toEqual(["ready"]);
+    expect(
+      seen.map((view) => {
+        return view.status;
+      }),
+    ).toEqual(["ready"]);
 
     answers$.next([{ id: "solo", name: "Solo" }]);
     answers$.complete();
 
-    expect(seen.map((view) => view.categories.length)).toEqual([3, 1]);
+    expect(
+      seen.map((view) => {
+        return view.categories.length;
+      }),
+    ).toEqual([3, 1]);
   });
 });
 
@@ -242,7 +280,11 @@ describe("the directory presenter: what an edit starts from", () => {
     const { presenter } = createPresented();
 
     expect(presenter.categoryDraft("sales")).toEqual({ name: "" });
-    expect(presenter.userDraft("linus")).toEqual({ name: "", email: "", categoryId: "" });
+    expect(presenter.userDraft("linus")).toEqual({
+      name: "",
+      email: "",
+      categoryId: "",
+    });
   });
 });
 
@@ -254,8 +296,18 @@ const SEED: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
+    {
+      id: "grace",
+      name: "Grace",
+      email: "grace@example.com",
+      categoryId: "eng",
+    },
+    {
+      id: "dieter",
+      name: "Dieter",
+      email: "dieter@example.com",
+      categoryId: "design",
+    },
     { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
   ],
 };
@@ -268,7 +320,9 @@ interface Presented {
 }
 
 /** The presenter with one reader, on a directory that counts what it is asked. */
-function createPresented(directory: DirectoryPort = createDirectorySimulator(SEED)): Presented {
+function createPresented(
+  directory: DirectoryPort = createDirectorySimulator(SEED),
+): Presented {
   const asked = { lists: 0, changes: 0 };
 
   function countChange<TArguments extends unknown[], TAnswer>(
@@ -301,7 +355,13 @@ function createPresented(directory: DirectoryPort = createDirectorySimulator(SEE
     view = next;
   });
 
-  return { presenter, latest: () => view, asked };
+  return {
+    presenter,
+    latest: () => {
+      return view;
+    },
+    asked,
+  };
 }
 
 interface FlakyDirectory {
@@ -317,10 +377,13 @@ function createFlakyDirectory(): FlakyDirectory {
   return {
     port: {
       ...directory,
-      users: () =>
-        reachable
+      users: () => {
+        return reachable
           ? directory.users()
-          : throwError(() => new Error("the directory cannot be reached")),
+          : throwError(() => {
+              return new Error("the directory cannot be reached");
+            });
+      },
     },
     recover: (): void => {
       reachable = true;

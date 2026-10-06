@@ -1,7 +1,7 @@
 // Small file helpers shared by the gates. Node built-ins only.
 
-import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, lstatSync, readdirSync, readFileSync, realpathSync } from "node:fs";
+import { join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Folders that hold only installed or generated files. This is a closed list on
@@ -27,6 +27,15 @@ export function isGeneratedPath(path: string): boolean {
 
 const SOURCE_FILE = /\.(ts|tsx|mts|js|jsx|mjs|cjs)$/;
 const TEST_FILE = /(\.(test|spec)\.[cm]?[jt]sx?$|\/__tests__\/|\/__testUtils__\/)/;
+
+/**
+ * Everything written for tests: the tests, and what they are built from (a
+ * `testing/` folder, a page object, a `*.testHelpers.*` file). As source for a
+ * dependency-cruiser path, and as a pattern for the gates that read files.
+ */
+export const TEST_SCAFFOLDING_SOURCE =
+  "(\\.(test|spec|page|testHelpers)\\.[cm]?[jt]sx?$|/__tests__/|/__testUtils__/|/testing/)";
+const TEST_SCAFFOLDING = new RegExp(TEST_SCAFFOLDING_SOURCE);
 
 /** Every source file under `directory`, as paths from `root`. Missing folder → none. */
 export function listSourceFiles(root: string, directory: string): string[] {
@@ -64,12 +73,109 @@ export function isMainModule(moduleUrl: string): boolean {
   return entry !== undefined && existsSync(entry) && realpathSync(entry) === realpathSync(fileURLToPath(moduleUrl));
 }
 
+/**
+ * True when no part of `path`, a place under `root`, is a symbolic link. A
+ * tool that writes at a fixed place in a tree it did not make asks this first:
+ * a link there would send the write wherever the link points.
+ */
+export function isPlainPath(root: string, path: string): boolean {
+  let current = root;
+
+  for (const part of path.split("/")) {
+    current = join(current, part);
+
+    try {
+      if (lstatSync(current, { throwIfNoEntry: false })?.isSymbolicLink()) {
+        return false;
+      }
+    } catch {
+      // A part that is a file, or cannot be read: nothing can be written under it either.
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function isTestFile(path: string): boolean {
   return TEST_FILE.test(path);
 }
 
+/** True for a test and for anything only tests are built from. */
+export function isTestScaffolding(path: string): boolean {
+  return TEST_SCAFFOLDING.test(path);
+}
+
+/** The 1-based line of the character at `index` in `text`. */
+export function lineAt(text: string, index: number): number {
+  let line = 1;
+
+  for (let position = text.indexOf("\n"); position !== -1 && position < index; position = text.indexOf("\n", position + 1)) {
+    line += 1;
+  }
+
+  return line;
+}
+
 export function isInside(path: string, directory: string): boolean {
   return path === directory || path.startsWith(`${directory}/`);
+}
+
+type SubpathTarget = string | { [condition: string]: SubpathTarget } | null;
+
+/**
+ * Where a `#…` import lands, as a path from `root`: read from the `imports`
+ * of the package's own package.json, the way Node and the bundlers read it.
+ * Undefined when the package declares no alias that matches. A gate that reads
+ * import paths as text needs this, or a forbidden import written through the
+ * alias would pass it.
+ */
+export function resolveSubpathImport(root: string, packagePath: string, specifier: string): string | undefined {
+  const manifest = join(root, packagePath, "package.json");
+
+  if (!specifier.startsWith("#") || !existsSync(manifest)) {
+    return undefined;
+  }
+
+  const { imports = {} } = JSON.parse(readFileSync(manifest, "utf8")) as { imports?: Record<string, SubpathTarget> };
+
+  for (const [key, declared] of Object.entries(imports)) {
+    const target = firstPath(declared);
+    const [before, after] = key.split("*");
+
+    if (target === undefined || before === undefined) {
+      continue;
+    }
+
+    if (after === undefined) {
+      if (key === specifier) {
+        return normalize(join(packagePath, target));
+      }
+    } else if (specifier.startsWith(before) && specifier.endsWith(after) && specifier.length >= key.length) {
+      const matched = specifier.slice(before.length, specifier.length - after.length);
+
+      return normalize(join(packagePath, target.replace("*", matched)));
+    }
+  }
+
+  return undefined;
+}
+
+/** A target is a path, or paths by condition (`import`, `default`): the first path found is taken. */
+function firstPath(target: SubpathTarget): string | undefined {
+  if (typeof target === "string" || target === null) {
+    return target ?? undefined;
+  }
+
+  for (const nested of Object.values(target)) {
+    const path = firstPath(nested);
+
+    if (path !== undefined) {
+      return path;
+    }
+  }
+
+  return undefined;
 }
 
 /** Matches a file name against `name` or a `*.suffix` pattern. */

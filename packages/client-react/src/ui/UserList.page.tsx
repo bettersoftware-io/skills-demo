@@ -3,13 +3,16 @@ import userEvent from "@testing-library/user-event";
 
 import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
 import type { DirectorySnapshot, RefusalField } from "@skills-demo/domain";
-import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
+import {
+  createViewModel,
+  ViewModelProvider,
+} from "@skills-demo/react-bindings";
 
 import { TESTIDS } from "./testids.ts";
 import { UserList } from "./UserList.tsx";
 
 /** What a person types into a user form. A field that is left out is left as it is. */
-export interface TypedUser {
+interface TypedUser {
   name?: string;
   email?: string;
   /** The category's name, as the choice shows it. */
@@ -65,11 +68,12 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
 
   /** The row of the user, whether it shows them or the form that edits them. */
   function findRow(name: string): HTMLElement {
-    const row = findRows().find(
-      (candidate) =>
+    const row = findRows().find((candidate) => {
+      return (
         within(candidate).queryByRole("rowheader", { name }) !== null ||
-        within(candidate).queryByRole("form", { name: `Edit ${name}` }) !== null,
-    );
+        within(candidate).queryByRole("form", { name: `Edit ${name}` }) !== null
+      );
+    });
 
     if (row === undefined) {
       throw new Error(`no row for the user ${name}`);
@@ -92,11 +96,17 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
 
   async function fill(form: HTMLElement, typed: TypedUser): Promise<void> {
     if (typed.name !== undefined) {
-      await replaceText(within(form).getByRole("textbox", { name: "Name" }), typed.name);
+      await replaceText(
+        within(form).getByRole("textbox", { name: "Name" }),
+        typed.name,
+      );
     }
 
     if (typed.email !== undefined) {
-      await replaceText(within(form).getByRole("textbox", { name: "Email" }), typed.email);
+      await replaceText(
+        within(form).getByRole("textbox", { name: "Email" }),
+        typed.email,
+      );
     }
 
     if (typed.category !== undefined) {
@@ -108,31 +118,47 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
   }
 
   async function startEdit(name: string): Promise<Required<TypedUser>> {
-    await user.click(within(findRow(name)).getByRole("button", { name: `Edit ${name}` }));
+    await user.click(
+      within(findRow(name)).getByRole("button", { name: `Edit ${name}` }),
+    );
 
     return readFields(findRow(name));
   }
 
   return {
-    rows: (): string[] =>
-      findRows().map((row) =>
-        [within(row).getByRole("rowheader"), ...within(row).getAllByRole("cell").slice(0, 2)]
+    rows: (): string[] => {
+      return findRows().map((row) => {
+        return [
+          within(row).getByRole("rowheader"),
+          ...within(row).getAllByRole("cell").slice(0, 2),
+        ]
           .map(readText)
-          .join(", "),
-      ),
-    categoryChoices: (): string[] =>
-      within(rendered.getByRole("combobox", { name: "Show" }))
+          .join(", ");
+      });
+    },
+    categoryChoices: (): string[] => {
+      return within(rendered.getByRole("combobox", { name: "Show" }))
         .getAllByRole("option")
-        .map(readText),
+        .map(readText);
+    },
     show: async (category: string): Promise<void> => {
-      await user.selectOptions(rendered.getByRole("combobox", { name: "Show" }), category);
+      await user.selectOptions(
+        rendered.getByRole("combobox", { name: "Show" }),
+        category,
+      );
     },
     add: async (typed: TypedUser): Promise<void> => {
       await fill(findAddForm(), typed);
-      await user.click(within(findAddForm()).getByRole("button", { name: "Add user" }));
+      await user.click(
+        within(findAddForm()).getByRole("button", { name: "Add user" }),
+      );
     },
-    newUser: (): Required<TypedUser> => readFields(findAddForm()),
-    addRefusal: (): string | null => readRefusal(findAddForm()),
+    newUser: (): Required<TypedUser> => {
+      return readFields(findAddForm());
+    },
+    addRefusal: (): string | null => {
+      return readRefusal(findAddForm());
+    },
     invalidNewFields: (): RefusalField[] => {
       const form = within(findAddForm());
       const fields: [RefusalField, HTMLElement][] = [
@@ -142,23 +168,37 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
       ];
 
       return fields
-        .filter(([, field]) => field.getAttribute("aria-invalid") === "true")
-        .map(([name]) => name);
+        .filter(([, field]) => {
+          return field.getAttribute("aria-invalid") === "true";
+        })
+        .map(([name]) => {
+          return name;
+        });
     },
     startEdit,
     edit: async (name: string, typed: TypedUser): Promise<void> => {
       await startEdit(name);
       await fill(findRow(name), typed);
-      await user.click(within(findRow(name)).getByRole("button", { name: "Save" }));
+      await user.click(
+        within(findRow(name)).getByRole("button", { name: "Save" }),
+      );
     },
     cancelEdit: async (name: string): Promise<void> => {
-      await user.click(within(findRow(name)).getByRole("button", { name: "Cancel" }));
+      await user.click(
+        within(findRow(name)).getByRole("button", { name: "Cancel" }),
+      );
     },
     remove: async (name: string): Promise<void> => {
-      await user.click(within(findRow(name)).getByRole("button", { name: `Delete ${name}` }));
+      await user.click(
+        within(findRow(name)).getByRole("button", { name: `Delete ${name}` }),
+      );
     },
-    refusalOn: (name: string): string | null => readRefusal(findRow(name)),
-    refusalCount: (): number => rendered.queryAllByTestId(TESTIDS.refusal).length,
+    refusalOn: (name: string): string | null => {
+      return readRefusal(findRow(name));
+    },
+    refusalCount: (): number => {
+      return rendered.queryAllByTestId(TESTIDS.refusal).length;
+    },
     removeBehindTheScreen: (id: string): void => {
       act(() => {
         harness.directory.removeUser(id).subscribe();
@@ -168,11 +208,16 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
 }
 
 function readFields(form: HTMLElement): Required<TypedUser> {
-  const category = within(form).getByRole<HTMLSelectElement>("combobox", { name: "Category" });
+  const category = within(form).getByRole<HTMLSelectElement>("combobox", {
+    name: "Category",
+  });
 
   return {
-    name: within(form).getByRole<HTMLInputElement>("textbox", { name: "Name" }).value,
-    email: within(form).getByRole<HTMLInputElement>("textbox", { name: "Email" }).value,
+    name: within(form).getByRole<HTMLInputElement>("textbox", { name: "Name" })
+      .value,
+    email: within(form).getByRole<HTMLInputElement>("textbox", {
+      name: "Email",
+    }).value,
     category: category.selectedOptions[0]?.textContent ?? "",
   };
 }

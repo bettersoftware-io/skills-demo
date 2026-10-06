@@ -25,14 +25,25 @@ export function createPriceSimulator({
   nextPrice = createRandomWalk(),
 }: PriceSimulatorOptions = {}): PricePort {
   return {
-    prices: (): Observable<Price> =>
-      defer(() => timer(intervalMs, intervalMs).pipe(map(() => nextPrice()))),
+    prices: (): Observable<Price> => {
+      return defer(() => {
+        return timer(intervalMs, intervalMs).pipe(
+          map(() => {
+            return nextPrice();
+          }),
+        );
+      });
+    },
   };
 }
 
 /** Each call moves one symbol by at most 0.1% and returns its new price. */
-export function createRandomWalk(random: () => number = Math.random): () => Price {
-  const latest: Price[] = Object.entries(OPENING_MIDS).map(([symbol, mid]) => ({ symbol, mid }));
+export function createRandomWalk(
+  random: () => number = Math.random,
+): () => Price {
+  const latest: Price[] = Object.entries(OPENING_MIDS).map(([symbol, mid]) => {
+    return { symbol, mid };
+  });
 
   return (): Price => {
     // `random()` is below 1, so the index is always inside the list.

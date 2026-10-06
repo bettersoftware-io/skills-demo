@@ -10,7 +10,11 @@ import {
   readUserDraft,
 } from "@skills-demo/shared";
 
-import type { HttpAnswer, HttpRequest, SendRequest } from "../adapters/httpDirectory.ts";
+import type {
+  HttpAnswer,
+  HttpRequest,
+  SendRequest,
+} from "../adapters/httpDirectory.ts";
 
 export interface FakeDirectoryServer {
   /** Give this to the adapter in place of `fetch`. */
@@ -36,14 +40,22 @@ export function createFakeDirectoryServer(
   let canned: HttpAnswer | undefined;
   let down = false;
 
-  async function route(method: string, path: string, body: unknown): Promise<HttpAnswer> {
-    const [, collection, id] = /^\/api\/(categories|users)(?:\/([^/]+))?$/.exec(path) ?? [];
+  async function route(
+    method: string,
+    path: string,
+    body: unknown,
+  ): Promise<HttpAnswer> {
+    const [, collection, id] =
+      /^\/api\/(categories|users)(?:\/([^/]+))?$/.exec(path) ?? [];
     const entry = id === undefined ? undefined : decodeURIComponent(id);
     const key = `${method} ${collection}${entry === undefined ? "" : "/:id"}`;
 
     switch (key) {
       case "GET categories":
-        return answer(200, (await firstValueFrom(directory.categories())).map(encodeCategory));
+        return answer(
+          200,
+          (await firstValueFrom(directory.categories())).map(encodeCategory),
+        );
       case "POST categories":
         return answerOutcome(
           await firstValueFrom(directory.addCategory(readCategoryDraft(body))),
@@ -52,7 +64,9 @@ export function createFakeDirectoryServer(
         );
       case "PUT categories/:id":
         return answerOutcome(
-          await firstValueFrom(directory.renameCategory(requireId(entry), readCategoryDraft(body))),
+          await firstValueFrom(
+            directory.renameCategory(requireId(entry), readCategoryDraft(body)),
+          ),
           200,
           encodeCategory,
         );
@@ -63,7 +77,10 @@ export function createFakeDirectoryServer(
           encodeNothing,
         );
       case "GET users":
-        return answer(200, (await firstValueFrom(directory.users())).map(encodeUser));
+        return answer(
+          200,
+          (await firstValueFrom(directory.users())).map(encodeUser),
+        );
       case "POST users":
         return answerOutcome(
           await firstValueFrom(directory.addUser(readUserDraft(body))),
@@ -72,7 +89,9 @@ export function createFakeDirectoryServer(
         );
       case "PUT users/:id":
         return answerOutcome(
-          await firstValueFrom(directory.changeUser(requireId(entry), readUserDraft(body))),
+          await firstValueFrom(
+            directory.changeUser(requireId(entry), readUserDraft(body)),
+          ),
           200,
           encodeUser,
         );
@@ -122,7 +141,9 @@ export function createFakeDirectoryServer(
 /** A route whose key ends in `/:id` was matched on a path that carries one. */
 function requireId(entry: string | undefined): string {
   if (entry === undefined) {
-    throw new Error("expected the path of a route that ends in /:id to carry an id");
+    throw new Error(
+      "expected the path of a route that ends in /:id to carry an id",
+    );
   }
 
   return entry;
@@ -133,7 +154,9 @@ function answerOutcome<T>(
   status: number,
   encode: (value: T) => unknown,
 ): HttpAnswer {
-  return outcome.accepted ? answer(status, encode(outcome.value)) : answerRefusal(outcome.refusal);
+  return outcome.accepted
+    ? answer(status, encode(outcome.value))
+    : answerRefusal(outcome.refusal);
 }
 
 function answerRefusal(refusal: Refusal): HttpAnswer {
@@ -144,10 +167,11 @@ function answerRefusal(refusal: Refusal): HttpAnswer {
 function answer(status: number, body: unknown): HttpAnswer {
   return {
     status,
-    json: (): Promise<unknown> =>
-      body === undefined
+    json: (): Promise<unknown> => {
+      return body === undefined
         ? Promise.reject(new SyntaxError("Unexpected end of JSON input"))
-        : Promise.resolve(body),
+        : Promise.resolve(body);
+    },
   };
 }
 

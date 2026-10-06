@@ -1,7 +1,12 @@
 import { type Observable, of, Subject, throwError } from "rxjs";
 import { describe, expect, it } from "vitest";
 
-import { accept, type Outcome, type Refusal, refuse } from "@skills-demo/domain";
+import {
+  accept,
+  type Outcome,
+  type Refusal,
+  refuse,
+} from "@skills-demo/domain";
 
 import {
   createAddFormMachine,
@@ -16,7 +21,10 @@ import type { Machine } from "./machine.ts";
 describe("reduceForm", () => {
   it("opens on the draft it is given, with nothing left over from before", () => {
     expect(
-      reduceForm({ ...CLOSED, refusal: TAKEN }, { type: "opened", draft: { name: "Design" } }),
+      reduceForm(
+        { ...CLOSED, refusal: TAKEN },
+        { type: "opened", draft: { name: "Design" } },
+      ),
     ).toEqual({
       open: true,
       draft: { name: "Design" },
@@ -26,9 +34,19 @@ describe("reduceForm", () => {
   });
 
   it("replaces only the fields that were typed in, and drops the refusal they answer", () => {
-    const current: FormState<Person> = { open: true, draft: ADA, refusal: TAKEN, busy: false };
+    const current: FormState<Person> = {
+      open: true,
+      draft: ADA,
+      refusal: TAKEN,
+      busy: false,
+    };
 
-    expect(reduceForm(current, { type: "changed", patch: { email: "ada@example.org" } })).toEqual({
+    expect(
+      reduceForm(current, {
+        type: "changed",
+        patch: { email: "ada@example.org" },
+      }),
+    ).toEqual({
       open: true,
       draft: { name: "Ada", email: "ada@example.org" },
       refusal: null,
@@ -44,14 +62,18 @@ describe("reduceForm", () => {
   });
 
   it("shows why the change was refused, and keeps what was typed", () => {
-    expect(reduceForm({ ...OPEN, busy: true }, { type: "refused", refusal: TAKEN })).toEqual({
+    expect(
+      reduceForm({ ...OPEN, busy: true }, { type: "refused", refusal: TAKEN }),
+    ).toEqual({
       ...OPEN,
       refusal: TAKEN,
     });
   });
 
   it("goes back to the way it rests", () => {
-    expect(reduceForm({ ...OPEN, busy: true }, { type: "settled", rest: CLOSED })).toEqual(CLOSED);
+    expect(
+      reduceForm({ ...OPEN, busy: true }, { type: "settled", rest: CLOSED }),
+    ).toEqual(CLOSED);
   });
 });
 
@@ -87,7 +109,9 @@ describe("the form that adds an entry", () => {
   });
 
   it("keeps what was typed and shows the refusal when the entry is refused", () => {
-    const { machine } = createAddForm(() => of(refuse(TAKEN)));
+    const { machine } = createAddForm(() => {
+      return of(refuse(TAKEN));
+    });
 
     machine.intents.change({ name: "Design" });
     machine.intents.save();
@@ -103,7 +127,9 @@ describe("the form that adds an entry", () => {
   });
 
   it("drops the refusal as soon as the field is changed", () => {
-    const { machine } = createAddForm(() => of(refuse(TAKEN)));
+    const { machine } = createAddForm(() => {
+      return of(refuse(TAKEN));
+    });
 
     machine.intents.save();
     machine.intents.change({ name: "Research" });
@@ -115,7 +141,9 @@ describe("the form that adds an entry", () => {
 
   it("is busy until the change is answered, and sends nothing more meanwhile", () => {
     const answer$ = new Subject<Outcome<unknown>>();
-    const { machine, sent } = createAddForm(() => answer$);
+    const { machine, sent } = createAddForm(() => {
+      return answer$;
+    });
 
     machine.intents.change({ name: "Design" });
     machine.intents.save();
@@ -132,7 +160,9 @@ describe("the form that adds an entry", () => {
   });
 
   it("can send again once it has been answered", () => {
-    const { machine, sent } = createAddForm(() => of(refuse(TAKEN)));
+    const { machine, sent } = createAddForm(() => {
+      return of(refuse(TAKEN));
+    });
 
     machine.intents.save();
     machine.intents.save();
@@ -143,7 +173,11 @@ describe("the form that adds an entry", () => {
   });
 
   it("is not left busy by a change that fails instead of answering", () => {
-    const { machine } = createAddForm(() => throwError(() => new Error("the port broke its word")));
+    const { machine } = createAddForm(() => {
+      return throwError(() => {
+        return new Error("the port broke its word");
+      });
+    });
 
     machine.intents.save();
 
@@ -157,10 +191,14 @@ describe("the form that adds an entry", () => {
 
   it("stops listening for an answer, and ignores intents, once it is disposed", () => {
     const answer$ = new Subject<Outcome<unknown>>();
-    const { machine } = createAddForm(() => answer$);
+    const { machine } = createAddForm(() => {
+      return answer$;
+    });
     const seen: boolean[] = [];
 
-    machine.state$.subscribe((current) => seen.push(current.busy));
+    machine.state$.subscribe((current) => {
+      return seen.push(current.busy);
+    });
     machine.intents.save();
     machine.dispose();
     machine.intents.change({ name: "Design" });
@@ -174,7 +212,11 @@ describe("the form of one entry in a list", () => {
   it("starts closed", () => {
     const { machine } = createRowForm();
 
-    expect(machine.state$.getValue()).toMatchObject({ open: false, refusal: null, busy: false });
+    expect(machine.state$.getValue()).toMatchObject({
+      open: false,
+      refusal: null,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -209,7 +251,11 @@ describe("the form of one entry in a list", () => {
   });
 
   it("stays open with what was typed and the refusal when the save is refused", () => {
-    const { machine } = createRowForm({ save: () => of(refuse(TAKEN)) });
+    const { machine } = createRowForm({
+      save: () => {
+        return of(refuse(TAKEN));
+      },
+    });
 
     machine.intents.edit();
     machine.intents.change({ name: "Research" });
@@ -226,7 +272,11 @@ describe("the form of one entry in a list", () => {
   });
 
   it("closes and forgets what was typed and why it was refused when cancelled", () => {
-    const { machine } = createRowForm({ save: () => of(refuse(TAKEN)) });
+    const { machine } = createRowForm({
+      save: () => {
+        return of(refuse(TAKEN));
+      },
+    });
 
     machine.intents.edit();
     machine.intents.change({ name: "Research" });
@@ -249,17 +299,29 @@ describe("the form of one entry in a list", () => {
     machine.intents.remove();
 
     expect(removals()).toBe(1);
-    expect(machine.state$.getValue()).toMatchObject({ open: false, refusal: null, busy: false });
+    expect(machine.state$.getValue()).toMatchObject({
+      open: false,
+      refusal: null,
+      busy: false,
+    });
 
     machine.dispose();
   });
 
   it("shows on the closed row why the entry could not be deleted", () => {
-    const { machine } = createRowForm({ remove: () => of(refuse(IN_USE)) });
+    const { machine } = createRowForm({
+      remove: () => {
+        return of(refuse(IN_USE));
+      },
+    });
 
     machine.intents.remove();
 
-    expect(machine.state$.getValue()).toMatchObject({ open: false, refusal: IN_USE, busy: false });
+    expect(machine.state$.getValue()).toMatchObject({
+      open: false,
+      refusal: IN_USE,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -272,18 +334,26 @@ interface Person {
 
 const ADA: Person = { name: "Ada", email: "ada@example.com" };
 
-const TAKEN: Refusal = { reason: "duplicate-name", field: "name", message: "That name is taken." };
+const TAKEN: Refusal = {
+  reason: "duplicate-name",
+  field: "name",
+  message: "That name is taken.",
+};
 
-const IN_USE: Refusal = { reason: "category-in-use", field: null, message: "It still has users." };
+const IN_USE: Refusal = {
+  reason: "category-in-use",
+  field: null,
+  message: "It still has users.",
+};
 
-const CLOSED: FormState<{ name: string }> = {
+const CLOSED: FormState<Draft> = {
   open: false,
   draft: { name: "" },
   refusal: null,
   busy: false,
 };
 
-const OPEN: FormState<{ name: string }> = {
+const OPEN: FormState<Draft> = {
   open: true,
   draft: { name: "Design" },
   refusal: null,
@@ -301,11 +371,15 @@ interface AddForm {
   sent: Draft[];
 }
 
-function createAddForm(answer: Answer = () => of(accept(null))): AddForm {
-  const sent: { name: string }[] = [];
+function createAddForm(
+  answer: Answer = () => {
+    return of(accept(null));
+  },
+): AddForm {
+  const sent: Draft[] = [];
   const machine = createAddFormMachine({
     blank: { name: "" },
-    add: (draft: { name: string }) => {
+    add: (draft: Draft) => {
       sent.push(draft);
 
       return answer();
@@ -313,6 +387,11 @@ function createAddForm(answer: Answer = () => of(accept(null))): AddForm {
   });
 
   return { machine, sent };
+}
+
+interface RowFormAnswers {
+  save?: Answer;
+  remove?: Answer;
 }
 
 interface RowForm {
@@ -324,18 +403,21 @@ interface RowForm {
 
 /** The form of an entry called "Design"; `entry` is that entry, for a test to change behind the form's back. */
 function createRowForm({
-  save = (): Observable<Outcome<unknown>> => of(accept(null)),
-  remove = (): Observable<Outcome<unknown>> => of(accept(null)),
-}: {
-  save?: Answer;
-  remove?: Answer;
-} = {}): RowForm {
+  save = (): Observable<Outcome<unknown>> => {
+    return of(accept(null));
+  },
+  remove = (): Observable<Outcome<unknown>> => {
+    return of(accept(null));
+  },
+}: RowFormAnswers = {}): RowForm {
   const entry = { name: "Design" };
-  const saved: { name: string }[] = [];
+  const saved: Draft[] = [];
   let removals = 0;
   const machine = createRowFormMachine({
-    current: () => ({ ...entry }),
-    save: (draft: { name: string }) => {
+    current: () => {
+      return { ...entry };
+    },
+    save: (draft: Draft) => {
       saved.push(draft);
 
       return save();
@@ -347,5 +429,12 @@ function createRowForm({
     },
   });
 
-  return { machine, entry, saved, removals: (): number => removals };
+  return {
+    machine,
+    entry,
+    saved,
+    removals: (): number => {
+      return removals;
+    },
+  };
 }

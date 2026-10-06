@@ -8,8 +8,9 @@ The rules below are enforced by checks, not by convention.
 ```bash
 pnpm dev          # the React client on the in-browser simulator (no server)
 pnpm dev:fs       # the server and the client together
-pnpm gate:fast    # architecture gates, lint, typecheck: seconds, for while you work
+pnpm gate:fast    # architecture gates, React checks, lint, typecheck: seconds, for while you work
 pnpm gate:full    # gate:fast, then tests and the build: what CI runs
+pnpm gate:full:quiet   # the same commands and verdict, printing only the stage that failed
 pnpm test
 ```
 
@@ -17,6 +18,14 @@ Run `pnpm gate:full` before you say work is finished. A red gate means the
 work is not finished, and `gate:fast` alone does not show that it is: it runs
 no test. The stop hook runs `gate:full` for you whenever a file has changed
 since it last passed.
+
+`pnpm gate:full:quiet` (and `gate:fast:quiet`) runs the same commands in the
+same order and exits with the same code. It prints one line for each stage
+that passed, any `SKIP` line that stage printed, and the whole output of the
+stage that failed. Run the quiet form
+when you are the one reading the output: the loud form prints every passing
+test and every cached task. Skip it when a person asked to see the full
+output; CI runs the loud form.
 
 Some sandboxes do not let a process listen on a port; Codex's default one does
 not. There the tests that open a real port (the files named `*.port.test.ts`)
@@ -39,6 +48,7 @@ the gates read; a package that is not listed there fails.
 | `packages/client-react` | client | `src/app` (composition root) and `src/ui` (dumb components) | bindings, core, domain |
 | `packages/server` | server | The WebSocket server and the REST API | domain, shared |
 | `packages/integration` | integration | Tests that run a client adapter against the real server. Tests only | every package above; nothing imports it |
+| `packages/e2e` | e2e | End-to-end specs and page objects that drive the built client in a browser | none of the application: only the client's test ids, and types |
 
 ## Where a thing goes
 
@@ -57,6 +67,20 @@ the gates read; a package that is not listed there fails.
   own tests stay where they are; this is for what neither can see alone.
 - **It is drawn on screen**: a component in `client-react/src/ui`, reading from
   the view model. No RxJS, storage, `fetch`, environment or timers there.
+- **It is a new package**: list it in `architecture.config.mts` with its role,
+  and give it a `typecheck` and a `test` script. One that holds only types
+  also says `typesOnly: true`.
+
+Four rules about imports:
+
+- A presenter or a state machine takes its port as an argument. It never
+  imports from an `adapters` folder.
+- No Node built-in (`node:fs`, `node:path`) outside `packages/server`, except
+  in tests: everything else runs in the browser.
+- `react` and `react-dom` are imported only in `react-bindings` and
+  `client-react`; `ws`, `hono` and `@hono/node-server` only in `server`.
+- What is written for tests (a `testing/` folder, a `*.page.tsx`, a test) is
+  imported only by tests.
 
 The price list is a worked example of every one of these. Copy its shape:
 
@@ -81,6 +105,13 @@ The price list is a worked example of every one of these. Copy its shape:
   A test never sleeps.
 - A UI test talks to a page object. Only the page object touches the testing
   library.
+- A test id is a constant in `packages/client-react/src/ui/testids.ts`, used
+  by the component and by the page object. Never a string literal.
+- A test that needs the whole application asks `createAppHarness`, in
+  `packages/client-core/src/testing/appHarness.ts`. Only that file calls
+  `createApp`.
+- A port's contract imports the port, the entities and the test runner. Never
+  a simulator or an adapter: each one's test passes itself in.
 - A test that opens a real port is named `*.port.test.ts`, so it can be left
   out, and said to be left out, where a port cannot be opened.
 - A fixture factory is named `create…`.
@@ -91,6 +122,94 @@ The price list is a worked example of every one of these. Copy its shape:
 No JavaScript source files. Scripts and tool configs are `.mts`, which Node runs
 directly. A file a tool can only load as JavaScript is listed in
 `architecture.config.mts` under `javascriptAllowed`, with the reason.
+
+## Node
+
+The oldest Node this runs on is declared once, as `devEngines.runtime` in the
+root `package.json`. Never add `engines.node` to any `package.json`: a host's
+build (`vercel build`) reads it and refuses a range above the Node it offers,
+so the deploy fails with every check green. The `node-floor` gate holds both.
+
+pnpm is named once, as `packageManager` in the root `package.json`: an exact
+version, then `+sha512.` and the hash of that release. Corepack checks the
+download against it. To move to another pnpm run
+`node tools/arch/ci/pin-package-manager.mts pnpm@<version> --write`, then
+`pnpm install`. Never type or copy the hash by hand, and never delete it to
+get past the `package-manager` gate.
+
+## How code is written
+
+`pnpm lint` enforces these. `pnpm lint --fix` repairs the ones marked (fix).
+
+- A named function is a `function` declaration, never a `const` holding an
+  arrow. Helpers go below the function that uses them.
+- An arrow (a callback, a member of an object) has a block body and a
+  `return`. (fix)
+- A blank line before and after a function and a block that spans lines,
+  between two declarations that span lines, and between the members of a
+  class. (fix)
+- An object type has a name. No `{ … }` type on a parameter, a return type, a
+  variable, a class property, a cast or a type argument: declare an
+  `interface` and use it.
+- One import statement per module, with an inline `type` on each type:
+  `import { type Price, read } from "./price.ts"`. A statement that names only
+  types stays `import type`. (fix)
+- No CommonJS: no `require`, `module.exports`, `__dirname` or `__filename`,
+  and no `.cts` file. Use `import` and `import.meta.dirname`.
+- One class in a file, and the file has its name.
+- In a component, take the hooks out of the view model by name:
+  `const { usePrices } = useViewModel()`. Never keep the bundle in a variable
+  or call through it.
+- A component follows React's rules: a hook is called at the top level, an
+  effect lists what it reads, and nothing reads a ref or sets state while
+  rendering.
+- No `style={{ … }}` in a component: styling goes in a stylesheet, by class.
+- `packages/react-bindings` uses no `useMemo`, `useCallback` or `memo`. Logic
+  that needs one belongs in the core.
+- `packages/client-react` uses none of the three either, for another reason:
+  the React Compiler memoizes at build time. Write the plain value, and a
+  function declaration for a callback.
+
+## The React Compiler
+
+The client's build runs the React Compiler
+(`packages/client-react/vite.config.ts`). It skips a function it cannot
+compile and says nothing, so two checks in `gate:fast` hold it:
+
+- `pnpm check:react-policies` fails when `reactCompiler` in
+  `architecture.config.mts` and the build disagree, and when a package that
+  imports React is not under the lint rules for its role.
+- `pnpm check:compiler` compiles each function listed under `compilerTracked`
+  in `architecture.config.mts` and fails when one is no longer memoized.
+
+What no check decides:
+
+- **A component that reads the view model is not compiled.** Its hooks come
+  out of a value (`const { usePrices } = useViewModel()`), and the compiler
+  skips such a function. Keep that component thin: it reads, and hands plain
+  props to components that take only props. Those are compiled.
+  `packages/client-react/src/ui/PriceList.tsx` shows both.
+- **When to add an entry to `compilerTracked`.** When a component depends on
+  the compiler to keep something stable or cheap: a costly derived value, a
+  callback a child compares. Skip it for a component whose render is cheap
+  anyway.
+- **When the compiler cannot do it** (an identity a library needs to stay the
+  same, in a function the compiler skips): say so and ask. Do not switch the
+  lint rule off to add a `useMemo`.
+
+## Imports inside a package
+
+An import of a file in the same package is relative and climbs one folder at
+most, as in `../entities/price.ts`. Anything deeper is written from the
+package's `src` with the `#/` alias: `#/entities/price.ts`. Every package
+declares it (`"imports": { "#/*": "./src/*" }` in its `package.json`), and
+Node, Vite, Vitest and `tsc` all read it from there. A new package declares it
+too.
+
+Skip it in a `*.config.ts` file that reaches `tools/`: the alias cannot point
+outside its package. The gates follow an alias to the file it names, so a
+forbidden import is still found. The `format-lint` add-on fails a deeper
+relative import; without it this is a convention.
 
 ## Reviewing a change
 
@@ -143,7 +262,9 @@ what it cannot decide.
    (`<` for `>`, a dropped guard) in a JSON spec and run
    `pnpm mutation-check mutants.json`; the format is at the top of
    `tools/coverage/mutation-check.mts`. `SURVIVED` means the test cannot see
-   that mistake: strengthen the test. Skip this only for a test that already
+   that mistake: strengthen the test. `NO TESTS` means the row's command ran
+   no test, usually a `-t` filter that matches no title (vitest cuts an
+   `it.each` title at 40 characters): fix the command. Skip this only for a test that already
    failed in front of you before the code existed.
 5. Run `pnpm coverage` again.
 
@@ -185,7 +306,8 @@ because systems draw text differently. CI compares the `linux-x64` set.
 pnpm visual          # compare every scenario with this system's goldens
 pnpm visual:update   # redraw this system's goldens
 pnpm visual:jitter   # measure how much the same commit differs from itself
-pnpm visual:check    # in gate:fast: Playwright version pin, typecheck of the tier
+pnpm visual:check    # in gate:fast: typecheck of the tier
+pnpm visual:check:server   # in gate:fast: no Playwright server is started through pnpm
 ```
 
 `pnpm visual` is not part of `gate:full`: it needs a browser and goldens drawn
@@ -227,12 +349,17 @@ difference and can say why it is correct. If you cannot say why, stop and ask.
 - **A scenario fails now and then.** Something on the page still moves. Find it
   and pin it in the host (its clock, an animation, a late font). Do not add a
   wait, a retry or tolerance.
+- **A run prints its results and never ends.** A server was started through
+  pnpm and outlived it. Never write `pnpm exec`, `pnpm run` or `pnpm --filter`
+  in a `webServer.command`; start the program by its path
+  (`node_modules/.bin/vite`) with `cwd` set to the package.
+  `pnpm visual:check:server` fails on it.
 - **Changing `tolerance.ts`.** Only with a measurement: run `pnpm visual:jitter`
   and write what it found beside the numbers. Both knobs matter: a zero pixel
   budget with a loose `threshold` still misses a low-contrast change.
-- **Upgrading Playwright.** Change the npm version and the image tag in both
-  workflows together (`pnpm visual:check` fails otherwise), then redraw every
-  set: a new browser draws new pixels.
+- **Upgrading Playwright.** Change the npm version and the image tag in every
+  workflow together (the `playwright-pin` gate fails otherwise), then redraw
+  every set: a new browser draws new pixels.
 - **A missing golden fails; it is never written by a plain run.** On another
   system than the committed sets, `pnpm visual` fails until that system has a
   set of its own. Say so; do not copy another system's images.
@@ -291,6 +418,11 @@ changes nothing. What it cannot decide is below.
 before you run the gate. Do not lay code out by hand, and do not sort imports
 by hand. Skip it when you changed no source, JSON or CSS file.
 
+**An import for its effect is sorted too.** `import "./index.css"` goes
+where the fixer puts it, after the code's imports. Do not write CSS that
+depends on which of two imported stylesheets loads first. If one must follow
+another, `@import` it from that one.
+
 **What the fixer leaves to you.** It applies only the fixes Biome calls safe.
 A finding it prints and does not fix is yours to fix in the code: add the
 braces, write the type, narrow the value. Do not pass `--unsafe` over the
@@ -323,12 +455,13 @@ architecture rules); both run.
 
 Three workflows check the supply chain on GitHub: `CI security` (workflow lint
 and `pnpm audit --prod`), `Dependency Review` and `Scorecard`. They need the
-network, so none of them is in `pnpm gate:full`. This section is what they
-cannot decide.
+network, so none of them is in `pnpm gate:full`. `pnpm check:dockerfiles`
+needs none and is in `gate:fast`. This section is what they cannot decide.
 
 ```bash
 pnpm lint:workflows              # actionlint (valid?) then zizmor (safe?)
 pnpm lint:workflows zizmor       # one of them
+pnpm check:dockerfiles           # images by digest, no root, no package outside a lockfile
 ```
 
 Exit 0 is a pass. Exit 1 is a finding, named in the linter's output above the
@@ -377,6 +510,42 @@ Never loosen `fail-on-severity`, `fail-on-scopes` or `deny-licenses` to pass.
 The same steps as an advisory above. The weekly run can fail with no change in
 the project: an advisory was published for a version already in the lockfile.
 
+### When you add or change a Dockerfile
+
+Run `pnpm check:dockerfiles`. Skip this when no Dockerfile changed.
+
+- Take a digest from the registry
+  (`docker buildx imagetools inspect <image>:<tag>`), never from memory, and
+  keep the tag in front of it for the reader. The same for an image in
+  `COPY --from=` and in `RUN --mount=…,from=`.
+- Write the image and the user out. A variable in either fails, whatever its
+  default: `FROM ${BASE}`, `USER ${APP_USER}`.
+- End the last stage with `USER` and a plain name or number that is not root.
+- Write a heredoc as `<<EOF` on a line with no quotes, and put the script in
+  its body.
+- "Nothing else in this file was judged" means the check could not read the
+  file as Docker does. Fix that line first, then run it again: the other
+  findings come after.
+
+Do not get past a finding by another spelling, by moving the Dockerfile, or
+by a `--build-arg` or `--target` on the command line. If you believe a finding
+is wrong, say so and leave it red.
+
+### The update bot
+
+The project has one update bot, Dependabot or Renovate, and its config is the
+one file for it in `.github/`. Never add a config for the other by hand: two
+bots open the same pull requests twice. To
+move from one to the other, tell the user; it is one command in the
+repository the add-on came from, and Renovate needs its GitHub App installed
+by a person. Do not shorten the release age in either file to get an update
+sooner.
+
+### `SECURITY.md`
+
+It is the project's own text. Change it only when the user asks, and keep
+its promises (the answer time, the disclosure time) ones the user chose.
+
 ### Moving a linter to a newer release
 
 `tools/ci-security/lib/pins.mts` holds the version, four URLs and four
@@ -409,11 +578,180 @@ anchor the file really has. It does not follow `https:` links, and it does not
 read `tools/`. Those are yours to check by reading. Skip this for a change
 that touches no markdown.
 
-**CSS.** Fix what stylelint reports. Turn a rule off in
-`tools/repo-hygiene/stylelint.json` only when the project as a whole does not
-want it, never for one file that breaks it, and say why in the commit message.
-Do not add a `stylelint-disable` comment without a reason after it. Skip this
-for a change that touches no `.css` file.
+**CSS.** Fix what stylelint reports. A colour is written once, as a custom
+property where the project's other tokens are (`:root` in the client's
+`src/index.css`), and used as `var(--name)`. Before you add a token, look for
+one that already means the same thing, and name a new one for what it means
+(`--color-up`), not for how it looks (`--green`). A class is camelCase in a
+`*.module.css` file and kebab-case in any other stylesheet. Turn a rule off
+in `tools/repo-hygiene/stylelint.json` only when the project as a whole does
+not want it, never for one file that breaks it, and say why in the commit
+message. Do not edit `stylelint.base.json`: an update of the add-on replaces
+it. A `stylelint-disable` comment needs ` -- ` and the reason after the rule's
+name; use one only for a line that is a true exception. Skip this for a
+change that touches no `.css` file.
 
 Do not weaken a check to make it pass. If a finding looks wrong, say so.
 <!-- /add-on: repo-hygiene -->
+
+<!-- add-on: strict-lint -->
+## Strict lint (types and dead code)
+
+Two checks run in `gate:fast`. `pnpm lint:types` runs the ESLint rules that
+need types. `pnpm lint:dead` runs knip: unused files, exports and
+dependencies. Each names the file. What they cannot decide is below.
+
+**A promise nothing waits for.** Choose one, in this order:
+
+- `await` it, when the code after it needs the work to be done or must see it
+  fail.
+- `return` it, when the caller is the one who should wait.
+- Mark it `void`, when nothing may wait (an event handler, a fire-and-forget
+  log). Then the promise must handle its own failure (`.catch`), and a comment
+  on the line above says why nothing waits. Never write `void` to get the
+  gate to pass.
+
+**An `async` function where a plain callback is expected** (`forEach`, an
+event handler, a subscriber). Do not make the callback `async`. Use a
+`for…of` loop with `await`, or call a named function and treat its promise as
+above.
+
+**A `switch` that misses a case.** Add the case. Add a `default` branch only
+when the rest really are handled the same way; a `default` that hides a new
+member is the bug this rule exists to stop.
+
+**"No tsconfig.json includes this file."** The file is not typechecked
+either. Add it to the `include` of its package's `tsconfig.json`. Do not move
+it under `tools/` to hide it.
+
+**knip calls something unused.** First check that it is: search for the name.
+
+- It is unused. Remove it: the file, the `export` keyword, the line in an
+  `index.ts`, the line in `package.json`. Do not keep an export for a caller
+  that does not exist yet; add it with the caller.
+- Only a test uses it. That counts as used, and knip does not report it. If it
+  is reported, the test does not import it.
+- It is used in a way knip cannot follow: a file a tool loads by name, a
+  program started from a string, a page a config serves. Name the file as an
+  `entry` in `tools/strict-lint/knip.jsonc`, or the dependency in
+  `ignoreDependencies`, with a comment that says who uses it.
+
+Never turn a kind of finding off, and never add a file to `ignore`, to get
+past one finding.
+
+A new package needs nothing: `packages/*` covers it. Skip all of this for a
+change that touches no TypeScript file and no `package.json`.
+
+Do not edit `tools/strict-lint/eslint.typed.base.mts`; an update replaces it.
+A rule the project adds or changes goes in `tools/strict-lint/eslint.config.mts`.
+<!-- /add-on: strict-lint -->
+
+<!-- add-on: e2e -->
+## End-to-end tests
+
+`packages/e2e` drives the built client in a real browser, with Playwright. It
+runs in two modes, and a mode's specs are in the folder of its name:
+
+| Mode | What runs | Specs |
+|---|---|---|
+| `sim` | The client alone, on its in-browser simulator | `packages/e2e/src/sim` |
+| `fullstack` | The client against the real server | `packages/e2e/src/fullstack` |
+
+```bash
+pnpm e2e                              # build, serve, run every spec in both modes, stop everything
+pnpm e2e --mode sim                   # one mode: only what it needs is built and started
+pnpm e2e src/sim/selection.spec.ts    # one spec
+pnpm e2e -g "marks the row"           # the tests whose title matches
+pnpm e2e --mode sim --headed          # a visible browser; --ui opens Playwright's own runner
+pnpm e2e:install                      # once on a machine: downloads the browser
+```
+
+`pnpm e2e` is not part of `gate:full`: it needs a browser and a port. Run it
+yourself after a change that can reach the screen through more than one layer
+(the composition root, an adapter, the server, a build setting). Skip it for a
+change one layer's own tests cover, and for docs and tooling. In CI it is the
+`End-to-end` workflow.
+
+Exit code 2 means the run could not start, not that the code is wrong. Where a
+port cannot be opened (a sandbox), say that the specs were not run where you
+are. Where the browser is missing, run `pnpm e2e:install`.
+
+### Is it an end-to-end test?
+
+Most behaviour has a cheaper and sharper home. An end-to-end spec waits in
+real time and sees only the screen, so write one only for what nothing else
+can show.
+
+| What you want to prove | Where it goes |
+|---|---|
+| A rule of the application: order, movement, when a row goes stale | A presenter, use case or machine test, on fake timers |
+| How a component draws a given state | The component's test, through its page object |
+| The client and the server agree on a message | `packages/integration` |
+| How it looks | The visual goldens, if the project has them |
+| The built app wires the feature at all; a mode picks the right adapter; a journey across screens | An end-to-end spec |
+
+One or two specs for a feature, on its main path. If a spec needs a state that
+takes time or luck to reach (a stale row, one symbol among several), the rule
+belongs in a test that controls time.
+
+### How a spec is written
+
+Copy `packages/e2e/src/sim/selection.spec.ts`.
+
+- A spec imports `test` and `expect` from `#/testing/test.ts`, takes page
+  objects as fixtures, and asserts on what they return. It never holds the
+  browser: the lint fails on `page`, a locator or a selector in a spec.
+- A page object is `packages/e2e/src/pages/<Name>.page.ts`: an interface in
+  the words of a user, and a function that builds it from Playwright's
+  `Page`. Add it to the fixtures in `packages/e2e/src/testing/test.ts`.
+- A page object finds an element by a test id from
+  `packages/client-react/src/ui/testids.ts`, or by its role. Add the id to the
+  client first. It reads what it reports in one step, so the page cannot
+  change between two reads.
+- The package imports nothing else of the application. Use `import type` for
+  a type of the wire protocol.
+
+### Waiting
+
+- Wait for a state, never for time. `await expect.poll(priceList.rows)` asks
+  again until it holds; `await expect(async () => { … }).toPass()` does the
+  same for two things that must agree.
+- Read a value to compare with only after waiting for the state it depends on.
+- When the state depends on chance, work out the odds and write them beside
+  the timeout, as `packages/e2e/src/sim/priceList.spec.ts` does. Better: assert
+  something that does not depend on chance.
+- Do not add a retry, and do not raise a timeout to make a spec pass. A spec
+  that fails now and then waits on the wrong thing.
+
+### A mode, and what it starts
+
+`tools/e2e.config.mts` is the project's. It says how the client is built and
+served and what each mode starts. Add a mode there, with a folder of its name
+under `packages/e2e/src`. A spec outside every mode's folder stops the run, and
+so does a mode with no spec.
+
+- Write a command as the program and its arguments, never `pnpm …`: the
+  wrapper can die on the stop signal and leave the server running.
+- Write no port. A program prints its address and the `ready` pattern reads it.
+- To prove a mode uses the server, compare the screen with what came over the
+  wire (`serverFeed`). The simulator makes prices that look the same.
+
+### When a spec fails
+
+1. Read the output in full. Do not pipe it through `tail`, `head` or `grep`.
+2. Open the report: `pnpm --dir packages/e2e exec playwright show-report reports/html`.
+   Each failure has a trace: every step, the page at that step, the network
+   and the console.
+3. Decide which it is. **The application is wrong:** fix it, and ask whether a
+   cheaper test should have caught it. **The spec waits on time or chance:**
+   make it wait on a state. If you cannot tell, stop and ask.
+
+### Traps
+
+- **`playwright test` run by hand fails with "the run is started with
+  `pnpm e2e`".** The Playwright config starts no server. Use `pnpm e2e`.
+- **Upgrading Playwright.** Change the version in `packages/e2e/package.json`
+  and the image tag in `.github/workflows/e2e.yml` together; the
+  `playwright-pin` gate fails otherwise. Every package that uses Playwright
+  takes the same version.
+<!-- /add-on: e2e -->

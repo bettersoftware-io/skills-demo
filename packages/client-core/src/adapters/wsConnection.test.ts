@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type FakeWebSocket, installFakeWebSocket } from "../testing/fakeWebSocket.ts";
+import {
+  type FakeWebSocket,
+  installFakeWebSocket,
+} from "../testing/fakeWebSocket.ts";
 import { createWsConnection } from "./wsConnection.ts";
 
 describe("the WebSocket connection", () => {
@@ -21,7 +24,11 @@ describe("the WebSocket connection", () => {
 
     connection.messages().subscribe();
 
-    expect(network.sockets.map((socket) => socket.url)).toEqual([SERVER_URL]);
+    expect(
+      network.sockets.map((socket) => {
+        return socket.url;
+      }),
+    ).toEqual([SERVER_URL]);
   });
 
   it("delivers each message the server sends, parsed", () => {
@@ -29,7 +36,9 @@ describe("the WebSocket connection", () => {
 
     createWsConnection(SERVER_URL)
       .messages()
-      .subscribe((message) => received.push(message));
+      .subscribe((message) => {
+        return received.push(message);
+      });
     network.sockets[0]?.open();
     network.sockets[0]?.receive({ type: "price", payload: 1 });
     network.sockets[0]?.receive({ type: "price", payload: 2 });
@@ -54,7 +63,9 @@ describe("the WebSocket connection", () => {
 
     createWsConnection(SERVER_URL)
       .messages()
-      .subscribe((message) => received.push(message));
+      .subscribe((message) => {
+        return received.push(message);
+      });
     network.sockets[0]?.open();
     network.sockets[0]?.drop();
 

@@ -2,7 +2,10 @@ import { firstValueFrom } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
 
 import { createHttpDirectoryPort } from "@skills-demo/client-core";
-import { createDirectorySimulator, createPriceSimulator } from "@skills-demo/domain";
+import {
+  createDirectorySimulator,
+  createPriceSimulator,
+} from "@skills-demo/domain";
 import { startServer } from "@skills-demo/server/startServer.ts";
 
 // The contract runs against the real routes in `directoryOverHttp.test.ts`,
@@ -17,8 +20,15 @@ describe("the HTTP adapter against the running server", () => {
     const added = await firstValueFrom(port.addCategory({ name: "Legal" }));
     const listed = await firstValueFrom(port.categories());
 
-    expect(added).toEqual({ accepted: true, value: { id: expect.any(String), name: "Legal" } });
-    expect(listed.map((category) => category.name)).toContain("Legal");
+    expect(added).toEqual({
+      accepted: true,
+      value: { id: expect.any(String), name: "Legal" },
+    });
+    expect(
+      listed.map((category) => {
+        return category.name;
+      }),
+    ).toContain("Legal");
   });
 
   it("reads a deletion, which is answered with no body, as accepted", async () => {
@@ -40,7 +50,9 @@ async function startServerOnFreePort(): Promise<string> {
     directory: createDirectorySimulator(),
   });
 
-  onTestFinished(() => server.close());
+  onTestFinished(() => {
+    return server.close();
+  });
 
   return `http://localhost:${server.port}`;
 }

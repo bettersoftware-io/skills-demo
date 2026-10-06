@@ -12,15 +12,16 @@ import { TESTIDS } from "./testids.ts";
  * are already decided by the core.
  */
 export function CategoryList(): ReactElement {
-  const { categories } = useViewModel().useDirectory();
+  const { useDirectory } = useViewModel();
+  const { categories } = useDirectory();
 
   return (
     <section data-testid={TESTIDS.categoryList}>
       <h2>Categories</h2>
       <ul>
-        {categories.map((category) => (
-          <CategoryItem key={category.id} category={category} />
-        ))}
+        {categories.map((category) => {
+          return <CategoryItem key={category.id} category={category} />;
+        })}
       </ul>
       <AddCategoryForm />
     </section>
@@ -32,7 +33,8 @@ interface CategoryItemProps {
 }
 
 function CategoryItem({ category }: CategoryItemProps): ReactElement {
-  const form = useViewModel().useCategoryRow(category.id);
+  const { useCategoryRow } = useViewModel();
+  const form = useCategoryRow(category.id);
 
   function changeName(event: ChangeEvent<HTMLInputElement>): void {
     form.change({ name: event.target.value });
@@ -64,9 +66,15 @@ function CategoryItem({ category }: CategoryItemProps): ReactElement {
         <div className="entry">
           <strong>{category.name}</strong>
           <span className="count">
-            {category.userCount === 1 ? "1 user" : `${category.userCount} users`}
+            {category.userCount === 1
+              ? "1 user"
+              : `${category.userCount} users`}
           </span>
-          <button type="button" aria-label={`Rename ${category.name}`} onClick={form.edit}>
+          <button
+            type="button"
+            aria-label={`Rename ${category.name}`}
+            onClick={form.edit}
+          >
             Rename
           </button>
           <button
@@ -85,7 +93,8 @@ function CategoryItem({ category }: CategoryItemProps): ReactElement {
 }
 
 function AddCategoryForm(): ReactElement {
-  const form = useViewModel().useCategoryForm();
+  const { useCategoryForm } = useViewModel();
+  const form = useCategoryForm();
 
   function changeName(event: ChangeEvent<HTMLInputElement>): void {
     form.change({ name: event.target.value });
@@ -97,7 +106,11 @@ function AddCategoryForm(): ReactElement {
   }
 
   return (
-    <form data-testid={TESTIDS.categoryForm} aria-label="Add a category" onSubmit={addCategory}>
+    <form
+      data-testid={TESTIDS.categoryForm}
+      aria-label="Add a category"
+      onSubmit={addCategory}
+    >
       <label>
         New category
         <input

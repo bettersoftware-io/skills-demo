@@ -1,7 +1,10 @@
 import { firstValueFrom } from "rxjs";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 
-import { createDirectorySimulator, type DirectoryPort } from "@skills-demo/domain";
+import {
+  createDirectorySimulator,
+  type DirectoryPort,
+} from "@skills-demo/domain";
 
 import {
   createFakeDirectoryServer,
@@ -35,17 +38,24 @@ describe("the HTTP directory adapter", () => {
   });
 
   it("takes a server URL with or without a slash at its end", async () => {
-    const server = createFakeDirectoryServer(createDirectorySimulator(SEED), SERVER_URL);
+    const server = createFakeDirectoryServer(
+      createDirectorySimulator(SEED),
+      SERVER_URL,
+    );
 
-    await firstValueFrom(createHttpDirectoryPort(`${SERVER_URL}//`, server.send).categories());
+    await firstValueFrom(
+      createHttpDirectoryPort(`${SERVER_URL}//`, server.send).categories(),
+    );
 
     expect(server.requests).toEqual(["GET http://example.test/api/categories"]);
   });
 
   it("uses the browser's fetch when it is given nothing else, and says the body is JSON", async () => {
-    const fetched = vi.fn(
-      async () => new Response(JSON.stringify({ id: "design", name: "Design" }), { status: 201 }),
-    );
+    const fetched = vi.fn(async () => {
+      return new Response(JSON.stringify({ id: "design", name: "Design" }), {
+        status: 201,
+      });
+    });
 
     vi.stubGlobal("fetch", fetched);
     onTestFinished(() => {
@@ -56,10 +66,16 @@ describe("the HTTP directory adapter", () => {
       createHttpDirectoryPort(SERVER_URL).addCategory({ name: "Design" }),
     );
 
-    expect(outcome).toEqual({ accepted: true, value: { id: "design", name: "Design" } });
+    expect(outcome).toEqual({
+      accepted: true,
+      value: { id: "design", name: "Design" },
+    });
     expect(fetched).toHaveBeenCalledWith("http://example.test/api/categories", {
       method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: '{"name":"Design"}',
     });
   });
@@ -87,7 +103,9 @@ describe("the HTTP directory adapter", () => {
 
     server.goDown();
 
-    await expect(firstValueFrom(port.categories())).rejects.toThrow("Failed to fetch");
+    await expect(firstValueFrom(port.categories())).rejects.toThrow(
+      "Failed to fetch",
+    );
   });
 
   it("fails a list the server answers with an error, or with something that is not a list", async () => {
@@ -99,7 +117,9 @@ describe("the HTTP directory adapter", () => {
     );
 
     server.answerNextWith(200, { users: [] });
-    await expect(firstValueFrom(port.users())).rejects.toThrow("the directory answered 200");
+    await expect(firstValueFrom(port.users())).rejects.toThrow(
+      "the directory answered 200",
+    );
   });
 
   it("refuses a change the server answers with an error the protocol does not know", async () => {
@@ -117,7 +137,9 @@ describe("the HTTP directory adapter", () => {
     expect(await firstValueFrom(port.addUser(GRACE))).toEqual(notUnderstood);
 
     server.answerNextWith(400, undefined);
-    expect(await firstValueFrom(port.removeCategory("eng"))).toEqual(notUnderstood);
+    expect(await firstValueFrom(port.removeCategory("eng"))).toEqual(
+      notUnderstood,
+    );
   });
 
   it("refuses a change the server says it made but answers with something else", async () => {
@@ -125,9 +147,13 @@ describe("the HTTP directory adapter", () => {
 
     server.answerNextWith(201, { ok: true });
 
-    expect(await firstValueFrom(port.addCategory({ name: "Design" }))).toMatchObject({
+    expect(
+      await firstValueFrom(port.addCategory({ name: "Design" })),
+    ).toMatchObject({
       accepted: false,
-      refusal: { message: "The server gave an answer the app does not understand." },
+      refusal: {
+        message: "The server gave an answer the app does not understand.",
+      },
     });
   });
 });
@@ -136,7 +162,9 @@ const SERVER_URL = "http://example.test";
 
 const SEED = {
   categories: [{ id: "eng", name: "Engineering" }],
-  users: [{ id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" }],
+  users: [
+    { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
+  ],
 };
 
 const GRACE = { name: "Grace", email: "grace@example.com", categoryId: "eng" };
@@ -148,7 +176,10 @@ interface Connected {
 
 /** The adapter on a fake server that holds one category with one user in it. */
 function createConnected(): Connected {
-  const server = createFakeDirectoryServer(createDirectorySimulator(SEED), SERVER_URL);
+  const server = createFakeDirectoryServer(
+    createDirectorySimulator(SEED),
+    SERVER_URL,
+  );
 
   return { port: createHttpDirectoryPort(SERVER_URL, server.send), server };
 }

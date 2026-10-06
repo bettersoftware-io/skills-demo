@@ -1,5 +1,5 @@
 /** One connection the code under test opened, driven by hand. */
-export interface FakeSocket {
+interface FakeSocket {
   url: string;
   /** True once the code under test has closed it. */
   closed: boolean;
@@ -19,8 +19,22 @@ export interface FakeWebSocket {
 
 interface SocketHandlers {
   onopen: ((event: unknown) => void) | null;
-  onmessage: ((event: { data: string }) => void) | null;
-  onclose: ((event: { wasClean: boolean }) => void) | null;
+  onmessage: ((event: ReceivedMessage) => void) | null;
+  onclose: ((event: Closing) => void) | null;
+}
+
+interface ReceivedMessage {
+  data: string;
+}
+
+interface Closing {
+  wasClean: boolean;
+}
+
+/** What `new WebSocket(url)` hands back: the handlers the adapter sets, and the two members it reads. */
+interface OpenedSocket extends SocketHandlers {
+  readyState: number;
+  close: () => void;
 }
 
 const CONNECTING = 0;
@@ -37,7 +51,7 @@ export function installFakeWebSocket(): FakeWebSocket {
   const sockets: FakeSocket[] = [];
 
   function connect(url: string): SocketHandlers {
-    const handlers: SocketHandlers & { readyState: number; close: () => void } = {
+    const handlers: OpenedSocket = {
       readyState: CONNECTING,
       onopen: null,
       onmessage: null,
@@ -47,6 +61,7 @@ export function installFakeWebSocket(): FakeWebSocket {
         socket.closed = true;
       },
     };
+
     const socket: FakeSocket = {
       url,
       closed: false,

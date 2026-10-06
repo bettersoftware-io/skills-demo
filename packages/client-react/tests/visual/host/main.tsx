@@ -1,19 +1,28 @@
-// The app's real global stylesheet, loaded the way src/main.tsx loads it. A
-// copy of its rules here would drift, and the goldens would be of a page that
-// does not exist.
-import "../../../src/index.css";
-import "./host.css";
-
 import FakeTimers from "@sinonjs/fake-timers";
 import { createRoot } from "react-dom/client";
 
-import { type App as Application, STALE_AFTER_MS } from "@skills-demo/client-core";
-import { type AppHarness, createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
-import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
+import type { App as Application } from "@skills-demo/client-core";
+import { STALE_AFTER_MS } from "@skills-demo/client-core/presenters/pricesPresenter.ts";
+import {
+  type AppHarness,
+  createAppHarness,
+} from "@skills-demo/client-core/testing/appHarness.ts";
+import {
+  createViewModel,
+  ViewModelProvider,
+} from "@skills-demo/react-bindings";
 
-import { App } from "../../../src/ui/App.tsx";
+// The app's real global stylesheet, loaded the way src/main.tsx loads it. A
+// copy of its rules here would drift, and the goldens would be of a page that
+// does not exist.
+import "#/index.css";
+import { App } from "#/ui/App.tsx";
+
 import { type Scenario, scenarios } from "../scenarios.ts";
 import { ScenarioFrame } from "./ScenarioFrame.tsx";
+
+// After the app's stylesheet, by its group: the host's two rules win a tie.
+import "./host.css";
 
 // The visual host: the real UI on the real application, with only the outside
 // world replaced. It shows the one scenario named in the address
@@ -29,7 +38,9 @@ import { ScenarioFrame } from "./ScenarioFrame.tsx";
 const NOW = new Date("2026-01-01T12:00:00Z");
 
 const name = new URLSearchParams(window.location.search).get("scenario");
-const scenario: Scenario | undefined = (scenarios as Record<string, Scenario>)[name ?? ""];
+const scenario: Scenario | undefined = (scenarios as Record<string, Scenario>)[
+  name ?? ""
+];
 const container = document.getElementById("root");
 
 if (scenario === undefined) {
@@ -46,8 +57,15 @@ if (container === null) {
 // is left alone, so rendering is not held up by the stopped clock.
 const clock = FakeTimers.install({
   now: NOW,
-  toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval", "Date"],
+  toFake: [
+    "setTimeout",
+    "clearTimeout",
+    "setInterval",
+    "clearInterval",
+    "Date",
+  ],
 });
+
 // The directory answers at once and from memory, so it is on screen before the frame says it is ready.
 const harness = createAppHarness({ directory: scenario.directory });
 
@@ -79,7 +97,10 @@ createRoot(container).render(
   </ViewModelProvider>,
 );
 
-function deliverAll({ deliverPrice }: AppHarness, prices: Scenario["prices"]): void {
+function deliverAll(
+  { deliverPrice }: AppHarness,
+  prices: Scenario["prices"],
+): void {
   for (const price of prices) {
     deliverPrice(price);
   }
@@ -90,7 +111,10 @@ function deliverAll({ deliverPrice }: AppHarness, prices: Scenario["prices"]): v
  * scenario's selection. The selection is set through the machine's own intent,
  * so the picture shows what a click would have produced without a click.
  */
-function selectFromTheStart(app: Application, symbol: string | undefined): Application {
+function selectFromTheStart(
+  app: Application,
+  symbol: string | undefined,
+): Application {
   if (symbol === undefined) {
     return app;
   }
@@ -115,7 +139,10 @@ function selectFromTheStart(app: Application, symbol: string | undefined): Appli
  * The request goes through the row machine's own intent and the real rules, so
  * the picture shows the refusal a click would have produced.
  */
-function askToDeleteFromTheStart(app: Application, categoryId: string | undefined): Application {
+function askToDeleteFromTheStart(
+  app: Application,
+  categoryId: string | undefined,
+): Application {
   if (categoryId === undefined) {
     return app;
   }
@@ -138,7 +165,10 @@ function askToDeleteFromTheStart(app: Application, categoryId: string | undefine
 }
 
 /** The application, with the form that adds a user already filled in and sent. */
-function sendUserFromTheStart(app: Application, draft: Scenario["userSent"]): Application {
+function sendUserFromTheStart(
+  app: Application,
+  draft: Scenario["userSent"],
+): Application {
   if (draft === undefined) {
     return app;
   }

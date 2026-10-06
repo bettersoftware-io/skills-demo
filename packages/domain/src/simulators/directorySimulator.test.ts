@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import type { Category, Outcome } from "../entities/directory.ts";
-import { createDirectorySimulator, SEED_DIRECTORY } from "./directorySimulator.ts";
+import {
+  createDirectorySimulator,
+  SEED_DIRECTORY,
+} from "./directorySimulator.ts";
 
 describe("the directory simulator", () => {
   it("starts with a few categories and users when it is given none", () => {
@@ -25,7 +28,10 @@ describe("the directory simulator", () => {
       outcome = answered;
     });
 
-    expect(outcome).toEqual({ accepted: true, value: { id: "category-1", name: "Design" } });
+    expect(outcome).toEqual({
+      accepted: true,
+      value: { id: "category-1", name: "Design" },
+    });
   });
 
   it("never issues an id that something it was seeded with already has", () => {
@@ -39,7 +45,10 @@ describe("the directory simulator", () => {
       outcome = answered;
     });
 
-    expect(outcome).toEqual({ accepted: true, value: { id: "category-2", name: "Support" } });
+    expect(outcome).toEqual({
+      accepted: true,
+      value: { id: "category-2", name: "Support" },
+    });
   });
 
   it("never gives a new entry the id of one that was deleted, so an old reference cannot reach it", () => {
@@ -54,7 +63,10 @@ describe("the directory simulator", () => {
       outcome = answered;
     });
 
-    expect(outcome).toEqual({ accepted: true, value: { id: "category-2", name: "Support" } });
+    expect(outcome).toEqual({
+      accepted: true,
+      value: { id: "category-2", name: "Support" },
+    });
   });
 
   it("keeps its own copy, so a change does not reach the seed it was given", () => {

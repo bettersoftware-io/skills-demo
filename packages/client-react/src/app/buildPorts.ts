@@ -16,8 +16,14 @@ import {
  * adapter. Each port is chosen on its own: with its server's URL it talks to
  * the server, without one it runs on its simulator.
  */
-export function buildPorts(serverUrl: string | undefined, apiUrl?: string): AppPorts {
-  return { price: choosePricePort(serverUrl), directory: chooseDirectoryPort(apiUrl) };
+export function buildPorts(
+  serverUrl: string | undefined,
+  apiUrl?: string,
+): AppPorts {
+  return {
+    price: choosePricePort(serverUrl),
+    directory: chooseDirectoryPort(apiUrl),
+  };
 }
 
 function choosePricePort(serverUrl: string | undefined): PricePort {

@@ -68,7 +68,10 @@ export interface DirectoryPresenter {
    * own is refused here and never sent.
    */
   addCategory: (draft: CategoryDraft) => Observable<Outcome<Category>>;
-  renameCategory: (id: string, draft: CategoryDraft) => Observable<Outcome<Category>>;
+  renameCategory: (
+    id: string,
+    draft: CategoryDraft,
+  ) => Observable<Outcome<Category>>;
   removeCategory: (id: string) => Observable<Outcome<null>>;
   addUser: (draft: UserDraft) => Observable<Outcome<User>>;
   changeUser: (id: string, draft: UserDraft) => Observable<Outcome<User>>;
@@ -82,7 +85,9 @@ export const BLANK_CATEGORY: CategoryDraft = { name: "" };
 
 export const BLANK_USER: UserDraft = { name: "", email: "", categoryId: "" };
 
-type Loaded = { reached: true; categories: Category[]; users: User[] } | { reached: false };
+type Loaded =
+  | { reached: true; categories: Category[]; users: User[] }
+  | { reached: false };
 
 const LOADING: DirectoryView = {
   status: "loading",
@@ -91,23 +96,33 @@ const LOADING: DirectoryView = {
   shownCategory: null,
 };
 
-export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresenter {
+export function createDirectoryPresenter(
+  port: DirectoryPort,
+): DirectoryPresenter {
   const reload$ = new Subject<void>();
   const shown$ = new BehaviorSubject<string | null>(null);
 
   const loaded$ = reload$.pipe(
     startWith(undefined),
     // The view keeps what it shows until the new lists arrive, so a reload does not flicker.
-    switchMap(() =>
-      forkJoin([port.categories(), port.users()]).pipe(
-        map(([categories, users]): Loaded => ({ reached: true, categories, users })),
-        catchError(() => of<Loaded>({ reached: false })),
-      ),
-    ),
+    switchMap(() => {
+      return forkJoin([port.categories(), port.users()]).pipe(
+        map(([categories, users]): Loaded => {
+          return { reached: true, categories, users };
+        }),
+        catchError(() => {
+          return of<Loaded>({ reached: false });
+        }),
+      );
+    }),
   );
 
   const view$ = state(
-    combineLatest([loaded$, shown$]).pipe(map(([loaded, shown]) => present(loaded, shown))),
+    combineLatest([loaded$, shown$]).pipe(
+      map(([loaded, shown]) => {
+        return present(loaded, shown);
+      }),
+    ),
     LOADING,
   );
 
@@ -137,22 +152,47 @@ export function createDirectoryPresenter(port: DirectoryPort): DirectoryPresente
     reload: (): void => {
       reload$.next();
     },
-    addCategory: (draft: CategoryDraft) =>
-      perform(checkCategoryDraft(draft), () => port.addCategory(draft)),
-    renameCategory: (id: string, draft: CategoryDraft) =>
-      perform(checkCategoryDraft(draft), () => port.renameCategory(id, draft)),
-    removeCategory: (id: string) => perform(null, () => port.removeCategory(id)),
-    addUser: (draft: UserDraft) => perform(checkUserDraft(draft), () => port.addUser(draft)),
-    changeUser: (id: string, draft: UserDraft) =>
-      perform(checkUserDraft(draft), () => port.changeUser(id, draft)),
-    removeUser: (id: string) => perform(null, () => port.removeUser(id)),
+    addCategory: (draft: CategoryDraft) => {
+      return perform(checkCategoryDraft(draft), () => {
+        return port.addCategory(draft);
+      });
+    },
+    renameCategory: (id: string, draft: CategoryDraft) => {
+      return perform(checkCategoryDraft(draft), () => {
+        return port.renameCategory(id, draft);
+      });
+    },
+    removeCategory: (id: string) => {
+      return perform(null, () => {
+        return port.removeCategory(id);
+      });
+    },
+    addUser: (draft: UserDraft) => {
+      return perform(checkUserDraft(draft), () => {
+        return port.addUser(draft);
+      });
+    },
+    changeUser: (id: string, draft: UserDraft) => {
+      return perform(checkUserDraft(draft), () => {
+        return port.changeUser(id, draft);
+      });
+    },
+    removeUser: (id: string) => {
+      return perform(null, () => {
+        return port.removeUser(id);
+      });
+    },
     categoryDraft: (id: string): CategoryDraft => {
-      const row = view$.getValue().categories.find((category) => category.id === id);
+      const row = view$.getValue().categories.find((category) => {
+        return category.id === id;
+      });
 
       return row === undefined ? BLANK_CATEGORY : { name: row.name };
     },
     userDraft: (id: string): UserDraft => {
-      const row = view$.getValue().users.find((user) => user.id === id);
+      const row = view$.getValue().users.find((user) => {
+        return user.id === id;
+      });
 
       return row === undefined
         ? BLANK_USER
@@ -167,26 +207,42 @@ function present(loaded: Loaded, shown: string | null): DirectoryView {
   }
 
   const { categories, users } = loaded;
-  const nameOf = new Map(categories.map((category) => [category.id, category.name]));
+  const nameOf = new Map(
+    categories.map((category) => {
+      return [category.id, category.name];
+    }),
+  );
   // A category that has been deleted cannot narrow the list any more.
   const shownCategory = shown !== null && nameOf.has(shown) ? shown : null;
 
   return {
     status: "ready",
     categories: categories
-      .map((category) => ({
-        ...category,
-        userCount: users.filter((user) => user.categoryId === category.id).length,
-      }))
+      .map((category) => {
+        return {
+          ...category,
+          userCount: users.filter((user) => {
+            return user.categoryId === category.id;
+          }).length,
+        };
+      })
       .sort(byName),
     users: users
-      .filter((user) => shownCategory === null || user.categoryId === shownCategory)
-      .map((user) => ({ ...user, categoryName: nameOf.get(user.categoryId) ?? "" }))
+      .filter((user) => {
+        return shownCategory === null || user.categoryId === shownCategory;
+      })
+      .map((user) => {
+        return { ...user, categoryName: nameOf.get(user.categoryId) ?? "" };
+      })
       .sort(byName),
     shownCategory,
   };
 }
 
-function byName(one: { name: string }, other: { name: string }): number {
+interface Named {
+  name: string;
+}
+
+function byName(one: Named, other: Named): number {
   return one.name.localeCompare(other.name);
 }

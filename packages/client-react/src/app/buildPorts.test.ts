@@ -17,12 +17,16 @@ describe("choosing what stands behind the ports", () => {
 
     const subscription = buildPorts(undefined)
       .price.prices()
-      .subscribe((price) => received.push(price));
+      .subscribe((price) => {
+        return received.push(price);
+      });
     vi.advanceTimersByTime(500);
     subscription.unsubscribe();
 
     expect(received).toHaveLength(1);
-    expect(said).toHaveBeenCalledWith("[data] composed sim: no VITE_SERVER_URL");
+    expect(said).toHaveBeenCalledWith(
+      "[data] composed sim: no VITE_SERVER_URL",
+    );
   });
 
   it("connects to the server when there is one", () => {
@@ -30,11 +34,19 @@ describe("choosing what stands behind the ports", () => {
     const network = installFakeWebSocket();
     onTestFinished(network.restore);
 
-    const subscription = buildPorts("ws://example.test/ws").price.prices().subscribe();
+    const subscription = buildPorts("ws://example.test/ws")
+      .price.prices()
+      .subscribe();
     subscription.unsubscribe();
 
-    expect(network.sockets.map((socket) => socket.url)).toEqual(["ws://example.test/ws"]);
-    expect(said).toHaveBeenCalledWith("[data] composed live from ws://example.test/ws");
+    expect(
+      network.sockets.map((socket) => {
+        return socket.url;
+      }),
+    ).toEqual(["ws://example.test/ws"]);
+    expect(said).toHaveBeenCalledWith(
+      "[data] composed live from ws://example.test/ws",
+    );
   });
 
   it("keeps the directory in the browser when there is no API URL", () => {
@@ -44,32 +56,46 @@ describe("choosing what stands behind the ports", () => {
     buildPorts(undefined)
       .directory.categories()
       .subscribe((categories) => {
-        names = categories.map((category) => category.name);
+        names = categories.map((category) => {
+          return category.name;
+        });
       });
 
-    expect(names).toEqual(SEED_DIRECTORY.categories.map((category) => category.name));
-    expect(said).toHaveBeenCalledWith("[directory] composed sim: no VITE_API_URL");
+    expect(names).toEqual(
+      SEED_DIRECTORY.categories.map((category) => {
+        return category.name;
+      }),
+    );
+    expect(said).toHaveBeenCalledWith(
+      "[directory] composed sim: no VITE_API_URL",
+    );
   });
 
   it("asks the server for the directory when there is an API URL, whatever the price source", async () => {
     const said = silenceInfo();
-    const fetched = vi.fn(
-      async () => new Response(JSON.stringify([{ id: "design", name: "Design" }])),
-    );
+    const fetched = vi.fn(async () => {
+      return new Response(JSON.stringify([{ id: "design", name: "Design" }]));
+    });
     vi.stubGlobal("fetch", fetched);
     onTestFinished(() => {
       vi.unstubAllGlobals();
     });
 
-    const categories = await firstCategories(buildPorts(undefined, "http://example.test"));
+    const categories = await firstCategories(
+      buildPorts(undefined, "http://example.test"),
+    );
 
     expect(categories).toEqual([{ id: "design", name: "Design" }]);
     expect(fetched).toHaveBeenCalledWith(
       "http://example.test/api/categories",
       expect.objectContaining({ method: "GET" }),
     );
-    expect(said).toHaveBeenCalledWith("[directory] composed live from http://example.test");
-    expect(said).toHaveBeenCalledWith("[data] composed sim: no VITE_SERVER_URL");
+    expect(said).toHaveBeenCalledWith(
+      "[directory] composed live from http://example.test",
+    );
+    expect(said).toHaveBeenCalledWith(
+      "[data] composed sim: no VITE_SERVER_URL",
+    );
   });
 });
 

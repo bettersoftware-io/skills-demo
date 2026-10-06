@@ -7,7 +7,9 @@ export type MachineView<TState, TIntents> = { state: TState } & TIntents;
 
 /** What a component sees of a machine of this type. */
 export type ViewOf<TMachine> =
-  TMachine extends Machine<infer TState, infer TIntents> ? MachineView<TState, TIntents> : never;
+  TMachine extends Machine<infer TState, infer TIntents>
+    ? MachineView<TState, TIntents>
+    : never;
 
 /**
  * One machine per component instance: built on first render, disposed on

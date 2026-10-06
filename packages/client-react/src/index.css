@@ -1,4 +1,12 @@
 :root {
+  /* Every colour has a name here, and a rule uses the name. `pnpm lint:css`
+     fails a colour written in a rule. */
+  --color-up: #1a8f4c;
+  --color-down: #c0392b;
+
+  /* A field the rules refused, and the reason beside it. */
+  --color-refused: #c0392b;
+
   font-family: system-ui, sans-serif;
   color-scheme: light dark;
 }
@@ -27,11 +35,11 @@ tr[data-stale="true"] {
 }
 
 td[data-movement="up"] {
-  color: #1a8f4c;
+  color: var(--color-up);
 }
 
 td[data-movement="down"] {
-  color: #c0392b;
+  color: var(--color-down);
 }
 
 /* The directory: categories and users. Nothing here moves, so nothing here animates. */
@@ -82,11 +90,11 @@ td[data-movement="down"] {
 }
 
 .directory [aria-invalid="true"] {
-  outline: 2px solid #c0392b;
+  outline: 2px solid var(--color-refused);
 }
 
 .refusal {
   flex-basis: 100%;
   margin: 0.2rem 0 0;
-  color: #c0392b;
+  color: var(--color-refused);
 }

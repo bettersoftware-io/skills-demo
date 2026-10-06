@@ -8,7 +8,11 @@ describe("the category list", () => {
   it("lists the categories in name order, each with how many users it has", () => {
     const page = mountCategoryList(DIRECTORY);
 
-    expect(page.rows()).toEqual(["Design, 1 user", "Engineering, 2 users", "Operations, 0 users"]);
+    expect(page.rows()).toEqual([
+      "Design, 1 user",
+      "Engineering, 2 users",
+      "Operations, 0 users",
+    ]);
   });
 
   it("adds a category, and clears the field for the next one", async () => {
@@ -44,7 +48,9 @@ describe("the category list", () => {
 
     await page.add("design");
 
-    expect(page.addRefusal()).toBe('There is already a category called "design".');
+    expect(page.addRefusal()).toBe(
+      'There is already a category called "design".',
+    );
     expect(page.newName()).toBe("design");
     expect(page.rows()).toHaveLength(3);
   });
@@ -54,7 +60,11 @@ describe("the category list", () => {
 
     await page.rename("Operations", "Support");
 
-    expect(page.rows()).toEqual(["Design, 1 user", "Engineering, 2 users", "Support, 0 users"]);
+    expect(page.rows()).toEqual([
+      "Design, 1 user",
+      "Engineering, 2 users",
+      "Support, 0 users",
+    ]);
   });
 
   it("says on the row being renamed why its new name is refused, and nowhere else", async () => {
@@ -62,7 +72,9 @@ describe("the category list", () => {
 
     await page.rename("Operations", "ENGINEERING");
 
-    expect(page.refusalOn("Operations")).toBe('There is already a category called "ENGINEERING".');
+    expect(page.refusalOn("Operations")).toBe(
+      'There is already a category called "ENGINEERING".',
+    );
     expect(page.addRefusal()).toBeNull();
     expect(page.refusalCount()).toBe(1);
   });
@@ -113,8 +125,18 @@ const DIRECTORY: DirectorySnapshot = {
     { id: "design", name: "Design" },
   ],
   users: [
-    { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng" },
-    { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design" },
+    {
+      id: "grace",
+      name: "Grace",
+      email: "grace@example.com",
+      categoryId: "eng",
+    },
+    {
+      id: "dieter",
+      name: "Dieter",
+      email: "dieter@example.com",
+      categoryId: "design",
+    },
     { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng" },
   ],
 };

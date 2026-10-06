@@ -29,9 +29,24 @@ export const SEED_DIRECTORY: DirectorySnapshot = {
     { id: "category-3", name: "Support" },
   ],
   users: [
-    { id: "user-1", name: "Ada Lovelace", email: "ada@example.com", categoryId: "category-1" },
-    { id: "user-2", name: "Grace Hopper", email: "grace@example.com", categoryId: "category-1" },
-    { id: "user-3", name: "Dieter Rams", email: "dieter@example.com", categoryId: "category-2" },
+    {
+      id: "user-1",
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      categoryId: "category-1",
+    },
+    {
+      id: "user-2",
+      name: "Grace Hopper",
+      email: "grace@example.com",
+      categoryId: "category-1",
+    },
+    {
+      id: "user-3",
+      name: "Dieter Rams",
+      email: "dieter@example.com",
+      categoryId: "category-2",
+    },
   ],
 };
 
@@ -43,13 +58,25 @@ export const SEED_DIRECTORY: DirectorySnapshot = {
  * It answers at once, so a caller that subscribes has its answer before
  * `subscribe` returns.
  */
-export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTORY): DirectoryPort {
-  let categories: Category[] = seed.categories.map((category) => ({ ...category }));
-  let users: User[] = seed.users.map((user) => ({ ...user }));
+export function createDirectorySimulator(
+  seed: DirectorySnapshot = SEED_DIRECTORY,
+): DirectoryPort {
+  let categories: Category[] = seed.categories.map((category) => {
+    return { ...category };
+  });
+
+  let users: User[] = seed.users.map((user) => {
+    return { ...user };
+  });
+
   // The ids it was seeded with, kept after their entries are deleted. The
   // counter below never goes back, so with these an id is never given out
   // twice, and a reference to a deleted entry cannot come to mean a new one.
-  const seeded = new Set([...categories, ...users].map((kept) => kept.id));
+  const seeded = new Set(
+    [...categories, ...users].map((kept) => {
+      return kept.id;
+    }),
+  );
   let issued = 0;
 
   /** An id nothing in the directory has ever had. */
@@ -79,13 +106,19 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
   }
 
   function renameCategory(id: string, draft: CategoryDraft): Outcome<Category> {
-    if (!categories.some((category) => category.id === id)) {
+    if (
+      !categories.some((category) => {
+        return category.id === id;
+      })
+    ) {
       return refuse(CATEGORY_NOT_FOUND);
     }
 
     const refusal = judgeCategoryDraft(
       draft,
-      categories.filter((category) => category.id !== id),
+      categories.filter((category) => {
+        return category.id !== id;
+      }),
     );
 
     if (refusal !== null) {
@@ -94,13 +127,17 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
 
     const renamed = { id, ...tidyCategoryDraft(draft) };
 
-    categories = categories.map((category) => (category.id === id ? renamed : category));
+    categories = categories.map((category) => {
+      return category.id === id ? renamed : category;
+    });
 
     return accept(renamed);
   }
 
   function removeCategory(id: string): Outcome<null> {
-    const category = categories.find((candidate) => candidate.id === id);
+    const category = categories.find((candidate) => {
+      return candidate.id === id;
+    });
 
     if (category === undefined) {
       return refuse(CATEGORY_NOT_FOUND);
@@ -112,7 +149,9 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
       return refuse(refusal);
     }
 
-    categories = categories.filter((candidate) => candidate.id !== id);
+    categories = categories.filter((candidate) => {
+      return candidate.id !== id;
+    });
 
     return accept(null);
   }
@@ -132,13 +171,19 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
   }
 
   function changeUser(id: string, draft: UserDraft): Outcome<User> {
-    if (!users.some((user) => user.id === id)) {
+    if (
+      !users.some((user) => {
+        return user.id === id;
+      })
+    ) {
       return refuse(USER_NOT_FOUND);
     }
 
     const refusal = judgeUserDraft(
       draft,
-      users.filter((user) => user.id !== id),
+      users.filter((user) => {
+        return user.id !== id;
+      }),
       categories,
     );
 
@@ -148,33 +193,80 @@ export function createDirectorySimulator(seed: DirectorySnapshot = SEED_DIRECTOR
 
     const changed = { id, ...tidyUserDraft(draft) };
 
-    users = users.map((user) => (user.id === id ? changed : user));
+    users = users.map((user) => {
+      return user.id === id ? changed : user;
+    });
 
     return accept(changed);
   }
 
   function removeUser(id: string): Outcome<null> {
-    if (!users.some((user) => user.id === id)) {
+    if (
+      !users.some((user) => {
+        return user.id === id;
+      })
+    ) {
       return refuse(USER_NOT_FOUND);
     }
 
-    users = users.filter((user) => user.id !== id);
+    users = users.filter((user) => {
+      return user.id !== id;
+    });
 
     return accept(null);
   }
 
   return {
-    categories: (): Observable<Category[]> =>
-      defer(() => of(categories.map((category) => ({ ...category })))),
-    users: (): Observable<User[]> => defer(() => of(users.map((user) => ({ ...user })))),
-    addCategory: (draft: CategoryDraft): Observable<Outcome<Category>> =>
-      defer(() => of(addCategory(draft))),
-    renameCategory: (id: string, draft: CategoryDraft): Observable<Outcome<Category>> =>
-      defer(() => of(renameCategory(id, draft))),
-    removeCategory: (id: string): Observable<Outcome<null>> => defer(() => of(removeCategory(id))),
-    addUser: (draft: UserDraft): Observable<Outcome<User>> => defer(() => of(addUser(draft))),
-    changeUser: (id: string, draft: UserDraft): Observable<Outcome<User>> =>
-      defer(() => of(changeUser(id, draft))),
-    removeUser: (id: string): Observable<Outcome<null>> => defer(() => of(removeUser(id))),
+    categories: (): Observable<Category[]> => {
+      return defer(() => {
+        return of(
+          categories.map((category) => {
+            return { ...category };
+          }),
+        );
+      });
+    },
+    users: (): Observable<User[]> => {
+      return defer(() => {
+        return of(
+          users.map((user) => {
+            return { ...user };
+          }),
+        );
+      });
+    },
+    addCategory: (draft: CategoryDraft): Observable<Outcome<Category>> => {
+      return defer(() => {
+        return of(addCategory(draft));
+      });
+    },
+    renameCategory: (
+      id: string,
+      draft: CategoryDraft,
+    ): Observable<Outcome<Category>> => {
+      return defer(() => {
+        return of(renameCategory(id, draft));
+      });
+    },
+    removeCategory: (id: string): Observable<Outcome<null>> => {
+      return defer(() => {
+        return of(removeCategory(id));
+      });
+    },
+    addUser: (draft: UserDraft): Observable<Outcome<User>> => {
+      return defer(() => {
+        return of(addUser(draft));
+      });
+    },
+    changeUser: (id: string, draft: UserDraft): Observable<Outcome<User>> => {
+      return defer(() => {
+        return of(changeUser(id, draft));
+      });
+    },
+    removeUser: (id: string): Observable<Outcome<null>> => {
+      return defer(() => {
+        return of(removeUser(id));
+      });
+    },
   };
 }
