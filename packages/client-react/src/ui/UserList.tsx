@@ -1,6 +1,7 @@
+import type { ChangeEvent, FormEvent, ReactElement } from "react";
+
 import type { CategoryRow, UserRow } from "@skills-demo/client-core";
 import { useViewModel } from "@skills-demo/react-bindings";
-import type { ChangeEvent, FormEvent, ReactElement } from "react";
 
 import { RefusalMessage } from "./RefusalMessage.tsx";
 import { TESTIDS } from "./testids.ts";
@@ -98,7 +99,12 @@ function UserItem({ user, categories }: UserItemProps): ReactElement {
         <button type="button" aria-label={`Edit ${user.name}`} onClick={form.edit}>
           Edit
         </button>
-        <button type="button" aria-label={`Delete ${user.name}`} disabled={form.state.busy} onClick={form.remove}>
+        <button
+          type="button"
+          aria-label={`Delete ${user.name}`}
+          disabled={form.state.busy}
+          onClick={form.remove}
+        >
           Delete
         </button>
         <RefusalMessage refusal={form.state.refusal} />

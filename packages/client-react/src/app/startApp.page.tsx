@@ -27,7 +27,10 @@ export async function startAppOnPage(): Promise<StartedApp> {
   return {
     heading: (): string | null => document.querySelector("h1")?.textContent ?? null,
     rowCount: (): number => countMarked(TESTIDS.priceRow),
-    directoryCounts: () => ({ categories: countMarked(TESTIDS.categoryRow), users: countMarked(TESTIDS.userRow) }),
+    directoryCounts: () => ({
+      categories: countMarked(TESTIDS.categoryRow),
+      users: countMarked(TESTIDS.userRow),
+    }),
     isBlank: (): boolean => document.getElementById("root")?.childElementCount === 0,
     stop: async (): Promise<void> => {
       await act(async () => {

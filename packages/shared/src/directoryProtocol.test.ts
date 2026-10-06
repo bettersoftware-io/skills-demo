@@ -1,5 +1,6 @@
-import { REFUSAL_REASONS } from "@skills-demo/domain";
 import { describe, expect, it } from "vitest";
+
+import { REFUSAL_REASONS } from "@skills-demo/domain";
 
 import {
   API_PATH,
@@ -14,9 +15,9 @@ import {
   parseRefusal,
   parseUser,
   parseUserList,
+  REFUSAL_STATUS,
   readCategoryDraft,
   readUserDraft,
-  REFUSAL_STATUS,
 } from "./directoryProtocol.ts";
 
 describe("the directory protocol", () => {
@@ -34,13 +35,23 @@ describe("the directory protocol", () => {
   it("carries a draft to the wire and back unchanged", () => {
     const draft = { name: "Ada", email: "ada@example.com", categoryId: "design" };
 
-    expect(readCategoryDraft(overTheWire(encodeCategoryDraft({ name: "Design" })))).toEqual({ name: "Design" });
+    expect(readCategoryDraft(overTheWire(encodeCategoryDraft({ name: "Design" })))).toEqual({
+      name: "Design",
+    });
     expect(readUserDraft(overTheWire(encodeUserDraft(draft)))).toEqual(draft);
   });
 
   it("carries a refusal to the wire and back unchanged, with or without a field", () => {
-    const aboutAField = { reason: "empty-name", field: "name", message: "A category needs a name." } as const;
-    const aboutTheChange = { reason: "category-in-use", field: null, message: "It still has users." } as const;
+    const aboutAField = {
+      reason: "empty-name",
+      field: "name",
+      message: "A category needs a name.",
+    } as const;
+    const aboutTheChange = {
+      reason: "category-in-use",
+      field: null,
+      message: "It still has users.",
+    } as const;
 
     expect(parseRefusal(overTheWire(encodeRefusal(aboutAField)))).toEqual(aboutAField);
     expect(parseRefusal(overTheWire(encodeRefusal(aboutTheChange)))).toEqual(aboutTheChange);

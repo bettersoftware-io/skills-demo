@@ -1,3 +1,5 @@
+import { useStateObservable } from "@react-rxjs/core";
+
 import type {
   App,
   CategoryFormMachine,
@@ -9,7 +11,6 @@ import type {
   UserFormMachine,
   UserRowMachine,
 } from "@skills-demo/client-core";
-import { useStateObservable } from "@react-rxjs/core";
 
 import { type MachineView, useMachine, type ViewOf } from "./useMachine.ts";
 
@@ -44,15 +45,18 @@ export function createViewModel(app: App): ViewModel {
 
   return {
     usePrices: (): PriceRow[] => useStateObservable(app.presenters.prices.rows$),
-    useSelection: (): MachineView<SelectionState, SelectionIntents> => useMachine(app.machines.createSelection),
+    useSelection: (): MachineView<SelectionState, SelectionIntents> =>
+      useMachine(app.machines.createSelection),
     useDirectory: (): DirectoryScreen => ({
       ...useStateObservable(directory.view$),
       showCategory: directory.showCategory,
       reload: directory.reload,
     }),
     useCategoryForm: (): ViewOf<CategoryFormMachine> => useMachine(app.machines.createCategoryForm),
-    useCategoryRow: (id: string): ViewOf<CategoryRowMachine> => useMachine(() => app.machines.createCategoryRow(id)),
+    useCategoryRow: (id: string): ViewOf<CategoryRowMachine> =>
+      useMachine(() => app.machines.createCategoryRow(id)),
     useUserForm: (): ViewOf<UserFormMachine> => useMachine(app.machines.createUserForm),
-    useUserRow: (id: string): ViewOf<UserRowMachine> => useMachine(() => app.machines.createUserRow(id)),
+    useUserRow: (id: string): ViewOf<UserRowMachine> =>
+      useMachine(() => app.machines.createUserRow(id)),
   };
 }

@@ -1,3 +1,7 @@
+import { type Context, Hono } from "hono";
+import { cors } from "hono/cors";
+import { firstValueFrom } from "rxjs";
+
 import { type DirectoryPort, type Outcome, type Refusal, UNAVAILABLE } from "@skills-demo/domain";
 import {
   API_PATH,
@@ -5,13 +9,10 @@ import {
   encodeCategory,
   encodeRefusal,
   encodeUser,
+  REFUSAL_STATUS,
   readCategoryDraft,
   readUserDraft,
-  REFUSAL_STATUS,
 } from "@skills-demo/shared";
-import { type Context, Hono } from "hono";
-import { cors } from "hono/cors";
-import { firstValueFrom } from "rxjs";
 
 const NO_SUCH_ADDRESS: Refusal = {
   reason: "not-found",
@@ -49,7 +50,10 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
     answerWithEntry(
       context,
       await firstValueFrom(
-        directory.renameCategory(context.req.param("id"), readCategoryDraft(await readBody(context))),
+        directory.renameCategory(
+          context.req.param("id"),
+          readCategoryDraft(await readBody(context)),
+        ),
       ),
       200,
       encodeCategory,
@@ -60,7 +64,9 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
     answerRemoval(context, await firstValueFrom(directory.removeCategory(context.req.param("id")))),
   );
 
-  api.get(API_PATH.users, async (context) => context.json((await firstValueFrom(directory.users())).map(encodeUser)));
+  api.get(API_PATH.users, async (context) =>
+    context.json((await firstValueFrom(directory.users())).map(encodeUser)),
+  );
 
   api.post(API_PATH.users, async (context) =>
     answerWithEntry(
@@ -74,7 +80,9 @@ export function createDirectoryApi(directory: DirectoryPort): Hono {
   api.put(`${API_PATH.users}/:id`, async (context) =>
     answerWithEntry(
       context,
-      await firstValueFrom(directory.changeUser(context.req.param("id"), readUserDraft(await readBody(context)))),
+      await firstValueFrom(
+        directory.changeUser(context.req.param("id"), readUserDraft(await readBody(context))),
+      ),
       200,
       encodeUser,
     ),
@@ -103,7 +111,9 @@ function answerWithEntry<T>(
   status: 200 | 201,
   encode: (entry: T) => object,
 ): Response {
-  return outcome.accepted ? context.json(encode(outcome.value), status) : answerRefusal(context, outcome.refusal);
+  return outcome.accepted
+    ? context.json(encode(outcome.value), status)
+    : answerRefusal(context, outcome.refusal);
 }
 
 function answerRemoval(context: Context, outcome: Outcome<null>): Response {

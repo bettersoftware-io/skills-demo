@@ -1,5 +1,6 @@
-import type { Refusal } from "@skills-demo/domain";
 import type { ReactElement } from "react";
+
+import type { Refusal } from "@skills-demo/domain";
 
 import { TESTIDS } from "./testids.ts";
 

@@ -1,8 +1,9 @@
+import { firstValueFrom } from "rxjs";
+import { describe, expect, it, onTestFinished } from "vitest";
+
 import { createHttpDirectoryPort } from "@skills-demo/client-core";
 import { createDirectorySimulator, createPriceSimulator } from "@skills-demo/domain";
 import { startServer } from "@skills-demo/server/startServer.ts";
-import { firstValueFrom } from "rxjs";
-import { describe, expect, it, onTestFinished } from "vitest";
 
 // The contract runs against the real routes in `directoryOverHttp.test.ts`,
 // in-process. These go over a real connection, so they need a port.
@@ -24,7 +25,10 @@ describe("the HTTP adapter against the running server", () => {
     const port = createHttpDirectoryPort(await startServerOnFreePort());
     const [first] = await firstValueFrom(port.users());
 
-    expect(await firstValueFrom(port.removeUser(first.id))).toEqual({ accepted: true, value: null });
+    expect(await firstValueFrom(port.removeUser(first.id))).toEqual({
+      accepted: true,
+      value: null,
+    });
   });
 });
 

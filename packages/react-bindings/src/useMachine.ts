@@ -1,6 +1,7 @@
-import type { Machine } from "@skills-demo/client-core";
 import { useStateObservable } from "@react-rxjs/core";
 import { useEffect, useRef } from "react";
+
+import type { Machine } from "@skills-demo/client-core";
 
 export type MachineView<TState, TIntents> = { state: TState } & TIntents;
 

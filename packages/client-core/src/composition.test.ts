@@ -1,13 +1,17 @@
-import { createDirectorySimulator, type DirectorySnapshot, type Price } from "@skills-demo/domain";
 import { Subject } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
+
+import { createDirectorySimulator, type DirectorySnapshot, type Price } from "@skills-demo/domain";
 
 import { type App, createApp } from "./composition.ts";
 
 describe("the application", () => {
   it("shows the prices its price port produces", () => {
     const prices$ = new Subject<Price>();
-    const app = createApp({ price: { prices: () => prices$ }, directory: createDirectorySimulator() });
+    const app = createApp({
+      price: { prices: () => prices$ },
+      directory: createDirectorySimulator(),
+    });
     const subscription = app.presenters.prices.rows$.subscribe();
 
     prices$.next({ symbol: "EURUSD", mid: 1.1 });
@@ -18,7 +22,10 @@ describe("the application", () => {
   });
 
   it("builds a separate selection machine for each component that asks", () => {
-    const app = createApp({ price: { prices: () => new Subject<Price>() }, directory: createDirectorySimulator() });
+    const app = createApp({
+      price: { prices: () => new Subject<Price>() },
+      directory: createDirectorySimulator(),
+    });
     const first = app.machines.createSelection();
     const second = app.machines.createSelection();
 
@@ -71,7 +78,9 @@ describe("the application", () => {
 
     row.intents.remove();
 
-    expect(row.state$.getValue().refusal?.message).toBe('"Engineering" still has 1 user. Move or delete them first.');
+    expect(row.state$.getValue().refusal?.message).toBe(
+      '"Engineering" still has 1 user. Move or delete them first.',
+    );
     expect(namesOf(app).categories).toEqual(["Design", "Engineering"]);
 
     row.dispose();
@@ -94,7 +103,10 @@ describe("the application", () => {
 
     form.intents.change({ name: "Grace", email: "ADA@example.com", categoryId: "design" });
     form.intents.save();
-    expect(form.state$.getValue().refusal).toMatchObject({ reason: "duplicate-email", field: "email" });
+    expect(form.state$.getValue().refusal).toMatchObject({
+      reason: "duplicate-email",
+      field: "email",
+    });
 
     form.intents.change({ email: "grace@example.com" });
     form.intents.save();
@@ -108,7 +120,11 @@ describe("the application", () => {
     const row = app.machines.createUserRow("ada");
 
     row.intents.edit();
-    expect(row.state$.getValue().draft).toEqual({ name: "Ada", email: "ada@example.com", categoryId: "eng" });
+    expect(row.state$.getValue().draft).toEqual({
+      name: "Ada",
+      email: "ada@example.com",
+      categoryId: "eng",
+    });
 
     row.intents.change({ name: "Ada Lovelace" });
     row.intents.save();
@@ -131,7 +147,10 @@ const SEED: DirectorySnapshot = {
 
 /** The application on a small directory, with a reader on the directory screen until the test ends. */
 function createDirectoryApp(): App {
-  const app = createApp({ price: { prices: () => new Subject<Price>() }, directory: createDirectorySimulator(SEED) });
+  const app = createApp({
+    price: { prices: () => new Subject<Price>() },
+    directory: createDirectorySimulator(SEED),
+  });
   const subscription = app.presenters.directory.view$.subscribe();
 
   onTestFinished(() => {

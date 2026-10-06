@@ -1,6 +1,7 @@
-import { SEED_DIRECTORY } from "@skills-demo/domain";
 import { act } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SEED_DIRECTORY } from "@skills-demo/domain";
 
 import { clearPage, startAppOnPage } from "./startApp.page.tsx";
 import { startApp } from "./startApp.tsx";

@@ -1,12 +1,23 @@
-import { accept, type Outcome, type Refusal, refuse } from "@skills-demo/domain";
 import { type Observable, of, Subject, throwError } from "rxjs";
 import { describe, expect, it } from "vitest";
 
-import { createAddFormMachine, createRowFormMachine, type FormState, reduceForm } from "./formMachine.ts";
+import { accept, type Outcome, type Refusal, refuse } from "@skills-demo/domain";
+
+import {
+  createAddFormMachine,
+  createRowFormMachine,
+  type FormIntents,
+  type FormState,
+  type RowFormIntents,
+  reduceForm,
+} from "./formMachine.ts";
+import type { Machine } from "./machine.ts";
 
 describe("reduceForm", () => {
   it("opens on the draft it is given, with nothing left over from before", () => {
-    expect(reduceForm({ ...CLOSED, refusal: TAKEN }, { type: "opened", draft: { name: "Design" } })).toEqual({
+    expect(
+      reduceForm({ ...CLOSED, refusal: TAKEN }, { type: "opened", draft: { name: "Design" } }),
+    ).toEqual({
       open: true,
       draft: { name: "Design" },
       refusal: null,
@@ -26,7 +37,10 @@ describe("reduceForm", () => {
   });
 
   it("is busy, with no refusal, while a change is unanswered", () => {
-    expect(reduceForm({ ...OPEN, refusal: TAKEN }, { type: "sent" })).toEqual({ ...OPEN, busy: true });
+    expect(reduceForm({ ...OPEN, refusal: TAKEN }, { type: "sent" })).toEqual({
+      ...OPEN,
+      busy: true,
+    });
   });
 
   it("shows why the change was refused, and keeps what was typed", () => {
@@ -45,7 +59,12 @@ describe("the form that adds an entry", () => {
   it("starts open and blank", () => {
     const { machine } = createAddForm();
 
-    expect(machine.state$.getValue()).toEqual({ open: true, draft: { name: "" }, refusal: null, busy: false });
+    expect(machine.state$.getValue()).toEqual({
+      open: true,
+      draft: { name: "" },
+      refusal: null,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -57,7 +76,12 @@ describe("the form that adds an entry", () => {
     machine.intents.save();
 
     expect(sent).toEqual([{ name: "Design" }]);
-    expect(machine.state$.getValue()).toEqual({ open: true, draft: { name: "" }, refusal: null, busy: false });
+    expect(machine.state$.getValue()).toEqual({
+      open: true,
+      draft: { name: "" },
+      refusal: null,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -68,7 +92,12 @@ describe("the form that adds an entry", () => {
     machine.intents.change({ name: "Design" });
     machine.intents.save();
 
-    expect(machine.state$.getValue()).toEqual({ open: true, draft: { name: "Design" }, refusal: TAKEN, busy: false });
+    expect(machine.state$.getValue()).toEqual({
+      open: true,
+      draft: { name: "Design" },
+      refusal: TAKEN,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -118,7 +147,10 @@ describe("the form that adds an entry", () => {
 
     machine.intents.save();
 
-    expect(machine.state$.getValue()).toMatchObject({ busy: false, refusal: { reason: "unavailable" } });
+    expect(machine.state$.getValue()).toMatchObject({
+      busy: false,
+      refusal: { reason: "unavailable" },
+    });
 
     machine.dispose();
   });
@@ -183,7 +215,12 @@ describe("the form of one entry in a list", () => {
     machine.intents.change({ name: "Research" });
     machine.intents.save();
 
-    expect(machine.state$.getValue()).toEqual({ open: true, draft: { name: "Research" }, refusal: TAKEN, busy: false });
+    expect(machine.state$.getValue()).toEqual({
+      open: true,
+      draft: { name: "Research" },
+      refusal: TAKEN,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -196,7 +233,12 @@ describe("the form of one entry in a list", () => {
     machine.intents.save();
     machine.intents.cancel();
 
-    expect(machine.state$.getValue()).toEqual({ open: false, draft: { name: "Design" }, refusal: null, busy: false });
+    expect(machine.state$.getValue()).toEqual({
+      open: false,
+      draft: { name: "Design" },
+      refusal: null,
+      busy: false,
+    });
 
     machine.dispose();
   });
@@ -234,13 +276,32 @@ const TAKEN: Refusal = { reason: "duplicate-name", field: "name", message: "That
 
 const IN_USE: Refusal = { reason: "category-in-use", field: null, message: "It still has users." };
 
-const CLOSED: FormState<{ name: string }> = { open: false, draft: { name: "" }, refusal: null, busy: false };
+const CLOSED: FormState<{ name: string }> = {
+  open: false,
+  draft: { name: "" },
+  refusal: null,
+  busy: false,
+};
 
-const OPEN: FormState<{ name: string }> = { open: true, draft: { name: "Design" }, refusal: null, busy: false };
+const OPEN: FormState<{ name: string }> = {
+  open: true,
+  draft: { name: "Design" },
+  refusal: null,
+  busy: false,
+};
 
 type Answer = () => Observable<Outcome<unknown>>;
 
-function createAddForm(answer: Answer = () => of(accept(null))) {
+interface Draft {
+  name: string;
+}
+
+interface AddForm {
+  machine: Machine<FormState<Draft>, FormIntents<Draft>>;
+  sent: Draft[];
+}
+
+function createAddForm(answer: Answer = () => of(accept(null))): AddForm {
   const sent: { name: string }[] = [];
   const machine = createAddFormMachine({
     blank: { name: "" },
@@ -254,8 +315,21 @@ function createAddForm(answer: Answer = () => of(accept(null))) {
   return { machine, sent };
 }
 
+interface RowForm {
+  machine: Machine<FormState<Draft>, RowFormIntents<Draft>>;
+  entry: Draft;
+  saved: Draft[];
+  removals: () => number;
+}
+
 /** The form of an entry called "Design"; `entry` is that entry, for a test to change behind the form's back. */
-function createRowForm({ save = () => of(accept(null)), remove = () => of(accept(null)) }: { save?: Answer; remove?: Answer } = {}) {
+function createRowForm({
+  save = (): Observable<Outcome<unknown>> => of(accept(null)),
+  remove = (): Observable<Outcome<unknown>> => of(accept(null)),
+}: {
+  save?: Answer;
+  remove?: Answer;
+} = {}): RowForm {
   const entry = { name: "Design" };
   const saved: { name: string }[] = [];
   let removals = 0;
@@ -273,5 +347,5 @@ function createRowForm({ save = () => of(accept(null)), remove = () => of(accept
     },
   });
 
-  return { machine, entry, saved, removals: () => removals };
+  return { machine, entry, saved, removals: (): number => removals };
 }

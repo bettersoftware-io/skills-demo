@@ -29,7 +29,10 @@ describe("the directory simulator", () => {
   });
 
   it("never issues an id that something it was seeded with already has", () => {
-    const directory = createDirectorySimulator({ categories: [{ id: "category-1", name: "Design" }], users: [] });
+    const directory = createDirectorySimulator({
+      categories: [{ id: "category-1", name: "Design" }],
+      users: [],
+    });
     let outcome: Outcome<Category> | undefined;
 
     directory.addCategory({ name: "Support" }).subscribe((answered) => {
@@ -40,7 +43,10 @@ describe("the directory simulator", () => {
   });
 
   it("never gives a new entry the id of one that was deleted, so an old reference cannot reach it", () => {
-    const directory = createDirectorySimulator({ categories: [{ id: "category-1", name: "Design" }], users: [] });
+    const directory = createDirectorySimulator({
+      categories: [{ id: "category-1", name: "Design" }],
+      users: [],
+    });
     let outcome: Outcome<Category> | undefined;
 
     directory.removeCategory("category-1").subscribe();

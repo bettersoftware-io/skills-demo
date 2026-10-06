@@ -2,10 +2,11 @@ import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { createAdaptorServer } from "@hono/node-server";
-import type { DirectoryPort, PricePort } from "@skills-demo/domain";
-import { encodePrice, WS_PATH } from "@skills-demo/shared";
 import { share } from "rxjs";
 import { WebSocketServer } from "ws";
+
+import type { DirectoryPort, PricePort } from "@skills-demo/domain";
+import { encodePrice, WS_PATH } from "@skills-demo/shared";
 
 import { createDirectoryApi } from "./directoryApi.ts";
 

@@ -1,14 +1,14 @@
+import { firstValueFrom } from "rxjs";
+
 import type { DirectoryPort, Outcome, Refusal } from "@skills-demo/domain";
 import {
-  API_PATH,
   encodeCategory,
   encodeRefusal,
   encodeUser,
+  REFUSAL_STATUS,
   readCategoryDraft,
   readUserDraft,
-  REFUSAL_STATUS,
 } from "@skills-demo/shared";
-import { firstValueFrom } from "rxjs";
 
 import type { HttpAnswer, HttpRequest, SendRequest } from "../adapters/httpDirectory.ts";
 
@@ -28,7 +28,10 @@ export interface FakeDirectoryServer {
  * socket. It speaks the real protocol, with the shared package's own encoders
  * and statuses, over the directory it is given.
  */
-export function createFakeDirectoryServer(directory: DirectoryPort, baseUrl: string): FakeDirectoryServer {
+export function createFakeDirectoryServer(
+  directory: DirectoryPort,
+  baseUrl: string,
+): FakeDirectoryServer {
   const requests: string[] = [];
   let canned: HttpAnswer | undefined;
   let down = false;
@@ -42,23 +45,43 @@ export function createFakeDirectoryServer(directory: DirectoryPort, baseUrl: str
       case "GET categories":
         return answer(200, (await firstValueFrom(directory.categories())).map(encodeCategory));
       case "POST categories":
-        return answerOutcome(await firstValueFrom(directory.addCategory(readCategoryDraft(body))), 201, encodeCategory);
+        return answerOutcome(
+          await firstValueFrom(directory.addCategory(readCategoryDraft(body))),
+          201,
+          encodeCategory,
+        );
       case "PUT categories/:id":
         return answerOutcome(
-          await firstValueFrom(directory.renameCategory(entry!, readCategoryDraft(body))),
+          await firstValueFrom(directory.renameCategory(requireId(entry), readCategoryDraft(body))),
           200,
           encodeCategory,
         );
       case "DELETE categories/:id":
-        return answerOutcome(await firstValueFrom(directory.removeCategory(entry!)), 204, encodeNothing);
+        return answerOutcome(
+          await firstValueFrom(directory.removeCategory(requireId(entry))),
+          204,
+          encodeNothing,
+        );
       case "GET users":
         return answer(200, (await firstValueFrom(directory.users())).map(encodeUser));
       case "POST users":
-        return answerOutcome(await firstValueFrom(directory.addUser(readUserDraft(body))), 201, encodeUser);
+        return answerOutcome(
+          await firstValueFrom(directory.addUser(readUserDraft(body))),
+          201,
+          encodeUser,
+        );
       case "PUT users/:id":
-        return answerOutcome(await firstValueFrom(directory.changeUser(entry!, readUserDraft(body))), 200, encodeUser);
+        return answerOutcome(
+          await firstValueFrom(directory.changeUser(requireId(entry), readUserDraft(body))),
+          200,
+          encodeUser,
+        );
       case "DELETE users/:id":
-        return answerOutcome(await firstValueFrom(directory.removeUser(entry!)), 204, encodeNothing);
+        return answerOutcome(
+          await firstValueFrom(directory.removeUser(requireId(entry))),
+          204,
+          encodeNothing,
+        );
       default:
         return answer(404, "404 Not Found");
     }
@@ -96,7 +119,20 @@ export function createFakeDirectoryServer(directory: DirectoryPort, baseUrl: str
   };
 }
 
-function answerOutcome<T>(outcome: Outcome<T>, status: number, encode: (value: T) => unknown): HttpAnswer {
+/** A route whose key ends in `/:id` was matched on a path that carries one. */
+function requireId(entry: string | undefined): string {
+  if (entry === undefined) {
+    throw new Error("expected the path of a route that ends in /:id to carry an id");
+  }
+
+  return entry;
+}
+
+function answerOutcome<T>(
+  outcome: Outcome<T>,
+  status: number,
+  encode: (value: T) => unknown,
+): HttpAnswer {
   return outcome.accepted ? answer(status, encode(outcome.value)) : answerRefusal(outcome.refusal);
 }
 
@@ -109,7 +145,9 @@ function answer(status: number, body: unknown): HttpAnswer {
   return {
     status,
     json: (): Promise<unknown> =>
-      body === undefined ? Promise.reject(new SyntaxError("Unexpected end of JSON input")) : Promise.resolve(body),
+      body === undefined
+        ? Promise.reject(new SyntaxError("Unexpected end of JSON input"))
+        : Promise.resolve(body),
   };
 }
 

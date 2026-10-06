@@ -1,8 +1,9 @@
+import { act, render, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
 import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
 import type { DirectorySnapshot, RefusalField } from "@skills-demo/domain";
 import { createViewModel, ViewModelProvider } from "@skills-demo/react-bindings";
-import { act, render, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import { TESTIDS } from "./testids.ts";
 import { UserList } from "./UserList.tsx";
@@ -99,7 +100,10 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
     }
 
     if (typed.category !== undefined) {
-      await user.selectOptions(within(form).getByRole("combobox", { name: "Category" }), typed.category);
+      await user.selectOptions(
+        within(form).getByRole("combobox", { name: "Category" }),
+        typed.category,
+      );
     }
   }
 
@@ -112,14 +116,18 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
   return {
     rows: (): string[] =>
       findRows().map((row) =>
-        [within(row).getByRole("rowheader"), ...within(row).getAllByRole("cell").slice(0, 2)].map(readText).join(", "),
+        [within(row).getByRole("rowheader"), ...within(row).getAllByRole("cell").slice(0, 2)]
+          .map(readText)
+          .join(", "),
       ),
     categoryChoices: (): string[] =>
-      within(rendered.getByRole("combobox", { name: "Show" })).getAllByRole("option").map(readText),
-    show: async (category): Promise<void> => {
+      within(rendered.getByRole("combobox", { name: "Show" }))
+        .getAllByRole("option")
+        .map(readText),
+    show: async (category: string): Promise<void> => {
       await user.selectOptions(rendered.getByRole("combobox", { name: "Show" }), category);
     },
-    add: async (typed): Promise<void> => {
+    add: async (typed: TypedUser): Promise<void> => {
       await fill(findAddForm(), typed);
       await user.click(within(findAddForm()).getByRole("button", { name: "Add user" }));
     },
@@ -133,23 +141,25 @@ export function mountUserList(directory: DirectorySnapshot): UserListPage {
         ["category", form.getByRole("combobox", { name: "Category" })],
       ];
 
-      return fields.filter(([, field]) => field.getAttribute("aria-invalid") === "true").map(([name]) => name);
+      return fields
+        .filter(([, field]) => field.getAttribute("aria-invalid") === "true")
+        .map(([name]) => name);
     },
     startEdit,
-    edit: async (name, typed): Promise<void> => {
+    edit: async (name: string, typed: TypedUser): Promise<void> => {
       await startEdit(name);
       await fill(findRow(name), typed);
       await user.click(within(findRow(name)).getByRole("button", { name: "Save" }));
     },
-    cancelEdit: async (name): Promise<void> => {
+    cancelEdit: async (name: string): Promise<void> => {
       await user.click(within(findRow(name)).getByRole("button", { name: "Cancel" }));
     },
-    remove: async (name): Promise<void> => {
+    remove: async (name: string): Promise<void> => {
       await user.click(within(findRow(name)).getByRole("button", { name: `Delete ${name}` }));
     },
-    refusalOn: (name): string | null => readRefusal(findRow(name)),
+    refusalOn: (name: string): string | null => readRefusal(findRow(name)),
     refusalCount: (): number => rendered.queryAllByTestId(TESTIDS.refusal).length,
-    removeBehindTheScreen: (id): void => {
+    removeBehindTheScreen: (id: string): void => {
       act(() => {
         harness.directory.removeUser(id).subscribe();
       });

@@ -48,7 +48,11 @@ export function checkUserDraft(draft: UserDraft): Refusal | null {
   }
 
   if (!LOOKS_LIKE_EMAIL.test(draft.email.trim())) {
-    return { reason: "invalid-email", field: "email", message: "This does not look like an email address." };
+    return {
+      reason: "invalid-email",
+      field: "email",
+      message: "This does not look like an email address.",
+    };
   }
 
   return draft.categoryId === ""
@@ -61,13 +65,20 @@ export function checkUserDraft(draft: UserDraft): Refusal | null {
  * `others` leaves out the category being renamed, so a category may keep its
  * own name.
  */
-export function judgeCategoryDraft(draft: CategoryDraft, others: readonly Category[]): Refusal | null {
+export function judgeCategoryDraft(
+  draft: CategoryDraft,
+  others: readonly Category[],
+): Refusal | null {
   const name = draft.name.trim();
 
   return (
     checkCategoryDraft(draft) ??
     (others.some((other) => sameIgnoringCase(other.name, name))
-      ? { reason: "duplicate-name", field: "name", message: `There is already a category called "${name}".` }
+      ? {
+          reason: "duplicate-name",
+          field: "name",
+          message: `There is already a category called "${name}".`,
+        }
       : null)
   );
 }
@@ -89,13 +100,21 @@ export function judgeUserDraft(
   }
 
   if (!categories.some((category) => category.id === draft.categoryId)) {
-    return { reason: "unknown-category", field: "category", message: "This category no longer exists." };
+    return {
+      reason: "unknown-category",
+      field: "category",
+      message: "This category no longer exists.",
+    };
   }
 
   const email = draft.email.trim();
 
   return others.some((other) => sameIgnoringCase(other.email, email))
-    ? { reason: "duplicate-email", field: "email", message: `Another user already has the email address ${email}.` }
+    ? {
+        reason: "duplicate-email",
+        field: "email",
+        message: `Another user already has the email address ${email}.`,
+      }
     : null;
 }
 

@@ -1,3 +1,6 @@
+import { type Observable, Subject, throwError } from "rxjs";
+import { describe, expect, it } from "vitest";
+
 import {
   type Category,
   createDirectorySimulator,
@@ -5,16 +8,23 @@ import {
   type DirectorySnapshot,
   type Outcome,
 } from "@skills-demo/domain";
-import { type Observable, Subject, throwError } from "rxjs";
-import { describe, expect, it } from "vitest";
 
-import { createDirectoryPresenter, type DirectoryPresenter, type DirectoryView } from "./directoryPresenter.ts";
+import {
+  createDirectoryPresenter,
+  type DirectoryPresenter,
+  type DirectoryView,
+} from "./directoryPresenter.ts";
 
 describe("the directory presenter: what it shows", () => {
   it("is loading until someone reads it", () => {
     const presenter = createDirectoryPresenter(createDirectorySimulator(SEED));
 
-    expect(presenter.view$.getValue()).toEqual({ status: "loading", categories: [], users: [], shownCategory: null });
+    expect(presenter.view$.getValue()).toEqual({
+      status: "loading",
+      categories: [],
+      users: [],
+      shownCategory: null,
+    });
   });
 
   it("lists the categories in name order, each with how many users it has", () => {
@@ -32,9 +42,27 @@ describe("the directory presenter: what it shows", () => {
     const { latest } = createPresented();
 
     expect(latest().users).toEqual([
-      { id: "ada", name: "Ada", email: "ada@example.com", categoryId: "eng", categoryName: "Engineering" },
-      { id: "dieter", name: "Dieter", email: "dieter@example.com", categoryId: "design", categoryName: "Design" },
-      { id: "grace", name: "Grace", email: "grace@example.com", categoryId: "eng", categoryName: "Engineering" },
+      {
+        id: "ada",
+        name: "Ada",
+        email: "ada@example.com",
+        categoryId: "eng",
+        categoryName: "Engineering",
+      },
+      {
+        id: "dieter",
+        name: "Dieter",
+        email: "dieter@example.com",
+        categoryId: "design",
+        categoryName: "Design",
+      },
+      {
+        id: "grace",
+        name: "Grace",
+        email: "grace@example.com",
+        categoryId: "eng",
+        categoryName: "Engineering",
+      },
     ]);
   });
 
@@ -79,15 +107,14 @@ describe("the directory presenter: changes", () => {
     presenter.addCategory({ name: "Billing" }).subscribe();
     presenter.renameCategory("ops", { name: "Support" }).subscribe();
     presenter.addUser({ name: "Linus", email: "linus@example.com", categoryId: "ops" }).subscribe();
-    presenter.changeUser("ada", { name: "Ada Lovelace", email: "ada@example.com", categoryId: "design" }).subscribe();
+    presenter
+      .changeUser("ada", { name: "Ada Lovelace", email: "ada@example.com", categoryId: "design" })
+      .subscribe();
     presenter.removeUser("grace").subscribe();
 
-    expect(latest().categories.map((category) => `${category.name} ${category.userCount}`)).toEqual([
-      "Billing 0",
-      "Design 2",
-      "Engineering 0",
-      "Support 1",
-    ]);
+    expect(latest().categories.map((category) => `${category.name} ${category.userCount}`)).toEqual(
+      ["Billing 0", "Design 2", "Engineering 0", "Support 1"],
+    );
     expect(latest().users.map((user) => `${user.name}, ${user.categoryName}`)).toEqual([
       "Ada Lovelace, Design",
       "Dieter, Design",
@@ -124,7 +151,9 @@ describe("the directory presenter: changes", () => {
     const { presenter, asked } = createPresented();
     const linus = { name: "Linus", email: "linus@example.com", categoryId: "ops" };
 
-    expect(answerOf(presenter.addCategory({ name: " " }))).toMatchObject({ refusal: { reason: "empty-name" } });
+    expect(answerOf(presenter.addCategory({ name: " " }))).toMatchObject({
+      refusal: { reason: "empty-name" },
+    });
     expect(answerOf(presenter.renameCategory("ops", { name: "" }))).toMatchObject({
       refusal: { reason: "empty-name", field: "name" },
     });
@@ -175,7 +204,12 @@ describe("the directory presenter: a directory that cannot be reached", () => {
   it("says the lists are unavailable, and shows none", () => {
     const { latest } = createPresented(createFlakyDirectory().port);
 
-    expect(latest()).toEqual({ status: "unavailable", categories: [], users: [], shownCategory: null });
+    expect(latest()).toEqual({
+      status: "unavailable",
+      categories: [],
+      users: [],
+      shownCategory: null,
+    });
   });
 
   it("loads them when asked again, once the directory can be reached", () => {
@@ -197,7 +231,11 @@ describe("the directory presenter: what an edit starts from", () => {
     presenter.renameCategory("ops", { name: "Support" }).subscribe();
 
     expect(presenter.categoryDraft("ops")).toEqual({ name: "Support" });
-    expect(presenter.userDraft("ada")).toEqual({ name: "Ada", email: "ada@example.com", categoryId: "eng" });
+    expect(presenter.userDraft("ada")).toEqual({
+      name: "Ada",
+      email: "ada@example.com",
+      categoryId: "eng",
+    });
   });
 
   it("is blank for an entry that is not on screen", () => {
@@ -279,7 +317,10 @@ function createFlakyDirectory(): FlakyDirectory {
   return {
     port: {
       ...directory,
-      users: () => (reachable ? directory.users() : throwError(() => new Error("the directory cannot be reached"))),
+      users: () =>
+        reachable
+          ? directory.users()
+          : throwError(() => new Error("the directory cannot be reached")),
     },
     recover: (): void => {
       reachable = true;

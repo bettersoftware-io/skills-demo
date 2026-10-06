@@ -1,6 +1,7 @@
-import type { Price } from "@skills-demo/domain";
 import { Subject } from "rxjs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { Price } from "@skills-demo/domain";
 
 import { createPricesPresenter, type PriceRow, STALE_AFTER_MS } from "./pricesPresenter.ts";
 

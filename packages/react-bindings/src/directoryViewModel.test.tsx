@@ -25,7 +25,10 @@ describe("the view model's directory", () => {
 
     await page.addCategory("design");
 
-    expect(page.categoryForm()).toEqual({ name: "design", refusal: 'There is already a category called "design".' });
+    expect(page.categoryForm()).toEqual({
+      name: "design",
+      refusal: 'There is already a category called "design".',
+    });
   });
 
   it("gives a component a form for one category, which renames it", async () => {
@@ -41,7 +44,10 @@ describe("the view model's directory", () => {
     const page = mountDirectoryUnderProvider();
 
     await page.addUser("Grace", "ada@example.com");
-    expect(page.userForm()).toEqual({ name: "Grace", refusal: "Another user already has the email address ada@example.com." });
+    expect(page.userForm()).toEqual({
+      name: "Grace",
+      refusal: "Another user already has the email address ada@example.com.",
+    });
 
     await page.addUser("Grace", "grace@example.com");
     expect(page.userNames()).toEqual(["Ada", "Grace"]);

@@ -1,9 +1,10 @@
 import { connect } from "node:net";
 
-import { createDirectorySimulator, type Price } from "@skills-demo/domain";
-import { API_PATH, encodePrice, parseCategoryList, WS_PATH } from "@skills-demo/shared";
 import { Subject } from "rxjs";
 import { describe, expect, it, onTestFinished } from "vitest";
+
+import { createDirectorySimulator, type Price } from "@skills-demo/domain";
+import { API_PATH, encodePrice, parseCategoryList, WS_PATH } from "@skills-demo/shared";
 
 import { type RunningServer, startServer } from "./startServer.ts";
 

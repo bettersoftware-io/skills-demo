@@ -64,7 +64,10 @@ export function describeDirectoryPortContract(
         const outcome = await firstValueFrom(port.addCategory({ name: "  Design " }));
         const categories = await firstValueFrom(port.categories());
 
-        expect(outcome).toEqual({ accepted: true, value: { id: expect.any(String), name: "Design" } });
+        expect(outcome).toEqual({
+          accepted: true,
+          value: { id: expect.any(String), name: "Design" },
+        });
         expect(categories).toHaveLength(3);
         expect(categories).toContainEqual(outcome.accepted && outcome.value);
         expect(new Set(categories.map((category) => category.id)).size).toBe(3);
@@ -99,7 +102,9 @@ export function describeDirectoryPortContract(
             message: 'There is already a category called "ENGINEERING".',
           },
         });
-        expect(await firstValueFrom(port.renameCategory("ops", { name: "engineering" }))).toMatchObject({
+        expect(
+          await firstValueFrom(port.renameCategory("ops", { name: "engineering" })),
+        ).toMatchObject({
           accepted: false,
           refusal: { reason: "duplicate-name", field: "name" },
         });
@@ -152,8 +157,13 @@ export function describeDirectoryPortContract(
       const { port, teardown } = createHarness(SEED);
 
       try {
-        expect(await firstValueFrom(port.removeCategory("ops"))).toEqual({ accepted: true, value: null });
-        expect(await firstValueFrom(port.categories())).toEqual([{ id: "eng", name: "Engineering" }]);
+        expect(await firstValueFrom(port.removeCategory("ops"))).toEqual({
+          accepted: true,
+          value: null,
+        });
+        expect(await firstValueFrom(port.categories())).toEqual([
+          { id: "eng", name: "Engineering" },
+        ]);
       } finally {
         teardown();
       }
@@ -170,7 +180,12 @@ export function describeDirectoryPortContract(
 
         expect(outcome).toEqual({
           accepted: true,
-          value: { id: expect.any(String), name: "Linus", email: "linus@example.com", categoryId: "ops" },
+          value: {
+            id: expect.any(String),
+            name: "Linus",
+            email: "linus@example.com",
+            categoryId: "ops",
+          },
         });
         expect(users).toHaveLength(3);
         expect(users).toContainEqual(outcome.accepted && outcome.value);
@@ -189,13 +204,23 @@ export function describeDirectoryPortContract(
           accepted: false,
           refusal: { reason: "empty-name", field: "name", message: "A user needs a name." },
         });
-        expect(await firstValueFrom(port.addUser({ ...linus, email: "linus.example.com" }))).toEqual({
+        expect(
+          await firstValueFrom(port.addUser({ ...linus, email: "linus.example.com" })),
+        ).toEqual({
           accepted: false,
-          refusal: { reason: "invalid-email", field: "email", message: "This does not look like an email address." },
+          refusal: {
+            reason: "invalid-email",
+            field: "email",
+            message: "This does not look like an email address.",
+          },
         });
         expect(await firstValueFrom(port.addUser({ ...linus, categoryId: "sales" }))).toEqual({
           accepted: false,
-          refusal: { reason: "unknown-category", field: "category", message: "This category no longer exists." },
+          refusal: {
+            reason: "unknown-category",
+            field: "category",
+            message: "This category no longer exists.",
+          },
         });
         expect(await firstValueFrom(port.users())).toEqual(SEED.users);
       } finally {
@@ -208,7 +233,9 @@ export function describeDirectoryPortContract(
 
       try {
         expect(
-          await firstValueFrom(port.addUser({ name: "Other Ada", email: "ADA@example.com", categoryId: "ops" })),
+          await firstValueFrom(
+            port.addUser({ name: "Other Ada", email: "ADA@example.com", categoryId: "ops" }),
+          ),
         ).toEqual({
           accepted: false,
           refusal: {
@@ -218,8 +245,17 @@ export function describeDirectoryPortContract(
           },
         });
         expect(
-          await firstValueFrom(port.changeUser("grace", { name: "Grace", email: "Ada@Example.com", categoryId: "eng" })),
-        ).toMatchObject({ accepted: false, refusal: { reason: "duplicate-email", field: "email" } });
+          await firstValueFrom(
+            port.changeUser("grace", {
+              name: "Grace",
+              email: "Ada@Example.com",
+              categoryId: "eng",
+            }),
+          ),
+        ).toMatchObject({
+          accepted: false,
+          refusal: { reason: "duplicate-email", field: "email" },
+        });
         expect(await firstValueFrom(port.users())).toEqual(SEED.users);
       } finally {
         teardown();
@@ -235,7 +271,10 @@ export function describeDirectoryPortContract(
           accepted: true,
           value: { id: "ada", ...moved },
         });
-        expect(await firstValueFrom(port.users())).toEqual([{ id: "ada", ...moved }, SEED.users[1]]);
+        expect(await firstValueFrom(port.users())).toEqual([
+          { id: "ada", ...moved },
+          SEED.users[1],
+        ]);
       } finally {
         teardown();
       }
@@ -245,10 +284,19 @@ export function describeDirectoryPortContract(
       const { port, teardown } = createHarness(SEED);
 
       try {
-        expect(await firstValueFrom(port.removeUser("ada"))).toEqual({ accepted: true, value: null });
-        expect(await firstValueFrom(port.removeUser("grace"))).toEqual({ accepted: true, value: null });
+        expect(await firstValueFrom(port.removeUser("ada"))).toEqual({
+          accepted: true,
+          value: null,
+        });
+        expect(await firstValueFrom(port.removeUser("grace"))).toEqual({
+          accepted: true,
+          value: null,
+        });
         expect(await firstValueFrom(port.users())).toEqual([]);
-        expect(await firstValueFrom(port.removeCategory("eng"))).toEqual({ accepted: true, value: null });
+        expect(await firstValueFrom(port.removeCategory("eng"))).toEqual({
+          accepted: true,
+          value: null,
+        });
       } finally {
         teardown();
       }
@@ -259,10 +307,14 @@ export function describeDirectoryPortContract(
       const gone = { accepted: false, refusal: { reason: "not-found", field: null } };
 
       try {
-        expect(await firstValueFrom(port.renameCategory("sales", { name: "Sales" }))).toMatchObject(gone);
+        expect(await firstValueFrom(port.renameCategory("sales", { name: "Sales" }))).toMatchObject(
+          gone,
+        );
         expect(await firstValueFrom(port.removeCategory("sales"))).toMatchObject(gone);
         expect(
-          await firstValueFrom(port.changeUser("linus", { name: "Linus", email: "l@example.com", categoryId: "ops" })),
+          await firstValueFrom(
+            port.changeUser("linus", { name: "Linus", email: "l@example.com", categoryId: "ops" }),
+          ),
         ).toMatchObject(gone);
         expect(await firstValueFrom(port.removeUser("linus"))).toMatchObject(gone);
       } finally {

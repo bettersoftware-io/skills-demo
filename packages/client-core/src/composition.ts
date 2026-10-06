@@ -8,7 +8,11 @@ import {
   type RowFormIntents,
 } from "./machines/formMachine.ts";
 import type { Machine } from "./machines/machine.ts";
-import { createSelectionMachine, type SelectionIntents, type SelectionState } from "./machines/selectionMachine.ts";
+import {
+  createSelectionMachine,
+  type SelectionIntents,
+  type SelectionState,
+} from "./machines/selectionMachine.ts";
 import {
   BLANK_CATEGORY,
   BLANK_USER,
@@ -58,18 +62,19 @@ export function createApp(ports: AppPorts): App {
     },
     machines: {
       createSelection: createSelectionMachine,
-      createCategoryForm: () => createAddFormMachine({ blank: BLANK_CATEGORY, add: directory.addCategory }),
-      createCategoryRow: (id) =>
+      createCategoryForm: () =>
+        createAddFormMachine({ blank: BLANK_CATEGORY, add: directory.addCategory }),
+      createCategoryRow: (id: string) =>
         createRowFormMachine({
           current: () => directory.categoryDraft(id),
-          save: (draft) => directory.renameCategory(id, draft),
+          save: (draft: CategoryDraft) => directory.renameCategory(id, draft),
           remove: () => directory.removeCategory(id),
         }),
       createUserForm: () => createAddFormMachine({ blank: BLANK_USER, add: directory.addUser }),
-      createUserRow: (id) =>
+      createUserRow: (id: string) =>
         createRowFormMachine({
           current: () => directory.userDraft(id),
-          save: (draft) => directory.changeUser(id, draft),
+          save: (draft: UserDraft) => directory.changeUser(id, draft),
           remove: () => directory.removeUser(id),
         }),
     },

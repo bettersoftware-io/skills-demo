@@ -27,7 +27,9 @@ describe("a category draft", () => {
   });
 
   it("is told it is empty before it is compared with the others", () => {
-    expect(judgeCategoryDraft({ name: "" }, [{ id: "blank", name: "" }])?.reason).toBe("empty-name");
+    expect(judgeCategoryDraft({ name: "" }, [{ id: "blank", name: "" }])?.reason).toBe(
+      "empty-name",
+    );
   });
 
   it("is stored without the spaces around it", () => {
@@ -45,12 +47,20 @@ describe("a user draft", () => {
     expect(checkUserDraft({ ...ADA, name: "  " })?.reason).toBe("empty-name");
   });
 
-  it.each(["", "ada", "ada@", "@example.com", "ada@example", "ada lovelace@example.com", "ada@@example.com"])(
-    "refuses %j as an email address",
-    (email) => {
-      expect(checkUserDraft({ ...ADA, email })).toMatchObject({ reason: "invalid-email", field: "email" });
-    },
-  );
+  it.each([
+    "",
+    "ada",
+    "ada@",
+    "@example.com",
+    "ada@example",
+    "ada lovelace@example.com",
+    "ada@@example.com",
+  ])("refuses %j as an email address", (email) => {
+    expect(checkUserDraft({ ...ADA, email })).toMatchObject({
+      reason: "invalid-email",
+      field: "email",
+    });
+  });
 
   it.each(["ada@example.com", " ada@example.com ", "ada.lovelace+tag@mail.example.co.uk"])(
     "accepts %j as an email address",
@@ -68,15 +78,18 @@ describe("a user draft", () => {
   });
 
   it("needs its category to exist", () => {
-    expect(judgeUserDraft({ ...ADA, categoryId: "sales" }, [], CATEGORIES)?.reason).toBe("unknown-category");
+    expect(judgeUserDraft({ ...ADA, categoryId: "sales" }, [], CATEGORIES)?.reason).toBe(
+      "unknown-category",
+    );
   });
 
   it("cannot take the email address of another user, whatever the case", () => {
     const others: User[] = [{ id: "ada", ...ADA }];
 
-    expect(judgeUserDraft({ ...ADA, name: "Other", email: " ADA@EXAMPLE.COM " }, others, CATEGORIES)?.reason).toBe(
-      "duplicate-email",
-    );
+    expect(
+      judgeUserDraft({ ...ADA, name: "Other", email: " ADA@EXAMPLE.COM " }, others, CATEGORIES)
+        ?.reason,
+    ).toBe("duplicate-email");
   });
 
   it("is told about its own flaws before it is compared with the others", () => {
@@ -86,7 +99,9 @@ describe("a user draft", () => {
   });
 
   it("is stored without the spaces around its name and email address", () => {
-    expect(tidyUserDraft({ name: " Ada ", email: " ada@example.com ", categoryId: "design" })).toEqual(ADA);
+    expect(
+      tidyUserDraft({ name: " Ada ", email: " ada@example.com ", categoryId: "design" }),
+    ).toEqual(ADA);
   });
 });
 

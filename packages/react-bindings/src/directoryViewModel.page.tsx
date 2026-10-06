@@ -1,6 +1,7 @@
-import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
 import { act, render } from "@testing-library/react";
 import type { ReactElement } from "react";
+
+import { createAppHarness } from "@skills-demo/client-core/testing/appHarness.ts";
 
 import { createViewModel, type ViewModel } from "./createViewModel.ts";
 import { useViewModel } from "./useViewModel.ts";
@@ -71,16 +72,16 @@ export function mountDirectoryUnderProvider(): DirectoryViewModelPage {
       category: current().categoryRow.state.open,
       user: current().userRow.state.open,
     }),
-    addCategory: async (name): Promise<void> => {
+    addCategory: async (name: string): Promise<void> => {
       await send((now) => now.categoryForm.change({ name }));
       await send((now) => now.categoryForm.save());
     },
-    renameFirstCategory: async (name): Promise<void> => {
+    renameFirstCategory: async (name: string): Promise<void> => {
       await send((now) => now.categoryRow.edit());
       await send((now) => now.categoryRow.change({ name }));
       await send((now) => now.categoryRow.save());
     },
-    addUser: async (name, email): Promise<void> => {
+    addUser: async (name: string, email: string): Promise<void> => {
       await send((now) => now.userForm.change({ name, email, categoryId: "design" }));
       await send((now) => now.userForm.save());
     },
@@ -99,10 +100,10 @@ interface Seen {
   userRow: ReturnType<ViewModel["useUserRow"]>;
 }
 
-function describeForm(state: {
-  draft: { name: string };
-  refusal: { message: string } | null;
-}): { name: string; refusal: string | null } {
+function describeForm(state: { draft: { name: string }; refusal: { message: string } | null }): {
+  name: string;
+  refusal: string | null;
+} {
   return { name: state.draft.name, refusal: state.refusal?.message ?? null };
 }
 

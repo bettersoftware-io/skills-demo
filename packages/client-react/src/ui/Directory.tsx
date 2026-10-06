@@ -1,5 +1,6 @@
-import { useViewModel } from "@skills-demo/react-bindings";
 import type { ReactElement } from "react";
+
+import { useViewModel } from "@skills-demo/react-bindings";
 
 import { CategoryList } from "./CategoryList.tsx";
 import { TESTIDS } from "./testids.ts";

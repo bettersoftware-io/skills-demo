@@ -56,7 +56,7 @@ const PEOPLE: DirectorySnapshot = {
  * lower-case and dashed. Each scenario needs a golden on every platform that
  * runs the tier; `pnpm visual` says which are missing.
  */
-export const scenarios = {
+export const scenarios: Record<string, Scenario> = {
   empty: {
     prices: [],
   },
@@ -85,4 +85,4 @@ export const scenarios = {
     directory: PEOPLE,
     userSent: { name: "Linus Torvalds", email: "linus.example.com", categoryId: "support" },
   },
-} satisfies Record<string, Scenario>;
+};

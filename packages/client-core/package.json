@@ -11,9 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@rx-state/core": "^0.1.4",
     "@skills-demo/domain": "workspace:*",
     "@skills-demo/shared": "workspace:*",
-    "@rx-state/core": "^0.1.4",
     "rxjs": "^7.8.2"
   }
 }
