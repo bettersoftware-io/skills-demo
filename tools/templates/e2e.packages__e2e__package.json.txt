@@ -9,9 +9,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@skills-demo/client-react": "workspace:*",
     "@skills-demo/shared": "workspace:*",
-    "@playwright/test": "1.63.0",
     "@types/node": "^26.2.0"
   }
 }

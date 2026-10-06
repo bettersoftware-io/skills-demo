@@ -319,9 +319,17 @@ is the `Visual goldens` workflow.
 
 Add an entry to `scenarios.ts`: a name and the state, as data. State goes in
 through the app harness; never click to reach it, and never wait for time to
-pass. If the state cannot be expressed yet, extend `Scenario` and
-`host/main.tsx`. Then run `pnpm visual:update`, open the new image, and check
-it shows what the name says. Commit the image with the scenario.
+pass. If the state cannot be expressed yet, add a field to `Scenario` and
+deliver it in `seeding.ts`, beside `scenarios.ts`. Both files are the
+project's. Never edit `host/`: it is the add-on's, an update replaces it, and
+an edited file there makes every update refuse. Then run `pnpm visual:update`,
+open the new image, and check it shows what the name says. Commit the image
+with the scenario.
+
+In `seeding.ts`, state that must be there before the first render goes in
+`app` (data a port answers from memory, a machine that starts with a value,
+set through its own intent). State that arrives afterwards goes in `deliver`,
+and a wait there is `clock.tick(...)`.
 
 ### When a comparison fails
 
@@ -414,9 +422,21 @@ and do not weaken a check. If a finding looks wrong, say so.
 import list that is out of order, and a lint finding, warnings included. It
 changes nothing. What it cannot decide is below.
 
-**When to run the fixer.** Run `pnpm biome:fix` after you finish editing and
-before you run the gate. Do not lay code out by hand, and do not sort imports
-by hand. Skip it when you changed no source, JSON or CSS file.
+**When to run the fixer.** Run `pnpm fix` after you finish editing and before
+you run the gate. Do not lay code out by hand, and do not sort imports by
+hand. Skip it when you changed no source, JSON or CSS file.
+
+`pnpm fix` runs Biome's fixer and `eslint --fix` in turn until neither
+changes a file. Run that one command, not the two by hand: each can make
+work for the other (Biome rewraps a line, and ESLint then wants a blank line
+beside it), so one pass of each is not always enough. `pnpm biome:fix` is
+Biome alone.
+
+- **It prints `FAIL fix — … still has findings no fixer repairs`.** The files
+  are settled; what is listed is yours to fix in the code.
+- **It prints `FAIL fix — not settled`.** The two fixers undo each other on
+  the files it names. Do not run it again. That is a conflict between
+  `biome.json` and the ESLint config: say so, with the file, and ask.
 
 **An import for its effect is sorted too.** `import "./index.css"` goes
 where the fixer puts it, after the code's imports. Do not write CSS that
@@ -733,6 +753,10 @@ so does a mode with no spec.
 - Write a command as the program and its arguments, never `pnpm …`: the
   wrapper can die on the stop signal and leave the server running.
 - Write no port. A program prints its address and the `ready` pattern reads it.
+- A server that answers a second protocol on its port still prints one
+  address. Write each of the client's variables around `SERVER_HOST`, its
+  host and port (`http://${SERVER_HOST}/api`), and give a new page object
+  the `serverHost` option to tell that server's responses from any other.
 - To prove a mode uses the server, compare the screen with what came over the
   wire (`serverFeed`). The simulator makes prices that look the same.
 
