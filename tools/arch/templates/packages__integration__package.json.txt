@@ -1,0 +1,19 @@
+{
+  "name": "@skills-demo/integration",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@skills-demo/client-core": "workspace:*",
+    "@skills-demo/domain": "workspace:*",
+    "@skills-demo/server": "workspace:*",
+    "@skills-demo/shared": "workspace:*",
+    "rxjs": "^7.8.2"
+  }
+}

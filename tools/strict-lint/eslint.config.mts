@@ -8,11 +8,4 @@
 import base from "../../eslint.config.mts";
 import { typedLint } from "./eslint.typed.base.mts";
 
-// `.remember/` is the working folder of a Claude Code plugin on a developer's
-// machine. It ignores itself in git and holds no source, but one of its
-// timestamp files ends in `.ts` (`tmp/last-ndc.ts`), which the typed run reads
-// as a TypeScript file that no tsconfig includes. Nothing of the project is
-// in that folder, and it does not exist in CI.
-const MACHINE_LOCAL: string[] = [".remember/**"];
-
-export default [{ ignores: MACHINE_LOCAL }, ...base, ...typedLint()];
+export default [...base, ...typedLint()];
