@@ -27,7 +27,7 @@ env:
 jobs:
   update:
     name: regenerate goldens (linux-x64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # Keep this tag the same as in visual.yml and as the @playwright/test
     # version in packages/client-react; the playwright-pin gate fails when they differ.
     container: mcr.microsoft.com/playwright:v1.63.0-noble

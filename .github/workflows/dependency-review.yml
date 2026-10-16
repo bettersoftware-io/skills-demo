@@ -29,7 +29,7 @@ permissions:
 jobs:
   dependency-review:
     name: dependency review (advisories · licences)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:

@@ -29,7 +29,7 @@ env:
 jobs:
   visual:
     name: visual goldens (linux-x64)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # The official Playwright image: the browser build, the fonts and the system
     # libraries are fixed, so the same commit draws the same pixels on every
     # run. The goldens are drawn in this same image by update-visual-goldens.yml.

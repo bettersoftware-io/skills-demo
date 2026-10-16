@@ -22,7 +22,7 @@ env:
 jobs:
   coverage:
     name: coverage gate · report
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       report: ${{ steps.report.outputs.built }}
     steps:
@@ -86,7 +86,7 @@ jobs:
     name: publish the report to GitHub Pages
     needs: coverage
     if: ${{ !cancelled() && github.event_name == 'push' && needs.coverage.outputs.report == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     # Shared with any other workflow that writes to the Pages branch, so two

@@ -19,7 +19,7 @@ env:
 jobs:
   motion-audit:
     name: motion audit (Chromium, simulator)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     # The official Playwright image holds the Chromium build that this
     # Playwright version drives, so nothing is downloaded here. The tag must

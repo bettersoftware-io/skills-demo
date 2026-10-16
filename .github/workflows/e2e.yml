@@ -28,7 +28,7 @@ env:
 jobs:
   e2e:
     name: end-to-end (chromium)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # The run takes well under a minute. A server that hangs must not hold a
     # runner for the six hours a job is allowed.
     timeout-minutes: 15
