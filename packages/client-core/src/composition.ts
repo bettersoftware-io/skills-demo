@@ -65,6 +65,8 @@ export interface App {
   };
   machines: {
     createSelection: () => Machine<SelectionState, SelectionIntents>;
+    /** Whose members are shown in a dialog: `select` a category's id to show them, `clear` to close it. */
+    createMembers: () => Machine<SelectionState, SelectionIntents>;
     createCategoryForm: () => CategoryFormMachine;
     createCategoryRow: (id: string) => CategoryRowMachine;
     createUserForm: () => UserFormMachine;
@@ -82,6 +84,7 @@ export function createApp(ports: AppPorts): App {
     },
     machines: {
       createSelection: createSelectionMachine,
+      createMembers: createSelectionMachine,
       createCategoryForm: () => {
         return createAddFormMachine({
           blank: BLANK_CATEGORY,

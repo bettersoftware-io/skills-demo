@@ -72,4 +72,16 @@ describe("the view model's directory", () => {
     await page.reload();
     expect(page.status()).toBe("ready");
   });
+
+  it("gives a component the category whose members a dialog shows, until it is closed", async () => {
+    const page = mountDirectoryUnderProvider();
+
+    expect(page.membersShown()).toBeNull();
+
+    await page.showMembers("eng");
+    expect(page.membersShown()).toBe("eng");
+
+    await page.closeMembers();
+    expect(page.membersShown()).toBeNull();
+  });
 });
