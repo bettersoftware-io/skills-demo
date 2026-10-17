@@ -116,6 +116,35 @@ describe("the category list", () => {
     expect(page.addRefusal()).toBeNull();
     expect(page.refusalCount()).toBe(1);
   });
+
+  it("shows a category's users in a dialog, in name order, until it is closed", async () => {
+    const page = mountCategoryList(DIRECTORY);
+
+    expect(page.membersDialog()).toBeNull();
+
+    await page.showMembers("Engineering");
+
+    expect(page.membersDialog()).toEqual([
+      "Members of Engineering",
+      "Ada",
+      "Grace",
+    ]);
+
+    await page.closeMembers();
+
+    expect(page.membersDialog()).toBeNull();
+  });
+
+  it("says in the dialog when no one is in the category", async () => {
+    const page = mountCategoryList(DIRECTORY);
+
+    await page.showMembers("Operations");
+
+    expect(page.membersDialog()).toEqual([
+      "Members of Operations",
+      "No one is in this category yet.",
+    ]);
+  });
 });
 
 const DIRECTORY: DirectorySnapshot = {

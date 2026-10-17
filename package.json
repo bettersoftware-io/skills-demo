@@ -21,7 +21,7 @@
     "gates": "node tools/arch/gates/run.mts",
     "check:react-policies": "node tools/arch/check-react-policies.mts",
     "check:compiler": "node tools/arch/check-compiler.mts",
-    "gate:fast": "pnpm gates && pnpm check:react-policies && pnpm check:compiler && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check && pnpm biome:check && pnpm check:versions && pnpm check:doc-links && pnpm lint:css && pnpm visual:check:server && pnpm check:dockerfiles && pnpm lint:types && pnpm lint:dead",
+    "gate:fast": "pnpm gates && pnpm check:react-policies && pnpm check:compiler && pnpm lint && pnpm typecheck && pnpm visual:check && pnpm perf:check && pnpm biome:check && pnpm check:versions && pnpm check:doc-links && pnpm lint:css && pnpm visual:check:server && pnpm check:dockerfiles && pnpm lint:types && pnpm lint:dead && pnpm visual:check:styles",
     "gate:full": "pnpm gate:fast && pnpm test && pnpm build && pnpm coverage",
     "coverage": "node tools/coverage/run.mts",
     "coverage:gaps": "node tools/coverage/gaps.mts",
@@ -48,7 +48,9 @@
     "e2e": "node tools/e2e/run.mts",
     "e2e:install": "pnpm --dir packages/e2e exec playwright install chromium",
     "fix": "node tools/format-lint/fix.mts",
-    "repo:settings": "node tools/ci-security/check-settings.mts"
+    "repo:settings": "node tools/ci-security/check-settings.mts",
+    "visual:check:styles": "node tools/visual/check-styles.mts",
+    "visual:coverage": "node tools/visual/coverage.mts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",

@@ -29,6 +29,8 @@ export interface ViewModel {
   usePrices: () => PriceRow[];
   useSelection: () => MachineView<SelectionState, SelectionIntents>;
   useDirectory: () => DirectoryScreen;
+  /** Whose members a dialog shows: the id of a category, or none. One per component that asks. */
+  useMembers: () => MachineView<SelectionState, SelectionIntents>;
   /** The form that adds a category. One per component that asks. */
   useCategoryForm: () => ViewOf<CategoryFormMachine>;
   /** The form of one category in the list: rename and delete. */
@@ -49,6 +51,9 @@ export function createViewModel(app: App): ViewModel {
     },
     useSelection: (): MachineView<SelectionState, SelectionIntents> => {
       return useMachine(app.machines.createSelection);
+    },
+    useMembers: (): MachineView<SelectionState, SelectionIntents> => {
+      return useMachine(app.machines.createMembers);
     },
     useDirectory: (): DirectoryScreen => {
       return {

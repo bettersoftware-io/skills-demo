@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent, ReactElement } from "react";
 import type { CategoryRow } from "@skills-demo/client-core";
 import { useViewModel } from "@skills-demo/react-bindings";
 
+import { MembersDialog } from "./MembersDialog.tsx";
 import { RefusalMessage } from "./RefusalMessage.tsx";
 import { TESTIDS } from "./testids.ts";
 
@@ -33,8 +34,13 @@ interface CategoryItemProps {
 }
 
 function CategoryItem({ category }: CategoryItemProps): ReactElement {
-  const { useCategoryRow } = useViewModel();
+  const { useCategoryRow, useMembers } = useViewModel();
   const form = useCategoryRow(category.id);
+  const members = useMembers();
+
+  function showMembers(): void {
+    members.select(category.id);
+  }
 
   function changeName(event: ChangeEvent<HTMLInputElement>): void {
     form.change({ name: event.target.value });
@@ -72,6 +78,13 @@ function CategoryItem({ category }: CategoryItemProps): ReactElement {
           </span>
           <button
             type="button"
+            aria-label={`Members of ${category.name}`}
+            onClick={showMembers}
+          >
+            Members
+          </button>
+          <button
+            type="button"
             aria-label={`Rename ${category.name}`}
             onClick={form.edit}
           >
@@ -88,6 +101,9 @@ function CategoryItem({ category }: CategoryItemProps): ReactElement {
         </div>
       )}
       <RefusalMessage refusal={form.state.refusal} />
+      {members.state.selected === category.id ? (
+        <MembersDialog category={category} onClose={members.clear} />
+      ) : null}
     </li>
   );
 }

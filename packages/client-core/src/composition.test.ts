@@ -35,6 +35,21 @@ describe("the application", () => {
     second.dispose();
   });
 
+  it("builds a machine that shows one category's members and closes them again", () => {
+    const { app } = createAppHarness();
+    const members = app.machines.createMembers();
+
+    expect(members.state$.getValue()).toEqual({ selected: null });
+
+    members.intents.select("eng");
+    expect(members.state$.getValue()).toEqual({ selected: "eng" });
+
+    members.intents.clear();
+    expect(members.state$.getValue()).toEqual({ selected: null });
+
+    members.dispose();
+  });
+
   it("shows the categories and users its directory port holds", () => {
     const app = createDirectoryApp();
 

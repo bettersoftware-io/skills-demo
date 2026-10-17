@@ -27,14 +27,27 @@ describe("the directory presenter: what it shows", () => {
     });
   });
 
-  it("lists the categories in name order, each with how many users it has", () => {
+  it("lists the categories in name order, each with its users in name order", () => {
     const { latest } = createPresented();
 
     expect(latest().status).toBe("ready");
     expect(latest().categories).toEqual([
-      { id: "design", name: "Design", userCount: 1 },
-      { id: "eng", name: "Engineering", userCount: 2 },
-      { id: "ops", name: "Operations", userCount: 0 },
+      {
+        id: "design",
+        name: "Design",
+        userCount: 1,
+        members: [{ id: "dieter", name: "Dieter" }],
+      },
+      {
+        id: "eng",
+        name: "Engineering",
+        userCount: 2,
+        members: [
+          { id: "ada", name: "Ada" },
+          { id: "grace", name: "Grace" },
+        ],
+      },
+      { id: "ops", name: "Operations", userCount: 0, members: [] },
     ]);
   });
 
