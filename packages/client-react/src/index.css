@@ -7,7 +7,10 @@
   /* A field the rules refused, and the reason beside it. */
   --color-refused: #c0392b;
 
-  /* A dialog's card, and the scrim and shadow behind it. */
+  /* The page's own text, for what would otherwise inherit a transparent one. */
+  --color-text: canvastext;
+
+  /* A dialog's card or a select's box, and the scrim and shadow behind a dialog. */
   --color-surface: canvas;
   --color-scrim: rgb(0 0 0 / 40%);
 
@@ -150,4 +153,51 @@ td[data-movement="down"] {
 
 .members-list li {
   padding: 0.3rem 0.5rem;
+}
+
+/* A select with its chosen option drawn over it as ordinary text (Choice.tsx).
+   The select is a plain box whose own text is transparent; the text on top
+   has the same padding, so it sits where the select's would. */
+.choice {
+  position: relative;
+  display: inline-grid;
+}
+
+.choice-select {
+  padding: 0.15rem 1.6rem 0.15rem 0.4rem;
+
+  /* Not currentcolor: the select's own text is transparent. */
+  border: 1px solid color-mix(in srgb, var(--color-text) 45%, transparent);
+  border-radius: 0.25rem;
+  font: inherit;
+  color: transparent;
+  background: var(--color-surface);
+  appearance: none;
+}
+
+.choice-select option {
+  color: var(--color-text);
+}
+
+.choice-shown {
+  position: absolute;
+  inset: 1px 1.6rem 1px calc(0.4rem + 1px);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.choice::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-right: 1.5px solid currentcolor;
+  border-bottom: 1.5px solid currentcolor;
+  pointer-events: none;
+  transform: translate(0, -70%) rotate(45deg);
 }
