@@ -1,3 +1,5 @@
+import { createElement } from "react";
+
 import type { App as Application } from "@skills-demo/client-core";
 import { STALE_AFTER_MS } from "@skills-demo/client-core/presenters/pricesPresenter.ts";
 import {
@@ -6,6 +8,7 @@ import {
 } from "@skills-demo/client-core/testing/appHarness.ts";
 
 import type { HostClock, Seeded } from "./host/seeded.ts";
+import { Mount } from "./registry.tsx";
 import type { Scenario } from "./scenarios.ts";
 
 // How a scenario's data becomes app state. This file is the project's: when a
@@ -22,20 +25,40 @@ import type { Scenario } from "./scenarios.ts";
 //   through its own intent.
 // - `deliver`: what arrives after the UI is on screen, in order. A wait is
 //   `clock.tick(...)`, never a real one.
+//
+// What is shown is `render`: the registry entry a scenario names in its
+// `mount`, in the app's surround (`Mount`, in `registry.tsx`). With no `mount`
+// it is undefined, and the host shows the whole app.
 
 /** The application and the deliveries of one scenario. Called once, before the first render. */
 export function seedScenario(scenario: Scenario, clock: HostClock): Seeded {
-  // The directory answers at once and from memory, so it is on screen before the frame says it is ready.
-  const harness = createAppHarness({ directory: scenario.directory });
+  // The directory answers at once and from memory, so it is on screen before
+  // the frame says it is ready; or never, or with a failure, if the scenario says so.
+  const harness = createAppHarness({
+    directory: scenario.directory,
+    directoryLink: scenario.directoryLink,
+  });
 
   return {
-    app: sendUserFromTheStart(
-      askToDeleteFromTheStart(
-        selectFromTheStart(harness.app, scenario.selected),
-        scenario.categoryAskedToDelete,
+    app: editUserFromTheStart(
+      sendUserFromTheStart(
+        renameFromTheStart(
+          askToDeleteFromTheStart(
+            selectFromTheStart(harness.app, scenario.selected),
+            scenario.categoryAskedToDelete,
+          ),
+          scenario.categoryRenaming,
+        ),
+        scenario.userSent,
       ),
-      scenario.userSent,
+      scenario.userEditing,
     ),
+    render:
+      scenario.mount === undefined
+        ? undefined
+        : () => {
+            return createElement(Mount, { scenario });
+          },
     deliver: () => {
       deliverAll(harness, scenario.stalePrices ?? []);
 
@@ -115,6 +138,32 @@ function askToDeleteFromTheStart(
   };
 }
 
+/** The application, with the rename form of one category's row already open, through the row machine's own intent. */
+function renameFromTheStart(
+  app: Application,
+  categoryId: string | undefined,
+): Application {
+  if (categoryId === undefined) {
+    return app;
+  }
+
+  return {
+    ...app,
+    machines: {
+      ...app.machines,
+      createCategoryRow: (id: string) => {
+        const machine = app.machines.createCategoryRow(id);
+
+        if (id === categoryId) {
+          machine.intents.edit();
+        }
+
+        return machine;
+      },
+    },
+  };
+}
+
 /** The application, with the form that adds a user already filled in and sent. */
 function sendUserFromTheStart(
   app: Application,
@@ -133,6 +182,32 @@ function sendUserFromTheStart(
 
         machine.intents.change(draft);
         machine.intents.save();
+
+        return machine;
+      },
+    },
+  };
+}
+
+/** The application, with the edit form of one user's row already open, through the row machine's own intent. */
+function editUserFromTheStart(
+  app: Application,
+  userId: string | undefined,
+): Application {
+  if (userId === undefined) {
+    return app;
+  }
+
+  return {
+    ...app,
+    machines: {
+      ...app.machines,
+      createUserRow: (id: string) => {
+        const machine = app.machines.createUserRow(id);
+
+        if (id === userId) {
+          machine.intents.edit();
+        }
 
         return machine;
       },

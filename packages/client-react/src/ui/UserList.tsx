@@ -1,8 +1,9 @@
-import type { ChangeEvent, FormEvent, ReactElement } from "react";
+import type { FormEvent, ReactElement } from "react";
 
 import type { CategoryRow, UserRow } from "@skills-demo/client-core";
 import { useViewModel } from "@skills-demo/react-bindings";
 
+import { Choice } from "./Choice.tsx";
 import { RefusalMessage } from "./RefusalMessage.tsx";
 import { TESTIDS } from "./testids.ts";
 import { UserFields } from "./UserFields.tsx";
@@ -16,28 +17,24 @@ export function UserList(): ReactElement {
   const { useDirectory } = useViewModel();
   const directory = useDirectory();
 
-  function showCategory(event: ChangeEvent<HTMLSelectElement>): void {
-    directory.showCategory(
-      event.target.value === "" ? null : event.target.value,
-    );
+  function showCategory(id: string): void {
+    directory.showCategory(id === "" ? null : id);
   }
 
   return (
     <section data-testid={TESTIDS.userList}>
       <h2>Users</h2>
-      <label>
-        Show
-        <select value={directory.shownCategory ?? ""} onChange={showCategory}>
-          <option value="">All categories</option>
-          {directory.categories.map((category) => {
-            return (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            );
-          })}
-        </select>
-      </label>
+      <Choice
+        label="Show"
+        value={directory.shownCategory ?? ""}
+        options={[
+          { value: "", label: "All categories" },
+          ...directory.categories.map((category) => {
+            return { value: category.id, label: category.name };
+          }),
+        ]}
+        onChoose={showCategory}
+      />
       <table>
         <thead>
           <tr>

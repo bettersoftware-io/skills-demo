@@ -3,6 +3,8 @@ import type { ChangeEvent, ReactElement } from "react";
 import type { CategoryRow } from "@skills-demo/client-core";
 import type { RefusalField, UserDraft } from "@skills-demo/domain";
 
+import { Choice } from "./Choice.tsx";
+
 /** The three fields of a user, for the form that adds one and the form that edits one. */
 export function UserFields({
   draft,
@@ -18,8 +20,8 @@ export function UserFields({
     onChange({ email: event.target.value });
   }
 
-  function changeCategory(event: ChangeEvent<HTMLSelectElement>): void {
-    onChange({ categoryId: event.target.value });
+  function changeCategory(categoryId: string): void {
+    onChange({ categoryId });
   }
 
   return (
@@ -40,23 +42,18 @@ export function UserFields({
           onChange={changeEmail}
         />
       </label>
-      <label>
-        Category
-        <select
-          aria-invalid={invalid === "category"}
-          value={draft.categoryId}
-          onChange={changeCategory}
-        >
-          <option value="">Choose a category</option>
-          {categories.map((category) => {
-            return (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            );
-          })}
-        </select>
-      </label>
+      <Choice
+        label="Category"
+        value={draft.categoryId}
+        options={[
+          { value: "", label: "Choose a category" },
+          ...categories.map((category) => {
+            return { value: category.id, label: category.name };
+          }),
+        ]}
+        invalid={invalid === "category"}
+        onChoose={changeCategory}
+      />
     </>
   );
 }

@@ -31,6 +31,10 @@ export interface CategoryListPage {
   refusalOn: (name: string) => string | null;
   /** How many messages are on screen, wherever they are. */
   refusalCount: () => number;
+  showMembers: (name: string) => Promise<void>;
+  /** The dialog of a category's members as it reads: its heading, then each line in it. Null when none is open. */
+  membersDialog: () => string[] | null;
+  closeMembers: () => Promise<void>;
 }
 
 /**
@@ -152,6 +156,31 @@ export function mountCategoryList(
     },
     refusalCount: (): number => {
       return rendered.queryAllByTestId(TESTIDS.refusal).length;
+    },
+    showMembers: async (name: string): Promise<void> => {
+      await user.click(
+        within(findRow(name)).getByRole("button", {
+          name: `Members of ${name}`,
+        }),
+      );
+    },
+    membersDialog: (): string[] | null => {
+      const dialog = rendered.queryByTestId(TESTIDS.membersDialog);
+
+      if (dialog === null) {
+        return null;
+      }
+
+      return within(dialog)
+        .getAllByText(/./, { selector: "h3, li, p" })
+        .map(readText);
+    },
+    closeMembers: async (): Promise<void> => {
+      await user.click(
+        within(rendered.getByRole("dialog")).getByRole("button", {
+          name: "Close",
+        }),
+      );
     },
   };
 }

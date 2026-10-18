@@ -35,6 +35,10 @@ export interface DirectoryViewModelPage {
   removeFirstUser: () => Promise<void>;
   showFirstCategory: () => Promise<void>;
   reload: () => Promise<void>;
+  /** The id of the category whose members the dialog shows, or null. */
+  membersShown: () => string | null;
+  showMembers: (id: string) => Promise<void>;
+  closeMembers: () => Promise<void>;
 }
 
 /** Two categories and one user; this package does not depend on the domain, so they are written out here. */
@@ -150,6 +154,19 @@ export function mountDirectoryUnderProvider(): DirectoryViewModelPage {
         return now.directory.reload();
       });
     },
+    membersShown: (): string | null => {
+      return current().members.state.selected;
+    },
+    showMembers: (id: string): Promise<void> => {
+      return send((now) => {
+        return now.members.select(id);
+      });
+    },
+    closeMembers: (): Promise<void> => {
+      return send((now) => {
+        return now.members.clear();
+      });
+    },
   };
 }
 
@@ -159,6 +176,7 @@ interface Seen {
   categoryRow: ReturnType<ViewModel["useCategoryRow"]>;
   userForm: ReturnType<ViewModel["useUserForm"]>;
   userRow: ReturnType<ViewModel["useUserRow"]>;
+  members: ReturnType<ViewModel["useMembers"]>;
 }
 
 /** Where the reader leaves what it last read, for the page object to pick up. */
@@ -194,6 +212,7 @@ function Reader({ seen }: ReaderProps): ReactElement {
     useCategoryRow,
     useUserForm,
     useUserRow,
+    useMembers,
   } = useViewModel();
 
   seen.current = {
@@ -202,6 +221,7 @@ function Reader({ seen }: ReaderProps): ReactElement {
     categoryRow: useCategoryRow("design"),
     userForm: useUserForm(),
     userRow: useUserRow("ada"),
+    members: useMembers(),
   };
 
   return <output />;

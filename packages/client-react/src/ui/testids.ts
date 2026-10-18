@@ -6,6 +6,7 @@ export const TESTIDS = {
   categoryList: "category-list",
   categoryRow: "category-row",
   categoryForm: "category-form",
+  membersDialog: "members-dialog",
   userList: "user-list",
   userRow: "user-row",
   userForm: "user-form",

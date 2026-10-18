@@ -32,6 +32,14 @@ export interface CategoryRow {
   name: string;
   /** How many users are in the category, whichever category the user list is narrowed to. */
   userCount: number;
+  /** The users in the category, in name order, whichever category the user list is narrowed to. */
+  members: Member[];
+}
+
+/** One user in a category's list of members. */
+interface Member {
+  id: string;
+  name: string;
 }
 
 /** One row of the user list, ready to render. */
@@ -219,12 +227,16 @@ function present(loaded: Loaded, shown: string | null): DirectoryView {
     status: "ready",
     categories: categories
       .map((category) => {
-        return {
-          ...category,
-          userCount: users.filter((user) => {
+        const members = users
+          .filter((user) => {
             return user.categoryId === category.id;
-          }).length,
-        };
+          })
+          .map(({ id, name }): Member => {
+            return { id, name };
+          })
+          .sort(byName);
+
+        return { ...category, userCount: members.length, members };
       })
       .sort(byName),
     users: users
