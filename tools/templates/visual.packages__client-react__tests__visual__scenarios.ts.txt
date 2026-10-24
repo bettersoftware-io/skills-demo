@@ -1,3 +1,8 @@
+// `pnpm visual:jitter` loads this file in plain Node, as it does framing.ts and
+// tolerance.ts. So an import here is type-only or one Node can load, names its
+// file with `.ts`, and the file uses only erasable syntax: no `enum`,
+// `namespace` or parameter property. Otherwise jitter stops with exit 2.
+
 import type { PriceRow } from "@skills-demo/client-core";
 import type { Price } from "@skills-demo/domain";
 
@@ -101,6 +106,15 @@ export const scenarios: Record<string, Scenario> = {
     mount: "price-list",
     prices: [...MOVES, USDJPY],
     selected: "GBPUSD",
+  },
+  // The stale wait, on the presenter's own timer: USDJPY arrives, the seeding
+  // moves the host's clock past `STALE_AFTER_MS`, then the other two move.
+  // Only USDJPY's row has gone stale.
+  "price-list-stale": {
+    level: "section",
+    mount: "price-list",
+    stalePrices: [USDJPY],
+    prices: MOVES,
   },
 
   // Page: the whole app, once, at the framing's viewport.

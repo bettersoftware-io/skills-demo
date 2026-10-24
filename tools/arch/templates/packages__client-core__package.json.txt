@@ -11,7 +11,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run --no-fsModuleCache"
   },
   "dependencies": {
     "@rx-state/core": "^0.1.4",
