@@ -23,3 +23,49 @@ that reached the main branch before Monday 00:00 UTC. So
 `git diff 2026-W39 2026-W40` is exactly the change the W40 section describes.
 The `Weekly tag` workflow creates the tag and opens an issue that asks for
 the entry.
+
+## 2026-W42 — 12 Oct – 18 Oct
+
+The demo took two rounds of the plugin's kit and add-ons and the visual
+add-on's redesign. Checks now reach it only through the installer, Renovate
+replaced Dependabot, and the screenshot tests became a pyramid of 24
+scenarios, pictured the way the app draws them.
+
+### Added
+
+- **Screenshot tests as a pyramid.** 24 scenarios: 14 components, 8 sections
+  and 2 pages, each with its own size and the way it is captured. A page is
+  the bare viewport, with no frame around it. New to picture: `PriceRowView`
+  as its own component, and a category's members in a dialog (a fixed layer,
+  a card at a half pixel, a scrolling list). The linux-x64 goldens were drawn
+  by five CI runs and compared before they were committed [#15].
+
+### Changed
+
+- **Renovate opens the dependency updates, not Dependabot.** The kit and
+  every add-on came from the plugin's 0.17.0; the installer removed
+  `.github/dependabot.yml` and wrote `.github/renovate.json5`, with security
+  fixes on [#14].
+- **Each screenshot carries its own tolerance.** The default moves from no
+  difference at all to 8 pixels at threshold 0.01, and a scenario may be
+  strict or carry a budget it measured [#15].
+
+### Decisions
+
+- **A check comes through the installer, never by hand.** `AGENTS.md` now
+  says so: without that section, Codex asked for an add-on planned to write
+  it by hand in 4 runs of 6; with it, in none of 12
+  ([skills#34](https://github.com/bettersoftware-io/skills/pull/34)) [#12].
+- **Renovate over Dependabot**, because Dependabot's updater runs Node 24 and
+  failed here under the demo's Node 26 floor on 14 October
+  ([skills#38](https://github.com/bettersoftware-io/skills/pull/38)) [#14].
+
+### Under the hood
+
+- The kit's own files from the plugin's 0.16.0 and 0.17.0: the React policy
+  check, the ESLint config, the config loader, and a new `explicit` role in
+  the architecture config's table. `pnpm repo:settings` is new [#12] [#14].
+
+[#12]: https://github.com/bettersoftware-io/skills-demo/pull/12
+[#14]: https://github.com/bettersoftware-io/skills-demo/pull/14
+[#15]: https://github.com/bettersoftware-io/skills-demo/pull/15
