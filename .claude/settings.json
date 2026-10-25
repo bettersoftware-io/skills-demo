@@ -22,6 +22,63 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-workflow/hooks/split-outward-commands.mts\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Monitor",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-workflow/hooks/split-outward-commands.mts\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/agent-workflow/hooks/changelog-due.mts\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "ask": [
+      "Bash(git push *--force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * -f*)",
+      "Bash(git push * +*)",
+      "Bash(git push *--delete*)",
+      "Bash(git push -d*)",
+      "Bash(git push * -d*)",
+      "Bash(git push *--mirror*)",
+      "Bash(git push *--all*)",
+      "Bash(git push *--tags*)",
+      "Bash(git push *--prune*)",
+      "Bash(gh pr merge *--admin*)",
+      "Bash(pnpm changelog tag *--apply*)",
+      "Bash(pnpm changelog:releases *--apply*)",
+      "Bash(pnpm run changelog tag *--apply*)",
+      "Bash(node tools/agent-workflow/changelog.mts tag *--apply*)",
+      "Bash(pnpm run changelog:releases *--apply*)",
+      "Bash(node tools/agent-workflow/sync-releases.mts *--apply*)",
+      "Edit(/tools/agent-workflow/**)"
     ]
   }
 }
