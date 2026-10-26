@@ -24,6 +24,42 @@ that reached the main branch before Monday 00:00 UTC. So
 The `Weekly tag` workflow creates the tag and opens an issue that asks for
 the entry.
 
+## 2026-W43 — 19 Oct – 25 Oct
+
+The demo took three rounds of the plugin, from 0.20.1 to 0.21.2, and with
+them the agent-workflow add-on for the first time. It now keeps this
+changelog by week, reminds each session of a week that is due, tags every
+finished week, and publishes each tagged week as a GitHub Release.
+
+### Added
+
+- **The weekly changelog.** `agent-workflow` came in for the first time: a
+  session-start reminder in Claude Code and Codex, `pnpm changelog
+  due|defs|tag|check`, a Monday workflow that tags the finished week and
+  opens a reminder issue, and `sync-releases.yml`, which publishes a release
+  per tagged week once `CHANGELOG_RELEASES` is set. The headless writer
+  (`changelog-writer.yml`) came too, and stays off [#18].
+- **The first entry and the first release.** 2026-W42 was written, and
+  published as the release 2026-W42 [#19].
+
+### Changed
+
+- **Renovate's first wave was met ahead of time.** `.github/renovate.json5`
+  became the add-on's: Playwright's package and its image move as one group
+  that waits to be asked for, and the schedule is the whole of Monday. Every
+  package's `test` script runs `vitest run --no-fsModuleCache`, which the
+  kit now requires [#17].
+- **The kit and every add-on followed the plugin to 0.21.1 and 0.21.2.**
+  The kit gained a gate that checks every workspace package is in the
+  lockfile; coverage and visual took new versions of their tools, and
+  `visual:check:styles` now also catches a stylesheet re-exported from
+  `main.tsx`. No file was refused or forced [#18] [#20].
+
+### Under the hood
+
+- Each update was proven locally with `pnpm gate:full`, the workflow lint
+  and the visual tests, with no picture changed [#17] [#18] [#20].
+
 ## 2026-W42 — 12 Oct – 18 Oct
 
 The demo took two rounds of the plugin's kit and add-ons and the visual
@@ -69,3 +105,7 @@ scenarios, pictured the way the app draws them.
 [#12]: https://github.com/bettersoftware-io/skills-demo/pull/12
 [#14]: https://github.com/bettersoftware-io/skills-demo/pull/14
 [#15]: https://github.com/bettersoftware-io/skills-demo/pull/15
+[#17]: https://github.com/bettersoftware-io/skills-demo/pull/17
+[#18]: https://github.com/bettersoftware-io/skills-demo/pull/18
+[#19]: https://github.com/bettersoftware-io/skills-demo/pull/19
+[#20]: https://github.com/bettersoftware-io/skills-demo/pull/20
