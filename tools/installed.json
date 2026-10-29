@@ -1,7 +1,7 @@
 {
   "kit": {
     "files": {
-      "tools/arch/README.md": "9bf99e45c5c1e76e66f2fa1044bc0e7dd752a09b9314417b3ec3e3d6b528785d",
+      "tools/arch/README.md": "edf5ae8d5b6d007aab6078a7dd3902cdf4bbf75af81ca702badca72bac041549",
       "tools/arch/check-compiler.mts": "855603968b48d5d0bfde07bf4d02120e785c245dea2f581e8de047b1244d5fb8",
       "tools/arch/check-react-policies.mts": "94f71013d6e759cc75656bef2a2cdd82ac7766507431d17e131e766f74279527",
       "tools/arch/ci/corepack/package-lock.json": "e832aaa8d3c5beb67be8887533a3eaaa327beebbc6a6ab447eae0c2da39bab35",
@@ -24,16 +24,17 @@
       "tools/arch/eslint-rules/no-render-functions.mts": "8a8fdd17c383f9b3bafb078b6103241dfdf30eea9f9146e4e4d214492cf604e9",
       "tools/arch/eslint-rules/one-import-per-module.mts": "2ff9d8a85fb9a7ed4e0044050782584371fa4cd4d974e90614cd873fed4e6ea8",
       "tools/arch/eslint-rules/page-objects-own-their-component.mts": "c149be0134a5839b50718ae4ee3cb4cb751094db376b9c1caf7e89f8c66836a3",
-      "tools/arch/eslint.config.mts": "50780717638d94afef5086adf69acfd67fb9bfdd18f1ec727d417251ae78bacc",
-      "tools/arch/gates/fails-on.json": "ea07aac5d70cd1ff28faf0b29e0db2409b019a85742ac8fc34d2019de66a01e6",
-      "tools/arch/gates/gates.json": "d220571b2c287a5b7beb50d058512e6f634e10ddcdd477a973b27c93cb9e52bb",
+      "tools/arch/eslint.config.mts": "6dc009fd3736867a8faced5152bffa0ff80280ccff66f23c6a912a2326c5ddb9",
+      "tools/arch/gates/fails-on.json": "b4f832ef684677610df962d154e15ae6bfe9c0d967844ea78593a9be61eaf0d4",
+      "tools/arch/gates/gates.json": "3cfd41efad12a6209173e8b49f75195cfd99ae3af1c32579beb54d6fab49e50a",
       "tools/arch/gates/lib/app-harness.mts": "eb5f70719281663aa6a414560d4cd3c907a346bc363ef6b75ddfce998ed1a42c",
-      "tools/arch/gates/lib/config.mts": "7990fa2a583539c35ccb610f21bb1ab9c6def9cddd2835e2156f7caa446fee60",
+      "tools/arch/gates/lib/config.mts": "e2420a61efc4925fc0f362ed16ab833225ca57740e04a4a47d23ee67d7f4d082",
       "tools/arch/gates/lib/contracts.mts": "cfafde8a785c341da8b07d594b6a75f0e7e64a76def3c919fcd1f2f50828f154",
       "tools/arch/gates/lib/depcruise.mts": "a81067d3c774f97610def9e2b1de3f9e96c391c25c2d7d459656b8d04c83b31e",
+      "tools/arch/gates/lib/end-to-end.mts": "71b8b228af352128c1524375d4ae5315cf150f5a7cda4ce301da87bb2457c304",
       "tools/arch/gates/lib/files.mts": "18fe405917d0785e9ed96e2cbeb29427f6a8014be3225d42fc6a4e989aa9654e",
       "tools/arch/gates/lib/instructions.mts": "c038d0c981033aaa976ee8d67ec0c01a04c62f4cb2601926eaf6c345fb65810f",
-      "tools/arch/gates/lib/language.mts": "f718fdddbc04a1058b78820a98e10fde2fcf1ae6ba338608319e06bfd8bcec32",
+      "tools/arch/gates/lib/language.mts": "db9e3b1069268c869f482f019ed4178ee15a86ed571745b137ed9c521436d760",
       "tools/arch/gates/lib/lockfile.mts": "f7b470847cfd5152d37ac6fc07cea9a142ba3424c683cdd3869ce04feb7899fb",
       "tools/arch/gates/lib/node-floor.mts": "1212a8a39e1e05370b57db297a6251cece4f21134a8779ef71c6df04214b2725",
       "tools/arch/gates/lib/package-manager.mts": "3a18d3589727b315f8200aefa1bd883bb333d0cd90a2c93114d1a016cfb80ec1",
@@ -45,18 +46,18 @@
       "tools/arch/gates/lib/types-only.mts": "fc3207813793f440ec3233e8183fba3f3e272dd296b570baa88244ebb8e5089f",
       "tools/arch/gates/lib/ui-bans.mts": "b8aea78943e779a05913db1f0db0840ddfe45979fe8e39c4b7568d859e960357",
       "tools/arch/gates/quiet.mts": "0b1bc587c460e39b831f21e0b78365d1ce914c4f828d651898e6e58561d3780a",
-      "tools/arch/gates/run.mts": "a889927e485e4e6dc4430803f2a21265c35e503fd3ca13172480cb0c2bd84811",
+      "tools/arch/gates/run.mts": "0606af958b4a3ed856aa3f33eda2dd57f6bb0734c4129d4573025d9ee5c4ebde",
       "tools/arch/hooks/after-edit.mts": "1de0ed2f2bc8d104a09d250bcf8efc3e883d936c0a58ad407e868a0eb4d416ea",
-      "tools/arch/hooks/before-stop.mts": "b0271a46b7cd19346f7327dc467b30ffb3f9722f75de5de781899b58f077393f",
+      "tools/arch/hooks/before-stop.mts": "71c782b671e1e23fefb1c68cb1ef4024d8a7771bc878ceb1b8fb19f223b5ebfa",
       "tools/arch/hooks/claude.settings.json": "6e11703439c3bb4265b5c0bea7bf94a1962414db2f5617d5924d7047bd3ed7ea",
       "tools/arch/hooks/codex.hooks.json": "14b3bc4e19d7ce1ef510a9e530dff00c25cbc9ddee830484bbba87c22e646545",
       "tools/arch/lint-dependencies.mts": "41675af6a8a05207d002f587c027518bb69d89d9d3af28bf791b0722d2269672",
       "tools/arch/templates/.github__workflows__ci.yml.txt": "336fa3a0537d2f0126ed631f1626b03c2c6c057f2a6d3a32781d675f37951e04",
       "tools/arch/templates/.gitignore.txt": "d09912b0a7ba2709ca533771ca4f91102e3ef0081769c8b57223506823fb3fc4",
       "tools/arch/templates/.nvmrc.txt": "20d2add851bf39edcc6b5e830930f962db7e19dffa2cab8610eed551eda6c302",
-      "tools/arch/templates/AGENTS.md.txt": "8458b6590c188a906a15a6829455c300ebbd7357fa583397f20236b36f7e3da8",
+      "tools/arch/templates/AGENTS.md.txt": "e6284c5ae43334f5024144bee3b0d471823f407234594ccb7f1090c657bb617f",
       "tools/arch/templates/CLAUDE.md.txt": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
-      "tools/arch/templates/architecture.config.mts.txt": "2bdc0294eb406baf9b0ccc88d27fbbe710c173da8f1ef61d9f75d4658e18fe5a",
+      "tools/arch/templates/architecture.config.mts.txt": "cfd58d4649a0915e110d3914565e9e21dd237f6101150ed55cb4bac4c6b3d43b",
       "tools/arch/templates/eslint.config.mts.txt": "2e36ca2344ae2d9e4a45741f170630d908a89ccbe6a1fd4294d8523f753c6ddf",
       "tools/arch/templates/package.json.txt": "81e97742cd941a90b5bfcf73eb3ee07ea287af98f2036d2608ed8927c0c42152",
       "tools/arch/templates/packages__client-core__package.json.txt": "a63cd4fe40f7c4335a22eb23d829cea82b7b5aca595e5a26a26418abd768d487",
@@ -77,7 +78,7 @@
       "tools/arch/templates/packages__react-bindings__tsconfig.json.txt": "f54bf0046c58b5cef852e7e3adff8c6e37632f8d27dd6f269af656223d38fdd2",
       "tools/arch/templates/packages__react-bindings__vitest.config.ts.txt": "9f1ec5ee73aad0c44ca41ee0871e7bdcce66ba69167e38f12dd075a211527b48",
       "tools/arch/templates/packages__react-bindings__vitest.setup.ts.txt": "50234d3b820588a4735cc60b7cd6dd9d48361fb47beaa8f31a7e11936599bea6",
-      "tools/arch/templates/packages__server__package.json.txt": "88c66f9d70e5cab12124b8b62445c3cce7004dfd80004c625e44058ff13320d0",
+      "tools/arch/templates/packages__server__package.json.txt": "4bd4e5fe54caf5984939d5f96d754ef60f24fc8f438e3b16aab5b834abf6f082",
       "tools/arch/templates/packages__server__tsconfig.json.txt": "0c4acb0145733c4650b93bfc2d1d9ce9af144212b06db483634fcb19d72b109f",
       "tools/arch/templates/packages__server__turbo.json.txt": "7b3a9cd37a036c6ec3bbc6f76d07ffb76f6b4e417e2ec6d65f66d67e6a00dc47",
       "tools/arch/templates/packages__server__vitest.config.ts.txt": "26d87f11ae2717b90eef570f98b960c26e218e5871f20407e38eeed3126c377b",
@@ -108,6 +109,7 @@
       "tools/coverage/mutation-check.mts": "91c79da7b8a6dd7de014f47ac21659e2f83ad25868d343fdee5a7d38586e3d3e",
       "tools/coverage/publish-to-pages.mts": "005e5a8f60cbb66275b47a5bee7a636a6e848362ae492d86948f05a309ef9383",
       "tools/coverage/run.mts": "71a720658afa7fb70a7cfbb5c7492756b54cde7a3572c17c43a3f573ad739039",
+      "tools/templates/coverage.AGENTS.section.md.txt": "a24e1f778fb44c4335e6a2a98d7ee494bcd7d3f2a4a3d87eda6be2348859a8cc",
       "tools/templates/coverage.tools__coverage.config.mts.txt": "c2a2446495d7557fb6ec7761ae199900e7a1744c025f32eaeda42c3fe848bb7f"
     },
     "withoutActionRefs": {
@@ -138,6 +140,7 @@
       "packages/client-react/tests/visual/reach/vite.config.ts": "2f81bed9382c133777dfc9f9d9e364f57e0fa09fe41f0b2e51d44495a955efb9",
       "packages/client-react/tests/visual/tsconfig.json": "a0a6a1cd826b12ed3c33226f18216641b5bbae249053cf0c4eaf31edfa5e2d82",
       "packages/client-react/tests/visual/visual.pw.ts": "ea5695b89ded18b2784d0be46e7f920d5a6ffaa14fc6554f2ff76a99479d3c30",
+      "tools/templates/visual.AGENTS.section.md.txt": "393d9920f7046df6a163e4959bd0791fb0af5ba3fa3444979d1d0be0976a81ef",
       "tools/templates/visual.packages__client-react__tests__visual__framing.ts.txt": "1f502feec84cb6930ea9aa6fc3d223bcc707f1f8fed1472d8813772721f34633",
       "tools/templates/visual.packages__client-react__tests__visual__registry.tsx.txt": "3b821390393f3dfb0e743d2ca8094b7bdbd23f11778e0ad080df40c3c22bd15d",
       "tools/templates/visual.packages__client-react__tests__visual__scenarios.ts.txt": "025801a9b6deb44e17d9ba856004eea93327088e081dc2d901f762c66905a15b",
@@ -207,6 +210,7 @@
       "tools/perf/lib/server.mts": "603435cd2d9e12db02bf46c90636c6e8e88b8a9156030762384851bbab302344",
       "tools/perf/lib/waapi.mts": "feb563f0b2da5aa63f13db9037ba3a7f72781ec92d0a32153d8e1f49497e752d",
       "tools/perf/motion-audit.mts": "cff0cd3b848fa5ce789298836d47cd5b799b3a7fe05434bd03bb8e6bfe9f4908",
+      "tools/templates/performance.AGENTS.section.md.txt": "04283c1b1b9e9245375fc2e2c782fa53069e15119c3551ff1e65518cb90173ab",
       "tools/templates/performance.tools__perf__allowed.mts.txt": "452928e9a2982102edf1cfa4770f3c2b805704f4c7a55ed2ff2d452e9c5d8371"
     },
     "withoutActionRefs": {
@@ -219,20 +223,23 @@
   },
   "format-lint": {
     "files": {
-      "tools/format-lint/biome.base.json": "ce86193c885e7a9b6d9f23217f3f91aa6f34bca9871e89f3bf3d4c8eb30a3704",
+      "tools/format-lint/biome.base.json": "61e92af8e470671195076d76d90bb14c43b36b10eb73f8be976043971915cce3",
       "tools/format-lint/fix.mts": "5c8418be9ea4890a8b11dafd6b935dc0b0ec1256553c7683515dea87d5cd7f94",
+      "tools/templates/format-lint.AGENTS.section.md.txt": "95b094502db0c39d49f6c4ab01d5fccb0aa17e9dda2d34ea548312b002b14863",
       "tools/templates/format-lint.biome.json.txt": "837989065b90202735ec8a433beaeaab8610fe4bf2d3c4a6862282d0ea4dedbf"
     },
     "starting": [
       "biome.json"
     ],
-    "releasesSeen": []
+    "releasesSeen": [
+      "0.23.1"
+    ]
   },
   "ci-security": {
     "files": {
       ".github/workflows/ci-security.yml": "25a68b6b0790770f56306d538ef0a1393363d6508ddb1b89e2502fab9b5a42d4",
       ".github/workflows/dependency-review.yml": "775d67ae2fb061a8a5dd93b9acacdcfa8e85d3a90f08e36e385e29e0f56c6c7b",
-      ".github/workflows/scorecard.yml": "62df75646fee0eff084ac4f645f06bc6e61f7d8ef2b8ed0912afaf7f7f47835e",
+      ".github/workflows/scorecard.yml": "f20d6474c90bd651db1373b8aab3534889247568178274185870cb5181021e82",
       "tools/ci-security/check-dockerfiles.mts": "932ac146a2defc999611db86ddcf7f5921ddf51adc6fc24c976bb3406e578bf7",
       "tools/ci-security/check-settings.mts": "36f12a795f14e0cfc29b89e7f4aeef1dca07f08650a5a56d45cc4de47ea8a50a",
       "tools/ci-security/lib/install.mts": "0dd644ee915bcd45cd32c1bc196d93cd0ee131460ba4fc70c9e945e12228a751",
@@ -243,6 +250,7 @@
       "tools/ci-security/lib/system.mts": "6fc11113bbe7bb516aff2dfe6db4cd4839924b57112abb18e1df5810b5760d44",
       "tools/ci-security/lint-workflows.mts": "e3cf7ddb033053576320cb9306219d001c20e6af58fb997b0b8e92ade8a8ac41",
       "tools/templates/ci-security..github__renovate.json5.txt": "d99a66cc46fe9c05da90909403e0ec73f03c68eb58456385a5955e6749a2929f",
+      "tools/templates/ci-security.AGENTS.section.md.txt": "851e51c961ed44b2072047c4c0c2df598af84d5a38057d08c436d83915ebaba7",
       "tools/templates/ci-security.SECURITY.md.txt": "79147381b2f995afcb6122cc7874604c7d78a0097ff2516757545fa38d681c96"
     },
     "withoutActionRefs": {
@@ -267,6 +275,7 @@
       "tools/repo-hygiene/lib/run.mts": "70bba5152fc002adb1303a2d405beed8d1610337681e39cd4d4a221e892f1b2f",
       "tools/repo-hygiene/lib/slug.mts": "1f38db3b299385f169784426d4a1d7eb17ca8db86f2cf289ec3836c784051375",
       "tools/repo-hygiene/stylelint.base.json": "9defab3c0488e96e6a31761f089d3629614ecc1c33510e7deebf56572bf725e2",
+      "tools/templates/repo-hygiene.AGENTS.section.md.txt": "5f1ab2d3a60a6fccad233e2958ab8d797779acd8672d6b0ea185c83d2cbbb144",
       "tools/templates/repo-hygiene.tools__repo-hygiene__stylelint.json.txt": "3f5948821caf872971488ab89b0df3a2ef531c09b75adbdb1c6ca8f41c59e696",
       "tools/templates/repo-hygiene.tools__repo-hygiene__syncpack.json.txt": "2bb932ca623dc94d6d4f30ae35f62c56a1af7a9290da88a1b667de539843a038"
     },
@@ -283,6 +292,7 @@
       "tools/strict-lint/eslint.typed.base.mts": "eb9fdafbffdbc68d5ec932bba9205d60eda041d8fedc19767fb1f32bc75b46a0",
       "tools/strict-lint/lib/files.mts": "71fe26dc7e77dcef4c2217aae9d9891061edce27a2f124dbd96a53b2f2038d96",
       "tools/strict-lint/lib/run.mts": "70bba5152fc002adb1303a2d405beed8d1610337681e39cd4d4a221e892f1b2f",
+      "tools/templates/strict-lint.AGENTS.section.md.txt": "2360ec83e8bad69dc1810d6bcbf6df7b8f9732e9111bdafde1144521038e6e73",
       "tools/templates/strict-lint.tools__strict-lint__eslint.config.mts.txt": "feb93ba515024fd0ba08a2f5b90157b3e56a825c25d770252c22e1959a17e8c1",
       "tools/templates/strict-lint.tools__strict-lint__knip.jsonc.txt": "d2c59e626ed7930d845ced2d540b12f3421dad28f27d793c91f65b97686ffd4b"
     },
@@ -304,6 +314,7 @@
       "tools/e2e/lib/processes.mts": "f70dee4cca7e55c9bfecc867de8abfaa2c1a629f50378e63a5621b3f783e286d",
       "tools/e2e/lib/stack.mts": "ed856a2c057588c635484b1322900cfb6f3b3f1dcda66afdd2a53c8bf9937fe9",
       "tools/e2e/run.mts": "5776d04093cd28af6a0f42e4f303309b3a3c9a64b633572374cbc85ea42bd70f",
+      "tools/templates/e2e.AGENTS.section.md.txt": "2620a9273659aca925d498219beafdd00cf49a57d5438179f5c0283cb623b182",
       "tools/templates/e2e.packages__e2e__package.json.txt": "35a06035beac29127ebf8d640717eeb535d20832fb3c3be9ff4cc004235d7c8c",
       "tools/templates/e2e.packages__e2e__src__fullstack__serverPrices.spec.ts.txt": "c6cc6dcefa4c591da5c141bea08ca71541908a66f29e6ca41795fdb7642abd55",
       "tools/templates/e2e.packages__e2e__src__pages__PriceList.page.ts.txt": "e14bc16b81e96913e0338af83dd99ea98902a5f8ffe7f0338157206f4f30fcca",
@@ -344,7 +355,7 @@
       ".claude/commands/workflow/status.md": "2258289e1c54d3b794befe0de2096db431aed12c1565d9aa402bd3e186d23e49",
       ".claude/commands/workflow/visual-tolerance-audit.md": "ccb18c05854944717e993852d32a1c84238fba64545b8d3f2c1d64c68b0d6b7e",
       ".claude/commands/workflow/worktrees.md": "8270c4183281d8183ea31680b02b8606eb2a9022921ab5ec4e66025629d07e9d",
-      ".github/workflows/changelog-writer.yml": "27ce292f7d05e93136501561428c61e61d30340a0771f069d7e8c94b70ddaace",
+      ".github/workflows/changelog-writer.yml": "174a45820f8a609fc3f4055e12cdc9bd1bb95892a8f16e6073d7d4a817dc6c60",
       ".github/workflows/sync-releases.yml": "dfe04fbf16fe905fbefa99b6945ca4e5bc5a28617ee0a0ce1ecea55fe6939c54",
       ".github/workflows/weekly-tag.yml": "92ba0882807e85f3a259f4ea35f7253d33c2b442692b9c5d4a33c4ac867552bf",
       "tools/agent-workflow/audit-worktrees.mts": "3a9e6ebaf2039495b5f6067f3420c6cb3a8ae674a23e5751cd03fca615a8fb40",
@@ -353,7 +364,7 @@
       "tools/agent-workflow/check.mts": "eea7286bfced1f932e2ce183592c2851653d582f7cd610bfe037e2cfd42f280f",
       "tools/agent-workflow/close-week.mts": "351638b71c9d7ca20e7b8a5de292633ded2aad89e9badd6b41391505b41307c8",
       "tools/agent-workflow/hooks/changelog-due.mts": "bc9e9743d33ae75323e83f7d34df93d95536237d8dbe2b53cb4ff479d29a541a",
-      "tools/agent-workflow/hooks/split-outward-commands.mts": "b055e933e9ede1e8b0caed379ceccbbb1f59231f89338426a11e3800e4dfa6ca",
+      "tools/agent-workflow/hooks/split-outward-commands.mts": "342d2fd6e34c417cbdea6090cd3c291b9f5039497b79d8c3fe671c73c792ba2e",
       "tools/agent-workflow/lib/changelog.mts": "d98cd64655da58085322e445f725ea15b546e516156f70b32fa1a762c6fd20d0",
       "tools/agent-workflow/lib/due-reminder.mts": "0c36b8a37f6f48352783d28e70faf4c99ce926ef79ead4db57b3c7cc95bbd2c9",
       "tools/agent-workflow/lib/due.mts": "4eb8b3c7687ec0372df9b320f9f826b22bc9cff284df16f69891a2ce547de426",
@@ -361,7 +372,7 @@
       "tools/agent-workflow/lib/hook-registration.mts": "a88ee68abbdaa63b8d733a0b97fa5102948e05a09ab7b7b07fcbbf97a44aa199",
       "tools/agent-workflow/lib/host.mts": "9dfeff37093b5c1b9072a3a003bd03873e86e98c050fdab74c880ec1d9fb569e",
       "tools/agent-workflow/lib/main.mts": "b9510ffce92e72c31b519bffcd5b2d464d723a11e9d2755b065afb91bca5d54c",
-      "tools/agent-workflow/lib/outward.mts": "1fbd27a8f424150aa96a70f327a9ad33e4827fd3cba26f0160d046da65abe0eb",
+      "tools/agent-workflow/lib/outward.mts": "f8d6f742e37f748fb0cf7ea2e21d1c135d8d280b1f06e873efdb0decf58eb573",
       "tools/agent-workflow/lib/releases.mts": "173d68726a1e5a6be758eb2dfbb426dd89d4139c7d78649598c2c21136326238",
       "tools/agent-workflow/lib/shell.mts": "2fd79e4949295c9a1adf306a7b8829b8eac399546b29a5c2e74a1c6a57db4419",
       "tools/agent-workflow/lib/shown.mts": "aa8f086b0a46c74ca04ef7e514f61ef95e4fc3cfac194e0c2687cdbd31bc6e8e",
@@ -372,6 +383,7 @@
       "tools/agent-workflow/new-worktree.mts": "fa3785e68f65e50273ee354b91f72b225776a13eb9f9970371cbf42194f1c1f3",
       "tools/agent-workflow/requires.mts": "0d6555c1112fc35e211e77a85298ac31fbf033d95db56b5e992e69c877926dd3",
       "tools/agent-workflow/sync-releases.mts": "d0b1e985130b54f752058fff3bc6a6f25407f032fb6fc88f3dd2f885158ce3d1",
+      "tools/templates/agent-workflow.AGENTS.section.md.txt": "957a6a4b83807a415c8b4b16aa8ea464883ed2e10bdd06533b7e0f923ac93431",
       "tools/templates/agent-workflow.CHANGELOG.md.txt": "04cc722c39225da69db2942d06c405d2768518ad3d9db48d6b9b1719e95b99c7",
       "tools/templates/agent-workflow.docs__IDEAS.md.txt": "8472595386eb9ac467efb7cdf424bd5552007297ecb94d99793b08222acead55",
       "tools/templates/agent-workflow.docs__STATUS.md.txt": "0d79af20527d350ded8bebc82b40c76692febb4fee1566eace45ced555a1618a"
