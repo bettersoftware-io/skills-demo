@@ -12,7 +12,7 @@ One bullet for each entry: its name in bold, what is left, and a link to its
 plan when it has one. `AGENTS.md` says when an entry is added, moved and
 removed.
 
-**Last updated: 2026-11-01**
+**Last updated: 2026-11-03**
 
 ## In progress
 
@@ -34,11 +34,6 @@ The next step is known, and nobody has written a plan for it.
 
 A step or a decision an agent cannot take: a setting, an account, a choice
 between options. Each entry says who, and gives the command or the question.
-
-- **Trust the Codex subagent hooks:** bettersoftware-skills 0.25.0 adds
-  `SubagentStart` and `SubagentStop` to `.codex/hooks.json`, and Codex skips a
-  hook nobody has trusted. A person runs `/hooks` in Codex in this project;
-  until then Codex behaves as before.
 
 ## Known limits
 
